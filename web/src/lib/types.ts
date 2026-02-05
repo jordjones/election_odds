@@ -101,7 +101,7 @@ export interface ApiError {
 }
 
 // Time filter options
-export type TimeFilter = '4h' | '1d' | '1w' | 'all';
+export type TimeFilter = '4h' | '1d' | '1w' | '30d' | 'all';
 
 export interface TimeFilterOption {
   value: TimeFilter;
@@ -112,6 +112,7 @@ export const TIME_FILTER_OPTIONS: TimeFilterOption[] = [
   { value: '4h', label: 'Last 4 hours' },
   { value: '1d', label: 'Last day' },
   { value: '1w', label: 'Last week' },
+  { value: '30d', label: 'Last 30 days' },
   { value: 'all', label: 'All time' },
 ];
 
