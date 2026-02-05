@@ -41,3 +41,6 @@ web/out/
 # Test artifacts
 coverage/
 .nyc_output/
+
+# Local Netlify folder
+.netlify

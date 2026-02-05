@@ -182,11 +182,11 @@ export function OddsChart({
     };
   }, [data]);
 
-  // Reset zoom and brush when data or time filter changes
+  // Reset zoom and brush when data or time filter changes - default to fit data
   useEffect(() => {
-    setYDomain([0, 1]);
+    setYDomain([dataRange.min, dataRange.max]);
     brushIndicesRef.current = null;
-  }, [data, timeFilter]);
+  }, [data, timeFilter, dataRange]);
 
   // Handle brush change - store in ref to avoid re-render loops
   const handleBrushChange = useCallback((params: { startIndex?: number; endIndex?: number }) => {
@@ -243,8 +243,8 @@ export function OddsChart({
     return () => container.removeEventListener('wheel', handleWheel);
   }, [handleWheel]);
 
-  // Reset zoom to full range
-  const resetZoom = useCallback(() => {
+  // Show full 0-100% range
+  const showFullRange = useCallback(() => {
     setYDomain([0, 1]);
   }, []);
 
@@ -253,7 +253,9 @@ export function OddsChart({
     setYDomain([dataRange.min, dataRange.max]);
   }, [dataRange]);
 
-  const isZoomed = yDomain[0] !== 0 || yDomain[1] !== 1;
+  // Check if currently showing full range or fit-to-data
+  const isFullRange = yDomain[0] === 0 && yDomain[1] === 1;
+  const isFitToData = Math.abs(yDomain[0] - dataRange.min) < 0.001 && Math.abs(yDomain[1] - dataRange.max) < 0.001;
 
   if (isLoading) {
     return (
@@ -307,14 +309,16 @@ export function OddsChart({
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Price History</CardTitle>
         <div className="flex items-center gap-2">
-          {isZoomed && (
-            <Button variant="outline" size="sm" onClick={resetZoom}>
-              Reset Zoom
+          {!isFullRange && (
+            <Button variant="outline" size="sm" onClick={showFullRange}>
+              Full Range
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={fitToData}>
-            Fit to Data
-          </Button>
+          {!isFitToData && (
+            <Button variant="outline" size="sm" onClick={fitToData}>
+              Fit to Data
+            </Button>
+          )}
           <TimeFilterDropdown value={timeFilter} onChange={onTimeFilterChange} />
         </div>
       </CardHeader>

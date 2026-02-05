@@ -26,7 +26,7 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <NavigationMenu className="hidden md:flex">
+        <NavigationMenu className="hidden md:flex" viewport={false}>
           <NavigationMenuList>
             {MAIN_NAV.map((item) => (
               <NavigationMenuItem key={item.label}>
