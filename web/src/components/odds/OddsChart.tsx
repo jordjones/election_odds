@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 // Tooltip data for custom rendering
 interface TooltipData {
   timestamp: string;
+  cursorX: number;
   values: { name: string; value: number; color: string }[];
 }
 
@@ -33,18 +34,19 @@ interface CustomTooltipContentProps {
     color?: string;
     payload?: Record<string, unknown>;
   }>;
+  coordinate?: { x: number; y: number };
   onTooltipData: (data: TooltipData | null) => void;
 }
 
 // Custom tooltip content that captures data for external display
-function CustomTooltipContent({ active, payload, onTooltipData }: CustomTooltipContentProps) {
+function CustomTooltipContent({ active, payload, coordinate, onTooltipData }: CustomTooltipContentProps) {
   const prevTimestampRef = useRef<string | null>(null);
 
   // Use useEffect with stable dependency (timestamp string) to avoid infinite loops
   const currentTimestamp = active && payload?.[0]?.payload?.fullTimestamp as string | undefined;
 
   useEffect(() => {
-    if (currentTimestamp && currentTimestamp !== prevTimestampRef.current && payload) {
+    if (currentTimestamp && currentTimestamp !== prevTimestampRef.current && payload && coordinate) {
       prevTimestampRef.current = currentTimestamp;
       const values = payload
         .filter((p) => p.value !== undefined && p.value !== null)
@@ -57,13 +59,14 @@ function CustomTooltipContent({ active, payload, onTooltipData }: CustomTooltipC
 
       onTooltipData({
         timestamp: currentTimestamp,
+        cursorX: coordinate.x,
         values,
       });
     } else if (!active && prevTimestampRef.current !== null) {
       prevTimestampRef.current = null;
       onTooltipData(null);
     }
-  }, [active, currentTimestamp, payload, onTooltipData]);
+  }, [active, currentTimestamp, payload, coordinate, onTooltipData]);
 
   // Return empty div to keep tooltip active (cursor line still renders)
   return <div style={{ display: 'none' }} />;
@@ -146,21 +149,15 @@ export function OddsChart({
   const [yDomain, setYDomain] = useState<[number, number]>([0, 1]);
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  // Brush state for horizontal zoom
-  const [brushIndices, setBrushIndices] = useState<{ startIndex: number; endIndex: number } | null>(null);
+  // Brush indices ref to persist across re-renders without causing them
+  const brushIndicesRef = useRef<{ startIndex: number; endIndex: number } | null>(null);
+  const [, forceUpdate] = useState(0);
 
   // Tooltip data for custom rendering
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
 
   const handleTooltipData = useCallback((data: TooltipData | null) => {
     setTooltipData(data);
-  }, []);
-
-  // Handle brush change
-  const handleBrushChange = useCallback((params: { startIndex?: number; endIndex?: number }) => {
-    if (params.startIndex !== undefined && params.endIndex !== undefined) {
-      setBrushIndices({ startIndex: params.startIndex, endIndex: params.endIndex });
-    }
   }, []);
 
   // Calculate data range for smart zooming
@@ -188,8 +185,15 @@ export function OddsChart({
   // Reset zoom and brush when data or time filter changes
   useEffect(() => {
     setYDomain([0, 1]);
-    setBrushIndices(null);
+    brushIndicesRef.current = null;
   }, [data, timeFilter]);
+
+  // Handle brush change - store in ref to avoid re-render loops
+  const handleBrushChange = useCallback((params: { startIndex?: number; endIndex?: number }) => {
+    if (params.startIndex !== undefined && params.endIndex !== undefined) {
+      brushIndicesRef.current = { startIndex: params.startIndex, endIndex: params.endIndex };
+    }
+  }, []);
 
   // Handle mouse wheel for vertical zoom
   const handleWheel = useCallback((e: WheelEvent) => {
@@ -315,10 +319,22 @@ export function OddsChart({
         </div>
       </CardHeader>
       <CardContent>
-        {/* Hover timestamp display */}
-        <div className="h-6 mb-1 text-sm text-muted-foreground">
+        <div
+          ref={chartContainerRef}
+          className="h-[400px] cursor-ns-resize relative"
+          title="Scroll to zoom vertically"
+        >
+          {/* Timestamp label positioned above cursor line */}
           {tooltipData && (
-            <span className="font-medium">
+            <div
+              className="absolute z-10 text-sm font-semibold text-muted-foreground pointer-events-none whitespace-nowrap px-1 rounded"
+              style={{
+                left: tooltipData.cursorX,
+                top: 0,
+                transform: 'translateX(-50%)',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              }}
+            >
               {new Date(tooltipData.timestamp).toLocaleString('en-US', {
                 month: 'short',
                 day: 'numeric',
@@ -327,25 +343,58 @@ export function OddsChart({
                 minute: '2-digit',
                 hour12: true,
               })}
-            </span>
-          )}
-        </div>
-        <div
-          ref={chartContainerRef}
-          className="h-[380px] cursor-ns-resize relative"
-          title="Scroll to zoom vertically"
-        >
-          {/* Floating value labels */}
-          {tooltipData && (
-            <div className="absolute right-2 top-2 z-10 flex flex-col gap-0.5 text-xs font-medium pointer-events-none">
-              {tooltipData.values.map(({ name, value, color }) => (
-                <div key={name} className="flex items-center gap-1.5">
-                  <span style={{ color }}>{(value * 100).toFixed(1)}%</span>
-                  <span style={{ color }} className="opacity-70">{name}</span>
-                </div>
-              ))}
             </div>
           )}
+          {/* Value labels positioned next to data points */}
+          {tooltipData && (() => {
+            // Chart area constants - tuned for Recharts layout
+            const chartTop = 5;
+            const chartBottom = 90; // X-axis + brush + legend
+            const chartHeight = 400 - chartTop - chartBottom;
+            const labelHeight = 16;
+            const minGap = 2;
+
+            // Calculate Y positions for each label
+            const labels = tooltipData.values.map(({ name, value, color }) => {
+              const yPercent = (value - yDomain[0]) / (yDomain[1] - yDomain[0]);
+              const rawY = chartTop + (1 - yPercent) * chartHeight;
+              return { name, value, color, rawY, adjustedY: rawY };
+            });
+
+            // Sort by Y position (top to bottom) for overlap prevention
+            labels.sort((a, b) => a.rawY - b.rawY);
+
+            // Spread overlapping labels apart from their center point
+            // This keeps labels closer to their actual positions
+            for (let i = 0; i < labels.length - 1; i++) {
+              const curr = labels[i];
+              const next = labels[i + 1];
+              const overlap = (curr.adjustedY + labelHeight / 2 + minGap) - (next.adjustedY - labelHeight / 2);
+
+              if (overlap > 0) {
+                // Split the overlap between both labels
+                const shift = overlap / 2;
+                curr.adjustedY -= shift;
+                next.adjustedY += shift;
+              }
+            }
+
+            return labels.map(({ name, value, color, adjustedY }) => (
+              <div
+                key={name}
+                className="absolute z-10 text-xs font-medium pointer-events-none whitespace-nowrap px-1 rounded"
+                style={{
+                  left: tooltipData.cursorX + 8,
+                  top: adjustedY,
+                  transform: 'translateY(-50%)',
+                  color,
+                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                }}
+              >
+                {(value * 100).toFixed(1)}% {name}
+              </div>
+            ));
+          })()}
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -397,8 +446,8 @@ export function OddsChart({
                 fill="#f5f5f5"
                 travellerWidth={15}
                 onChange={handleBrushChange}
-                startIndex={brushIndices?.startIndex ?? 0}
-                endIndex={brushIndices?.endIndex ?? chartData.length - 1}
+                startIndex={brushIndicesRef.current?.startIndex}
+                endIndex={brushIndicesRef.current?.endIndex}
               />
             </LineChart>
           </ResponsiveContainer>
