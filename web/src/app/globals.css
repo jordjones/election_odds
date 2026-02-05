@@ -123,3 +123,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide text labels in Recharts Brush component */
+.recharts-brush-texts {
+  display: none;
+}
