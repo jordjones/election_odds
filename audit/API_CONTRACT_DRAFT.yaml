@@ -1,0 +1,375 @@
+# OpenAPI 3.0 Specification - electionbettingodds.com
+# NOTE: This site has NO actual REST APIs. This document describes
+# the static HTML endpoints and embedded data structures for
+# scraping/integration purposes.
+
+openapi: 3.0.3
+info:
+  title: ElectionBettingOdds.com Static Endpoints
+  description: |
+    **IMPORTANT: This is NOT a REST API.**
+
+    electionbettingodds.com serves static HTML pages with embedded data.
+    This specification documents the URL patterns and data structures
+    for integration purposes (web scraping).
+
+    ## Architecture
+    - All data is pre-rendered into HTML
+    - No dynamic API endpoints exist
+    - Data refreshes via page regeneration (server-side)
+    - Client auto-refreshes every 5 minutes
+
+    ## Data Sources (Aggregated)
+    - Kalshi (US)
+    - Polymarket (International)
+    - Betfair (UK)
+    - PredictIt (US)
+    - Smarkets (UK)
+  version: "1.0.0"
+  contact:
+    name: Maxim Lott
+    url: https://www.maximumtruth.org/
+
+servers:
+  - url: https://electionbettingodds.com
+    description: Production (static HTML)
+
+paths:
+  /:
+    get:
+      summary: Homepage - Current Betting Odds
+      description: |
+        Returns HTML page with all current betting odds embedded in tables.
+        Data includes: Supreme Court decisions, 2028 Presidential by party,
+        2028 Presidential by candidate.
+      operationId: getHomepage
+      tags:
+        - Static Pages
+      responses:
+        '200':
+          description: HTML page with embedded odds data
+          content:
+            text/html:
+              schema:
+                type: string
+              example: |
+                <html>
+                  <table>
+                    <tr><th>US Presidency 2028...</th></tr>
+                    <tr><td>Vance</td><td>24.5%</td>...</tr>
+                  </table>
+                </html>
+
+  /President2028.html:
+    get:
+      summary: 2028 Presidential Election - By Candidate
+      description: Full candidate list with multi-market odds comparison
+      operationId: getPresident2028
+      tags:
+        - Presidential
+      responses:
+        '200':
+          description: HTML page with candidate odds tables
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /President2028_4hr.html:
+    get:
+      summary: 2028 Presidential - 4 Hour Filter
+      description: Same data filtered to show changes in last 4 hours
+      operationId: getPresident2028_4hr
+      tags:
+        - Presidential
+      responses:
+        '200':
+          description: HTML page with 4-hour filtered data
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /President2028_week.html:
+    get:
+      summary: 2028 Presidential - Weekly Filter
+      description: Same data filtered to show changes in last week
+      operationId: getPresident2028_week
+      tags:
+        - Presidential
+      responses:
+        '200':
+          description: HTML page with weekly filtered data
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /PresidentialParty2028.html:
+    get:
+      summary: 2028 Presidential - By Party
+      description: Party-level odds (DEM vs GOP)
+      operationId: getPresidentialParty2028
+      tags:
+        - Presidential
+      responses:
+        '200':
+          description: HTML page with party odds
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /DEMPrimary2028.html:
+    get:
+      summary: 2028 Democratic Primary
+      description: Democratic nomination odds
+      operationId: getDEMPrimary2028
+      tags:
+        - Primaries
+      responses:
+        '200':
+          description: HTML page with DEM primary odds
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /GOPPrimary2028.html:
+    get:
+      summary: 2028 Republican Primary
+      description: Republican nomination odds
+      operationId: getGOPPrimary2028
+      tags:
+        - Primaries
+      responses:
+        '200':
+          description: HTML page with GOP primary odds
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /House-Control-2026.html:
+    get:
+      summary: 2026 House Control
+      description: House of Representatives control odds
+      operationId: getHouseControl2026
+      tags:
+        - Congressional
+      responses:
+        '200':
+          description: HTML page with House control odds
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /Senate-Control-2026.html:
+    get:
+      summary: 2026 Senate Control
+      description: Senate control odds
+      operationId: getSenateControl2026
+      tags:
+        - Congressional
+      responses:
+        '200':
+          description: HTML page with Senate control odds
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /President2024.html:
+    get:
+      summary: 2024 Presidential Election (Historical)
+      description: Archived 2024 election data with charts
+      operationId: getPresident2024
+      tags:
+        - Historical
+      parameters:
+        - name: anchor
+          in: query
+          description: Jump to charts section
+          schema:
+            type: string
+            enum: [chart]
+      responses:
+        '200':
+          description: HTML page with 2024 data and charts
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /TrackRecord.html:
+    get:
+      summary: Track Record / Historical Accuracy
+      description: |
+        Historical prediction accuracy with Brier scores.
+        Contains 808+ historical predictions.
+      operationId: getTrackRecord
+      tags:
+        - Historical
+      responses:
+        '200':
+          description: HTML page with accuracy tables
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /about.html:
+    get:
+      summary: About / FAQ
+      description: Methodology explanation and FAQ
+      operationId: getAbout
+      tags:
+        - Info
+      responses:
+        '200':
+          description: HTML page with about content
+          content:
+            text/html:
+              schema:
+                type: string
+
+components:
+  schemas:
+    # These schemas represent the DATA STRUCTURE embedded in HTML
+    # Use for parsing/scraping reference
+
+    CandidateOdds:
+      type: object
+      description: Odds data for a single candidate (extracted from HTML table)
+      properties:
+        candidateName:
+          type: string
+          example: "Vance"
+        thumbnailUrl:
+          type: string
+          format: uri
+          example: "/images/candidates/vance.jpg"
+        detailsLink:
+          type: string
+          description: Link to external betting market
+        markets:
+          type: array
+          items:
+            $ref: '#/components/schemas/MarketOdds'
+        aggregatedProbability:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 24.5
+        change:
+          type: number
+          format: float
+          description: Change from previous period (positive or negative)
+          example: -0.1
+
+    MarketOdds:
+      type: object
+      description: Odds from a single betting market
+      properties:
+        marketName:
+          type: string
+          enum: [Kalshi, Polymarket, Betfair, PredictIt, Smarkets]
+        region:
+          type: string
+          enum: [US, UK, International]
+        regionEmoji:
+          type: string
+          enum: ["🇺🇸", "🇬🇧", "🌎"]
+        bidAskRange:
+          type: string
+          pattern: "^\\d+\\.\\d+-\\d+\\.\\d+%$"
+          example: "26.0-27.0%"
+        totalVolume:
+          type: integer
+          description: Total dollars bet on this market
+          example: 5952889
+
+    ChartDataPoint:
+      type: object
+      description: Single data point in time-series chart (from embedded JS)
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: JavaScript Date object
+        values:
+          type: object
+          additionalProperties:
+            type: number
+          description: Key-value pairs of candidate name to probability
+          example:
+            Harris: 19.8
+            Trump: 5.8
+            Biden: 13.9
+
+    TrackRecordEntry:
+      type: object
+      description: Historical prediction accuracy record
+      properties:
+        year:
+          type: integer
+          example: 2016
+        type:
+          type: string
+          enum: [General, Primary, Brexit, Intl.]
+        state:
+          type: string
+          example: "AK"
+        candidate:
+          type: string
+          example: "Clinton"
+        eboProbability:
+          type: number
+          format: float
+          example: 14.5
+        won:
+          type: boolean
+        brierScore:
+          type: number
+          format: float
+          example: 0.0210
+
+tags:
+  - name: Static Pages
+    description: Main content pages
+  - name: Presidential
+    description: Presidential election odds
+  - name: Primaries
+    description: Primary election odds
+  - name: Congressional
+    description: House and Senate odds
+  - name: Historical
+    description: Past elections and track record
+  - name: Info
+    description: About and methodology
+
+# Custom extension for scraping guidance
+x-scraping-guide:
+  refreshInterval: 300  # seconds (5 minutes)
+  dataLocation:
+    tables: "table"
+    odds: "table tr td"
+    charts: "script:contains('google.visualization')"
+
+  sampleSelectors:
+    candidateName: "table tr td:first-child"
+    probability: "table tr td:last-child"
+    marketName: "table tr td:contains('Kalshi'), table tr td:contains('Polymarket')"
+
+  chartDataExtraction: |
+    // Data is in: data.addRows([[...], [...], ...])
+    // Parse the JavaScript array literal from inline script
+    const script = document.querySelector('script:not([src])');
+    const match = script.textContent.match(/data\.addRows\(\[([\s\S]*?)\]\)/);
+    if (match) {
+      // Parse the nested array
+      const dataStr = '[' + match[1] + ']';
+      // Note: Contains `new Date()` calls that need special handling
+    }

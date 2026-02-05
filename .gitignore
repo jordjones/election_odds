@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Data files (too large for git)
+data/
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+
+# Logs
+*.log
+audit/*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.env
+
+# Next.js
+web/.next/
+web/out/
+
+# Test artifacts
+coverage/
+.nyc_output/

@@ -1,0 +1,268 @@
+{
+  "source": "Smarkets",
+  "sync_type": "incremental",
+  "captured_at": "2026-02-05T18:40:36.346166+00:00",
+  "data": {
+    "market_count": 10,
+    "sample_markets": [
+      {
+        "market_id": "67243587",
+        "market_name": "Donald Trump to serve as president for 9+ years by end of 2030",
+        "source": "Smarkets",
+        "category": "politics",
+        "status": "MarketStatus.OPEN",
+        "contracts": [
+          "ContractData(contract_id='190374419', contract_name='No', yes_price=0.92265, no_price=0.07735000000000003, yes_bid=0.8929, yes_ask=0.9524, no_bid=0.047599999999999976, no_ask=0.10709999999999997, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='190374418', contract_name='Yes', yes_price=0.07705000000000001, no_price=0.9229499999999999, yes_bid=0.0541, yes_ask=0.1, no_bid=0.9, no_ask=0.9459, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)"
+        ],
+        "url": "https://smarkets.com/politics/us/donald-trump/2030/12/31/23-59/donald-trump-to-serve-as-president-for-9-years-by-end-of-2030",
+        "description": "Will Donald Trump have served as President of the United States for nine or more years by the end of 2030?",
+        "end_date": null,
+        "total_volume": null,
+        "last_updated": "2026-02-05 12:40:24.863280",
+        "raw_data": {
+          "event": {
+            "bet_allowed": true,
+            "bettable": true,
+            "chart_time_period": null,
+            "created": "2024-04-03T15:46:43.494877Z",
+            "description": "",
+            "display_order": 10,
+            "end_date": null,
+            "full_slug": "/politics/us/donald-trump/2030/12/31/23-59/donald-trump-to-serve-as-president-for-9-years-by-end-of-2030",
+            "hidden": false,
+            "id": "43780069",
+            "inplay_enabled": true,
+            "modified": "2026-01-02T15:43:26.724459Z",
+            "name": "Donald Trump to serve as president for 9+ years by end of 2030",
+            "parent_id": "784698",
+            "seo_description": null,
+            "short_name": "",
+            "slug": "donald-trump-to-serve-as-president-for-9-years-by-end-of-2030",
+            "special_rules": "This market relates to whether Donald Trump will have served as President of the United States for a total of nine years or more by the end of 2030.\r\n\r\nAt the moment, the 22nd Amendment prevents presidents from serving for more than two 4-year terms.\r\n\r\nIf Donald Trump has served for nine years as President of the United States before the end of 2030, this market will settle for Yes. If Donald Trump has not served as President of the United States for nine years or more by the end of 2030, this market will be settled for No. \r\n\r\nFor the purposes of this market, President of the United States relates to the head of state and head of government of the country known as the United States of America. In the event that the title of the role which comprises head of state and head of government of the United States of America changes, this role will still be considered President of the United States. Likewise, if the name of the country changes, it will still be considered the United States of America as long as it contains at least 60% of the 50 US states in terms of their population as of the 2020 United States census.",
+            "start_date": "2030-12-31",
+            "start_datetime": "2030-12-31T23:59:00Z",
+            "state": "upcoming",
+            "super_sub_enabled": false,
+            "type": "politics",
+            "venue": null
+          },
+          "market": {
+            "bet_delay": 0,
+            "cashout_enabled": false,
+            "categories": [
+              "other"
+            ],
+            "category": "other",
+            "complete": false,
+            "contract_selections": null,
+            "created": "2024-04-03T16:00:41.714Z",
+            "description": "Will Donald Trump have served as President of the United States for nine or more years by the end of 2030?",
+            "display_order": 10,
+            "display_type": "default",
+            "event_id": "43780069",
+            "hidden": false,
+            "id": "67243587",
+            "info": {
+              "reason": "cf"
+            },
+            "inplay_enabled": true,
+            "market_type": {
+              "name": "WINNER"
+            },
+            "modified": "2024-04-03T16:00:41.714Z",
+            "name": "Donald Trump to serve as president for 9+ years by end of 2030",
+            "slug": "donald-trump-to-serve-as-president-for-9-years-by-end-of-2030",
+            "state": "open",
+            "winner_count": 1
+          }
+        }
+      },
+      {
+        "market_id": "83359513",
+        "market_name": "2028 Presidential Election Winner",
+        "source": "Smarkets",
+        "category": "politics",
+        "status": "MarketStatus.OPEN",
+        "contracts": [
+          "ContractData(contract_id='236572813', contract_name='Alexandria Ocasio-Cortez', yes_price=0.054400000000000004, no_price=0.9456, yes_bid=0.05, yes_ask=0.0588, no_bid=0.9412, no_ask=0.95, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572815', contract_name='Amy Klobuchar', yes_price=0.00345, no_price=0.99655, yes_bid=0.0033, yes_ask=0.0036, no_bid=0.9964, no_ask=0.9967, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572814', contract_name='Andrew Cuomo', yes_price=0.0015, no_price=0.9985, yes_bid=0.001, yes_ask=0.002, no_bid=0.998, no_ask=0.999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572821', contract_name='Bernie Sanders', yes_price=0.0015, no_price=0.9985, yes_bid=0.001, yes_ask=0.002, no_bid=0.998, no_ask=0.999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572822', contract_name='Dana White', yes_price=0.00055, no_price=0.99945, yes_bid=0.0001, yes_ask=0.001, no_bid=0.999, no_ask=0.9999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572795', contract_name='Donald Trump Jr.', yes_price=0.019950000000000002, no_price=0.98005, yes_bid=0.0182, yes_ask=0.0217, no_bid=0.9783, no_ask=0.9818, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572785', contract_name='Gavin Newsom', yes_price=0.20205, no_price=0.7979499999999999, yes_bid=0.2, yes_ask=0.2041, no_bid=0.7959, no_ask=0.8, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572816', contract_name='Glenn Youngkin', yes_price=0.0040999999999999995, no_price=0.9959, yes_bid=0.002, yes_ask=0.0062, no_bid=0.9938, no_ask=0.998, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572792', contract_name='Gretchen Whitmer', yes_price=0.020450000000000003, no_price=0.97955, yes_bid=0.0182, yes_ask=0.0227, no_bid=0.9773, no_ask=0.9818, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572798', contract_name='Hillary Clinton', yes_price=0.0015, no_price=0.9985, yes_bid=0.001, yes_ask=0.002, no_bid=0.998, no_ask=0.999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='297985189', contract_name='Hunter Biden', yes_price=0.00105, no_price=0.99895, yes_bid=0.0001, yes_ask=0.002, no_bid=0.998, no_ask=0.9999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572796', contract_name='Ivanka Trump', yes_price=0.01575, no_price=0.98425, yes_bid=0.0133, yes_ask=0.0182, no_bid=0.9818, no_ask=0.9867, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572790', contract_name='J.B Pritzker', yes_price=0.01715, no_price=0.98285, yes_bid=0.0143, yes_ask=0.02, no_bid=0.98, no_ask=0.9857, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572783', contract_name='JD Vance', yes_price=0.2151, no_price=0.7848999999999999, yes_bid=0.2128, yes_ask=0.2174, no_bid=0.7826, no_ask=0.7872, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572811', contract_name='Joe Rogan', yes_price=0.00055, no_price=0.99945, yes_bid=0.0001, yes_ask=0.001, no_bid=0.999, no_ask=0.9999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572803', contract_name='John Fetterman', yes_price=0.00665, no_price=0.99335, yes_bid=0.0062, yes_ask=0.0071, no_bid=0.9929, no_ask=0.9938, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572799', contract_name='Jon Ossoff', yes_price=0.00625, no_price=0.99375, yes_bid=0.0048, yes_ask=0.0077, no_bid=0.9923, no_ask=0.9952, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572801', contract_name='Josh Hawley', yes_price=0.00265, no_price=0.99735, yes_bid=0.002, yes_ask=0.0033, no_bid=0.9967, no_ask=0.998, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572788', contract_name='Josh Shapiro', yes_price=0.027049999999999998, no_price=0.97295, yes_bid=0.0263, yes_ask=0.0278, no_bid=0.9722, no_ask=0.9737, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572802', contract_name='Kamala Harris', yes_price=0.0266, no_price=0.9734, yes_bid=0.0238, yes_ask=0.0294, no_bid=0.9706, no_ask=0.9762, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572805', contract_name='Kristi Noem', yes_price=0.00215, no_price=0.99785, yes_bid=0.001, yes_ask=0.0033, no_bid=0.9967, no_ask=0.999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572819', contract_name='Liz Cheney', yes_price=0.00105, no_price=0.99895, yes_bid=0.0001, yes_ask=0.002, no_bid=0.998, no_ask=0.9999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572807', contract_name='Mark Cuban', yes_price=0.00395, no_price=0.99605, yes_bid=0.0036, yes_ask=0.0043, no_bid=0.9957, no_ask=0.9964, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572806', contract_name='Michael Bloomberg', yes_price=0.00055, no_price=0.99945, yes_bid=0.0001, yes_ask=0.001, no_bid=0.999, no_ask=0.9999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572784', contract_name='Michelle Obama', yes_price=0.006500000000000001, no_price=0.9935, yes_bid=0.0053, yes_ask=0.0077, no_bid=0.9923, no_ask=0.9947, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572817', contract_name='Mike Pence', yes_price=0.0015, no_price=0.9985, yes_bid=0.001, yes_ask=0.002, no_bid=0.998, no_ask=0.999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572793', contract_name='Nikki Haley', yes_price=0.01125, no_price=0.98875, yes_bid=0.01, yes_ask=0.0125, no_bid=0.9875, no_ask=0.99, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572800', contract_name='Oprah Winfrey', yes_price=0.0015, no_price=0.9985, yes_bid=0.001, yes_ask=0.002, no_bid=0.998, no_ask=0.999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572787', contract_name='Pete Buttigieg', yes_price=0.021249999999999998, no_price=0.97875, yes_bid=0.0208, yes_ask=0.0217, no_bid=0.9783, no_ask=0.9792, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572810', contract_name='Raphael Warnock', yes_price=0.00265, no_price=0.99735, yes_bid=0.002, yes_ask=0.0033, no_bid=0.9967, no_ask=0.998, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572797', contract_name='Robert F. Kennedy Jr.', yes_price=0.00355, no_price=0.99645, yes_bid=0.0033, yes_ask=0.0038, no_bid=0.9962, no_ask=0.9967, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572786', contract_name='Ron DeSantis', yes_price=0.01485, no_price=0.98515, yes_bid=0.0143, yes_ask=0.0154, no_bid=0.9846, no_ask=0.9857, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572809', contract_name='Ted Cruz', yes_price=0.00695, no_price=0.99305, yes_bid=0.0056, yes_ask=0.0083, no_bid=0.9917, no_ask=0.9944, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572812', contract_name='Tim Walz', yes_price=0.0015, no_price=0.9985, yes_bid=0.001, yes_ask=0.002, no_bid=0.998, no_ask=0.999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572804', contract_name='Tom Cotton', yes_price=0.00475, no_price=0.99525, yes_bid=0.0033, yes_ask=0.0062, no_bid=0.9938, no_ask=0.9967, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572789', contract_name='Tucker Carlson', yes_price=0.010450000000000001, no_price=0.98955, yes_bid=0.0091, yes_ask=0.0118, no_bid=0.9882, no_ask=0.9909, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572794', contract_name='Tulsi Gabbard', yes_price=0.00715, no_price=0.99285, yes_bid=0.0043, yes_ask=0.01, no_bid=0.99, no_ask=0.9957, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='236572791', contract_name='Vivek Ramaswamy', yes_price=0.0038, no_price=0.9962, yes_bid=0.0033, yes_ask=0.0043, no_bid=0.9957, no_ask=0.9967, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)"
+        ],
+        "url": "https://smarkets.com/politics/us/2028/11/07/12-00/2028-presidential-election/2028/11/07/12-00/2028-presidential-election-winner",
+        "description": "Who will win the 2028 United States presidential election?",
+        "end_date": null,
+        "total_volume": null,
+        "last_updated": "2026-02-05 12:40:26.602797",
+        "raw_data": {
+          "event": {
+            "bet_allowed": true,
+            "bettable": true,
+            "chart_time_period": null,
+            "created": "2024-11-07T11:41:41.591810Z",
+            "description": "",
+            "display_order": 0,
+            "end_date": null,
+            "full_slug": "/politics/us/2028/11/07/12-00/2028-presidential-election/2028/11/07/12-00/2028-presidential-election-winner",
+            "hidden": false,
+            "id": "44136686",
+            "inplay_enabled": true,
+            "modified": "2025-07-26T10:59:40.737965Z",
+            "name": "2028 Presidential Election Winner",
+            "parent_id": "44136685",
+            "seo_description": null,
+            "short_name": "",
+            "slug": "2028-presidential-election-winner",
+            "special_rules": "This market will be settled based on the candidate that is projected by the Associated Press to receive a majority of Electoral College votes following the election. If the Associated Press does not appear to have made a timely declaration or becomes unavailable for any reason alternative media sources may be consulted. In the event of clear uncertainty the market will remain open until the winner is selected in accordance with the Twelfth Amendment to the United States Constitution.\r\n\r\nThis market will be void if a presidential election does not take place in 2028. ",
+            "start_date": "2028-11-07",
+            "start_datetime": "2028-11-07T12:00:00Z",
+            "state": "upcoming",
+            "super_sub_enabled": false,
+            "type": "politics",
+            "venue": null
+          },
+          "market": {
+            "bet_delay": 0,
+            "cashout_enabled": false,
+            "categories": [
+              "other"
+            ],
+            "category": "other",
+            "complete": false,
+            "contract_selections": null,
+            "created": "2024-11-07T11:48:00.369Z",
+            "description": "Who will win the 2028 United States presidential election?",
+            "display_order": 0,
+            "display_type": "default",
+            "event_id": "44136686",
+            "hidden": false,
+            "id": "83359513",
+            "info": {
+              "reason": ""
+            },
+            "inplay_enabled": true,
+            "market_type": {
+              "name": "MANUAL",
+              "param": "inrWMQOE00"
+            },
+            "modified": "2024-11-07T11:48:42.194Z",
+            "name": "2028 Presidential Election Winner",
+            "slug": "2028-presidential-election-winner",
+            "state": "open",
+            "winner_count": 1
+          }
+        }
+      },
+      {
+        "market_id": "90346655",
+        "market_name": "2028 Winning Party",
+        "source": "Smarkets",
+        "category": "politics",
+        "status": "MarketStatus.OPEN",
+        "contracts": [
+          "ContractData(contract_id='255083016', contract_name='Any Other', yes_price=0.01905, no_price=0.98095, yes_bid=0.0118, yes_ask=0.0263, no_bid=0.9737, no_ask=0.9882, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='255083015', contract_name='Democratic', yes_price=0.5542499999999999, no_price=0.4457500000000001, yes_bid=0.5435, yes_ask=0.565, no_bid=0.43500000000000005, no_ask=0.4565, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)",
+          "ContractData(contract_id='255083014', contract_name='Republican', yes_price=0.4296, no_price=0.5704, yes_bid=0.4167, yes_ask=0.4425, no_bid=0.5575, no_ask=0.5832999999999999, volume=None, volume_24h=None, last_trade_price=None, last_updated=None)"
+        ],
+        "url": "https://smarkets.com/politics/us/2028/11/07/12-00/2028-presidential-election/2028/11/07/12-00/2028-winning-party",
+        "description": "",
+        "end_date": null,
+        "total_volume": null,
+        "last_updated": "2026-02-05 12:40:27.579129",
+        "raw_data": {
+          "event": {
+            "bet_allowed": true,
+            "bettable": true,
+            "chart_time_period": null,
+            "created": "2025-01-23T11:53:12.666182Z",
+            "description": "",
+            "display_order": 1,
+            "end_date": null,
+            "full_slug": "/politics/us/2028/11/07/12-00/2028-presidential-election/2028/11/07/12-00/2028-winning-party",
+            "hidden": false,
+            "id": "44255012",
+            "inplay_enabled": true,
+            "modified": "2025-01-23T11:54:17.083504Z",
+            "name": "2028 Winning Party",
+            "parent_id": "44136685",
+            "seo_description": null,
+            "short_name": "",
+            "slug": "2028-winning-party",
+            "special_rules": "",
+            "start_date": "2028-11-07",
+            "start_datetime": "2028-11-07T12:00:00Z",
+            "state": "upcoming",
+            "super_sub_enabled": false,
+            "type": "politics",
+            "venue": null
+          },
+          "market": {
+            "bet_delay": 0,
+            "cashout_enabled": false,
+            "categories": [
+              "other"
+            ],
+            "category": "other",
+            "complete": true,
+            "contract_selections": null,
+            "created": "2025-01-23T11:53:54.976Z",
+            "description": "",
+            "display_order": 0,
+            "display_type": "default",
+            "event_id": "44255012",
+            "hidden": false,
+            "id": "90346655",
+            "info": {
+              "reason": ""
+            },
+            "inplay_enabled": true,
+            "market_type": {
+              "name": "MANUAL",
+              "param": "yhozVzCMgo"
+            },
+            "modified": "2025-01-23T11:53:54.976Z",
+            "name": "2028 Winning Party",
+            "slug": "2028-winning-party",
+            "state": "open",
+            "winner_count": 1
+          }
+        }
+      }
+    ]
+  }
+}

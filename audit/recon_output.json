@@ -1,0 +1,535 @@
+=== Starting Recon of electionbettingodds.com ===
+
+1. Analyzing Homepage...
+   Screenshot: 01_homepage.png
+   Found 11 navigation links
+   Total internal links found: 11
+
+2. Exploring Subpages...
+   Visiting: https://electionbettingodds.com/about.html
+   Visiting: https://electionbettingodds.com/about.html#whyBetfair
+   Visiting: https://electionbettingodds.com/
+   Visiting: https://electionbettingodds.com/President2024.html#chart
+   Visiting: https://electionbettingodds.com/TrackRecord.html
+   Visiting: https://electionbettingodds.com/House-Control-2026.html
+   Visiting: https://electionbettingodds.com/Senate-Control-2026.html
+   Visiting: https://electionbettingodds.com/DEMPrimary2028.html
+   Visiting: https://electionbettingodds.com/GOPPrimary2028.html
+   Visiting: https://electionbettingodds.com/PresidentialParty2028.html
+   Visiting: https://electionbettingodds.com/President2028.html
+
+3. Identifying Features...
+
+4. Documenting User Flows...
+
+=== Recon Complete ===
+{
+  "siteMap": {
+    "pages": [
+      {
+        "url": "https://electionbettingodds.com/about.html",
+        "title": "Election Betting Odds by Maxim Lott",
+        "linkText": "About these odds and FAQ",
+        "screenshot": "02_page_1_About_these_odds_and_FAQ.png",
+        "features": {
+          "hasTables": 0,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/about.html#whyBetfair",
+        "title": "Election Betting Odds by Maxim Lott",
+        "linkText": "How People Bet",
+        "screenshot": "02_page_2_How_People_Bet.png",
+        "features": {
+          "hasTables": 0,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "Home",
+        "screenshot": "02_page_3_Home.png",
+        "features": {
+          "hasTables": 31,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/President2024.html#chart",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "Charts",
+        "screenshot": "02_page_4_Charts.png",
+        "features": {
+          "hasTables": 5,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/TrackRecord.html",
+        "title": "Election Betting Odds by Maxim Lott",
+        "linkText": "Track Record",
+        "screenshot": "02_page_5_Track_Record.png",
+        "features": {
+          "hasTables": 2,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/House-Control-2026.html",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "House Control",
+        "screenshot": "02_page_6_House_Control.png",
+        "features": {
+          "hasTables": 6,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/Senate-Control-2026.html",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "Senate Control",
+        "screenshot": "02_page_7_Senate_Control.png",
+        "features": {
+          "hasTables": 6,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/DEMPrimary2028.html",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "DEM Nom",
+        "screenshot": "02_page_8_DEM_Nom.png",
+        "features": {
+          "hasTables": 19,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/GOPPrimary2028.html",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "GOP Nom",
+        "screenshot": "02_page_9_GOP_Nom.png",
+        "features": {
+          "hasTables": 23,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/PresidentialParty2028.html",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "General by Party",
+        "screenshot": "02_page_10_General_by_Party.png",
+        "features": {
+          "hasTables": 6,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      },
+      {
+        "url": "https://electionbettingodds.com/President2028.html",
+        "title": "Election Betting Odds by Maxim Lott and John Stossel",
+        "linkText": "By Candidate",
+        "screenshot": "02_page_11_By_Candidate.png",
+        "features": {
+          "hasTables": 28,
+          "hasCharts": 0,
+          "hasOddsData": true,
+          "mainContent": ""
+        }
+      }
+    ],
+    "navigation": [
+      {
+        "href": "https://electionbettingodds.com/",
+        "text": "Home",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/President2024.html#chart",
+        "text": "Charts",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/TrackRecord.html",
+        "text": "Track Record",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/House-Control-2026.html",
+        "text": "House Control",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/Senate-Control-2026.html",
+        "text": "Senate Control",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/DEMPrimary2028.html",
+        "text": "DEM Nom",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/GOPPrimary2028.html",
+        "text": "GOP Nom",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/PresidentialParty2028.html",
+        "text": "General by Party",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/President2028.html",
+        "text": "By Candidate",
+        "selector": "nav a"
+      },
+      {
+        "href": "https://electionbettingodds.com/about.html",
+        "text": "Why This Beats Polls",
+        "selector": "a[href^=\"/\"]"
+      },
+      {
+        "href": "https://electionbettingodds.com/about.html#whyBetfair",
+        "text": "How People Bet",
+        "selector": "a[href^=\"/\"]"
+      }
+    ]
+  },
+  "features": [
+    "Presidential Election Odds",
+    "Congressional Election Data",
+    "Multi-Market Aggregation",
+    "Historical Trends/Charts",
+    "Data Tables"
+  ],
+  "uiComponents": [
+    {
+      "type": "table",
+      "index": 0,
+      "headers": [
+        "Will Supreme Courtallow Trump tariffs?Will the Supreme Court rule in favor of Trump's tariffs?$13,260,426 bet so far"
+      ],
+      "rowCount": 11,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 1,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 2,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 3,
+      "headers": [
+        "Presidency 2028 (by party)Bets on which party will control the Presidency after Nov 5, 2028 elections$380,866 bet so far"
+      ],
+      "rowCount": 14,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 4,
+      "headers": [],
+      "rowCount": 5,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 5,
+      "headers": [],
+      "rowCount": 5,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 6,
+      "headers": [
+        "US Presidency 2028Winner of Presidential election held on Nov 5 2028$248,220,477 bet so far"
+      ],
+      "rowCount": 141,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 7,
+      "headers": [],
+      "rowCount": 6,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 8,
+      "headers": [],
+      "rowCount": 6,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 9,
+      "headers": [],
+      "rowCount": 5,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 10,
+      "headers": [],
+      "rowCount": 6,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 11,
+      "headers": [],
+      "rowCount": 6,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 12,
+      "headers": [],
+      "rowCount": 6,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 13,
+      "headers": [],
+      "rowCount": 6,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 14,
+      "headers": [],
+      "rowCount": 6,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 15,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 16,
+      "headers": [],
+      "rowCount": 5,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 17,
+      "headers": [],
+      "rowCount": 5,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 18,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 19,
+      "headers": [],
+      "rowCount": 5,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 20,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 21,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 22,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 23,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 24,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 25,
+      "headers": [],
+      "rowCount": 5,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 26,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 27,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 28,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 29,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "table",
+      "index": 30,
+      "headers": [],
+      "rowCount": 4,
+      "className": ""
+    },
+    {
+      "type": "buttons",
+      "count": 2,
+      "samples": [
+        "",
+        ""
+      ]
+    },
+    {
+      "type": "charts",
+      "count": 0
+    },
+    {
+      "type": "dropdowns",
+      "count": 3
+    },
+    {
+      "type": "modals",
+      "count": 0
+    },
+    {
+      "type": "images",
+      "count": 42
+    }
+  ],
+  "technical": {
+    "analytics": [
+      "Facebook Pixel",
+      "Twitter Pixel",
+      "Google Analytics",
+      "Google Tag Manager"
+    ],
+    "seo": {
+      "title": "Election Betting Odds by Maxim Lott and John Stossel",
+      "metaDescription": "Live betting odds on the 2028 presidential election, and more! Who will win? Vance, Newsom, DeSantis, AOC?...",
+      "metaKeywords": "N/A"
+    },
+    "accessibility": [
+      {
+        "check": "images_with_alt",
+        "pass": false,
+        "detail": "0/42 have alt"
+      },
+      {
+        "check": "form_labels",
+        "detail": "0 inputs may lack labels"
+      },
+      {
+        "check": "skip_link",
+        "pass": false
+      },
+      {
+        "check": "single_h1",
+        "pass": false,
+        "detail": "Found 0 h1 elements"
+      },
+      {
+        "check": "aria_landmarks",
+        "detail": "1 landmarks found"
+      }
+    ]
+  },
+  "flows": [
+    {
+      "name": "View Current Election Odds",
+      "steps": [
+        "Navigate to homepage",
+        "View main odds display/table",
+        "Compare odds across candidates"
+      ],
+      "entryPage": "https://electionbettingodds.com",
+      "authenticated": false
+    },
+    {
+      "name": "Filter/Sort Data",
+      "steps": [
+        "Navigate to data page",
+        "Use dropdown/filter controls",
+        "View filtered results"
+      ],
+      "entryPage": "https://electionbettingodds.com",
+      "authenticated": false
+    }
+  ]
+}
