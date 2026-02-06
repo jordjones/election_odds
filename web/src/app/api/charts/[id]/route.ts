@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { mockMarkets, generateMockChartData } from '@/lib/api/mock-data';
 import type { TimeFilter } from '@/lib/types';
+import { usePostgres } from '@/lib/use-postgres';
 
 // Candidate party affiliations for filtering primary charts
 const DEMOCRAT_CANDIDATES = new Set([
@@ -68,7 +69,7 @@ function filterByParty(candidates: string[], party: 'dem' | 'gop' | null): strin
 
 // Dynamic imports to avoid loading better-sqlite3 on Netlify
 async function getDbMarket(id: string) {
-  if (process.env.DATABASE_URL) {
+  if (usePostgres()) {
     const { getMarketAsync } = await import('@/lib/db-pg');
     return getMarketAsync(id);
   } else {
@@ -79,7 +80,7 @@ async function getDbMarket(id: string) {
 }
 
 async function getDbChartData(chartMarketId: string, granularity: string) {
-  if (process.env.DATABASE_URL) {
+  if (usePostgres()) {
     const { getChartDataAsync } = await import('@/lib/db-pg');
     return getChartDataAsync(chartMarketId);
   } else {

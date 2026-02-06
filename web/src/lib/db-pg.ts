@@ -11,7 +11,8 @@ let pool: Pool | null = null;
 
 function getPool(): Pool {
   if (!pool) {
-    const connectionString = process.env.DATABASE_URL;
+    // Use bracket notation to prevent Next.js/webpack from replacing at build time
+    const connectionString = (process.env as Record<string, string | undefined>)['DATABASE_URL'];
     if (!connectionString) {
       throw new Error('DATABASE_URL not set');
     }
@@ -442,7 +443,9 @@ export async function getChartDataAsync(
  * Check if PostgreSQL is available
  */
 export function isPostgresAvailable(): boolean {
-  return !!process.env.DATABASE_URL;
+  // Use bracket notation to prevent Next.js/webpack from replacing at build time
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return !!(process.env as any)['DATABASE_URL'];
 }
 
 /**

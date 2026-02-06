@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { usePostgres } from '@/lib/use-postgres';
 
 async function getStatsFromDb() {
-  if (process.env.DATABASE_URL) {
+  if (usePostgres()) {
     const { getStatsAsync } = await import('@/lib/db-pg');
     return getStatsAsync();
   } else {

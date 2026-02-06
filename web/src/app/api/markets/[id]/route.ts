@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { TimeFilter } from '@/lib/types';
+import { usePostgres } from '@/lib/use-postgres';
 
 // Dynamic import to avoid loading better-sqlite3 on Netlify
 async function getMarketFromDb(id: string, changePeriod: string) {
-  if (process.env.DATABASE_URL) {
+  if (usePostgres()) {
     const { getMarketAsync } = await import('@/lib/db-pg');
     return getMarketAsync(id, changePeriod);
   } else {
