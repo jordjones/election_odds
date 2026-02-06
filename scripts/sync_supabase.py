@@ -7,9 +7,9 @@ and stores them in Supabase PostgreSQL.
 
 Usage:
     python sync_supabase.py --source polymarket
-    python sync_supabase.py --source kalshi
-    python sync_supabase.py --source predictit
+    python sync_supabase.py --source polymarket --featured-only
     python sync_supabase.py --all
+    python sync_supabase.py --all --featured-only
 """
 
 import argparse
@@ -32,15 +32,52 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Featured market keywords - these get synced every 5 minutes
+FEATURED_KEYWORDS = [
+    # Presidential 2028
+    'presidential election winner 2028',
+    'presidential election 2028',
+    '2028 us presidential',
+    'next u.s. presidential',
+    # Primary nominees
+    'republican presidential nominee 2028',
+    'democratic presidential nominee 2028',
+    'republican nominee 2028',
+    'democratic nominee 2028',
+    '2028 republican nominee',
+    '2028 democratic nominee',
+    # Party control
+    'which party wins 2028',
+    'party wins the 2028',
+    # Congress 2026
+    'house 2026',
+    'senate 2026',
+    'which party will win the house',
+    'which party will win the senate',
+    'which party will control',
+]
 
-def sync_polymarket(storage: SupabaseStorage) -> dict:
+
+def is_featured_market(market_name: str) -> bool:
+    """Check if a market is a featured market."""
+    name_lower = market_name.lower()
+    return any(kw in name_lower for kw in FEATURED_KEYWORDS)
+
+
+def sync_polymarket(storage: SupabaseStorage, featured_only: bool = False) -> dict:
     """Sync data from Polymarket."""
     client = PolymarketClient()
-    stats = {'markets': 0, 'contracts': 0, 'snapshots': 0}
+    stats = {'markets': 0, 'contracts': 0, 'snapshots': 0, 'skipped': 0}
 
     logger.info("Fetching Polymarket political markets...")
     markets = client.get_political_markets()
     logger.info(f"Found {len(markets)} political markets")
+
+    if featured_only:
+        original_count = len(markets)
+        markets = [m for m in markets if is_featured_market(m.market_name)]
+        stats['skipped'] = original_count - len(markets)
+        logger.info(f"Filtering to {len(markets)} featured markets (skipped {stats['skipped']})")
 
     snapshot_time = datetime.now(timezone.utc).isoformat()
 
@@ -85,14 +122,20 @@ def sync_polymarket(storage: SupabaseStorage) -> dict:
     return stats
 
 
-def sync_kalshi(storage: SupabaseStorage) -> dict:
+def sync_kalshi(storage: SupabaseStorage, featured_only: bool = False) -> dict:
     """Sync data from Kalshi."""
     client = KalshiClient()
-    stats = {'markets': 0, 'contracts': 0, 'snapshots': 0}
+    stats = {'markets': 0, 'contracts': 0, 'snapshots': 0, 'skipped': 0}
 
     logger.info("Fetching Kalshi political markets...")
     markets = client.get_political_markets()
     logger.info(f"Found {len(markets)} political markets")
+
+    if featured_only:
+        original_count = len(markets)
+        markets = [m for m in markets if is_featured_market(m.market_name)]
+        stats['skipped'] = original_count - len(markets)
+        logger.info(f"Filtering to {len(markets)} featured markets (skipped {stats['skipped']})")
 
     snapshot_time = datetime.now(timezone.utc).isoformat()
 
@@ -137,14 +180,20 @@ def sync_kalshi(storage: SupabaseStorage) -> dict:
     return stats
 
 
-def sync_predictit(storage: SupabaseStorage) -> dict:
+def sync_predictit(storage: SupabaseStorage, featured_only: bool = False) -> dict:
     """Sync data from PredictIt."""
     client = PredictItClient()
-    stats = {'markets': 0, 'contracts': 0, 'snapshots': 0}
+    stats = {'markets': 0, 'contracts': 0, 'snapshots': 0, 'skipped': 0}
 
     logger.info("Fetching PredictIt political markets...")
     markets = client.get_political_markets()
     logger.info(f"Found {len(markets)} political markets")
+
+    if featured_only:
+        original_count = len(markets)
+        markets = [m for m in markets if is_featured_market(m.market_name)]
+        stats['skipped'] = original_count - len(markets)
+        logger.info(f"Filtering to {len(markets)} featured markets (skipped {stats['skipped']})")
 
     snapshot_time = datetime.now(timezone.utc).isoformat()
 
@@ -193,28 +242,30 @@ def main():
     parser = argparse.ArgumentParser(description='Sync election odds to Supabase')
     parser.add_argument('--source', choices=['polymarket', 'kalshi', 'predictit', 'all'],
                         default='all', help='Data source to sync')
+    parser.add_argument('--featured-only', action='store_true',
+                        help='Only sync featured markets (presidential, primaries, congress)')
 
     args = parser.parse_args()
 
     storage = SupabaseStorage()
 
     try:
-        total_stats = {'markets': 0, 'contracts': 0, 'snapshots': 0}
+        total_stats = {'markets': 0, 'contracts': 0, 'snapshots': 0, 'skipped': 0}
 
         if args.source in ['polymarket', 'all']:
-            stats = sync_polymarket(storage)
+            stats = sync_polymarket(storage, args.featured_only)
             logger.info(f"Polymarket: {stats}")
             for k, v in stats.items():
                 total_stats[k] += v
 
         if args.source in ['kalshi', 'all']:
-            stats = sync_kalshi(storage)
+            stats = sync_kalshi(storage, args.featured_only)
             logger.info(f"Kalshi: {stats}")
             for k, v in stats.items():
                 total_stats[k] += v
 
         if args.source in ['predictit', 'all']:
-            stats = sync_predictit(storage)
+            stats = sync_predictit(storage, args.featured_only)
             logger.info(f"PredictIt: {stats}")
             for k, v in stats.items():
                 total_stats[k] += v

@@ -2,14 +2,24 @@ name: Sync Polymarket Data
 
 on:
   schedule:
-    # Run every 5 minutes
+    # Featured markets every 5 minutes
     - cron: '*/5 * * * *'
   workflow_dispatch:
-    # Allow manual trigger
+    inputs:
+      sync_type:
+        description: 'Sync type'
+        required: true
+        default: 'featured'
+        type: choice
+        options:
+          - featured
+          - all
 
 jobs:
-  sync:
+  sync-featured:
     runs-on: ubuntu-latest
+    # Run for scheduled triggers and manual 'featured' trigger
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.sync_type == 'featured')
 
     steps:
       - name: Checkout repository
@@ -24,19 +34,32 @@ jobs:
         run: |
           pip install requests psycopg2-binary python-dotenv
 
-      - name: Sync Polymarket data
+      - name: Sync featured markets (all sources)
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python scripts/sync_supabase.py --source polymarket
+          python scripts/sync_supabase.py --all --featured-only
 
-      - name: Sync other sources
+  sync-all:
+    runs-on: ubuntu-latest
+    # Only run for manual 'all' trigger
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.sync_type == 'all'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests psycopg2-binary python-dotenv
+
+      - name: Sync all markets (all sources)
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python scripts/sync_supabase.py --source kalshi
-          python scripts/sync_supabase.py --source predictit
+          python scripts/sync_supabase.py --all
