@@ -13,7 +13,17 @@ const PARTY_CONFIG: Record<string, { category: MarketCategory; title: string; co
     title: '2028 Democratic Primary',
     color: 'text-blue-600',
   },
+  democratic: {
+    category: 'primary-dem',
+    title: '2028 Democratic Primary',
+    color: 'text-blue-600',
+  },
   gop: {
+    category: 'primary-gop',
+    title: '2028 Republican Primary',
+    color: 'text-red-600',
+  },
+  republican: {
     category: 'primary-gop',
     title: '2028 Republican Primary',
     color: 'text-red-600',
