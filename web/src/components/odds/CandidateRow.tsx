@@ -42,6 +42,121 @@ function getAvatarColor(name: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
+// Get X (Twitter) handle for a candidate
+function getTwitterHandle(name: string): string | undefined {
+  const handles: Record<string, string> = {
+    // Top candidates
+    'JD Vance': 'JDVance',
+    'Gavin Newsom': 'GavinNewsom',
+    'Marco Rubio': 'marcorubio',
+    'Alexandria Ocasio-Cortez': 'AOC',
+    'Josh Shapiro': 'GovernorShapiro',
+    'Pete Buttigieg': 'PeteButtigieg',
+    'Gretchen Whitmer': 'graborwhitmer',
+    'Ron DeSantis': 'RonDeSantis',
+    'Nikki Haley': 'NikkiHaley',
+    'Donald Trump': 'realDonaldTrump',
+    'Donald Trump Jr.': 'DonaldJTrumpJr',
+    'Kamala Harris': 'KamalaHarris',
+    'Vivek Ramaswamy': 'VivekGRamaswamy',
+    'Tim Walz': 'Tim_Walz',
+    'Andy Beshear': 'AndyBeshearKY',
+    'JB Pritzker': 'GovPritzker',
+    'Wes Moore': 'iamwesmoore',
+    'Jon Ossoff': 'ossaborgia',
+    'Glenn Youngkin': 'GlennYoungkin',
+    'Tulsi Gabbard': 'TulsiGabbard',
+    'Tucker Carlson': 'TuckerCarlson',
+    'Ted Cruz': 'tedcruz',
+    'Josh Hawley': 'HawleyMO',
+    'Sarah Sanders': 'SarahHuckabee',
+    'Brian Kemp': 'BrianKempGA',
+    'Kristi Noem': 'KristiNoem',
+    'Mike Pence': 'Mike_Pence',
+    'Rand Paul': 'RandPaul',
+    'Tom Cotton': 'SenTomCotton',
+    'Robert F. Kennedy Jr.': 'RobertKennedyJr',
+    'Elon Musk': 'elonmusk',
+
+    // Democrats
+    'Michelle Obama': 'MichelleObama',
+    'Barack Obama': 'BarackObama',
+    'Hillary Clinton': 'HillaryClinton',
+    'Bernie Sanders': 'BernieSanders',
+    'Elizabeth Warren': 'eaborren',
+    'Amy Klobuchar': 'amyklobuchar',
+    'Cory Booker': 'CoryBooker',
+    'Mark Kelly': 'SenMarkKelly',
+    'John Fetterman': 'JohnFetterman',
+    'Raphael Warnock': 'SenatorWarnock',
+    'Chris Murphy': 'ChrisMurphyCT',
+    'Ro Khanna': 'RoKhanna',
+    'Ruben Gallego': 'RubenGallego',
+    'Phil Murphy': 'GovMurphy',
+    'Jared Polis': 'GovofCO',
+    'Roy Cooper': 'NC_Governor',
+    'Andrew Cuomo': 'andrewcuomo',
+    'Andrew Yang': 'AndrewYang',
+    'Elissa Slotkin': 'ElissaSlotkin',
+    'Jasmine Crockett': 'JasmineCrockett',
+    'Zohran Mamdani': 'ZohranKMamdani',
+    'James Talarico': 'jamestalarico',
+    'Rahm Emanuel': 'RahmEmanuel',
+    'Gina Raimondo': 'GinaRaimondo',
+    'Hakeem Jeffries': 'RepJeffries',
+    'Stacey Abrams': 'staboreyabrams',
+
+    // Republicans
+    'Greg Abbott': 'GregAbbott_TX',
+    'Matt Gaetz': 'mattgaetz',
+    'Marjorie Taylor Greene': 'RepMTG',
+    'Byron Donalds': 'ByronDonalds',
+    'Elise Stefanik': 'EliseStefanik',
+    'John Thune': 'SenJohnThune',
+    'Katie Britt': 'SenKatieBritt',
+    'Thomas Massie': 'RepThomasMassie',
+    'Steve Bannon': 'SteveBannon',
+    'Tim Scott': 'SenatorTimScott',
+    'Rick Scott': 'SenRickScott',
+    'Bill Hagerty': 'SenatorHagerty',
+    'Joni Ernst': 'SenJoniErnst',
+    'Dan Crenshaw': 'DanCrenshawTX',
+    'Liz Cheney': 'Liz_Cheney',
+
+    // Business/Media
+    'Jamie Dimon': 'jamie_dimon',
+    'Mark Cuban': 'mcuban',
+    'Oprah Winfrey': 'Oprah',
+    'Dwayne Johnson': 'TheRock',
+    "Dwayne 'The Rock' Johnson": 'TheRock',
+    'Kim Kardashian': 'KimKardashian',
+    'LeBron James': 'KingJames',
+    'Tom Brady': 'TomBrady',
+    'Jon Stewart': 'jonstewart',
+    'Joe Rogan': 'joerogan',
+    'Dana White': 'danawhite',
+    'MrBeast': 'MrBeast',
+    'Stephen A. Smith': 'stephenasmith',
+    'Stephen Smith': 'stephenasmith',
+    'Chelsea Clinton': 'ChelseaClinton',
+    'George Clooney': 'GeorgeClooney',
+
+    // Trump family
+    'Ivanka Trump': 'IvankaTrump',
+    'Eric Trump': 'EricTrump',
+    'Lara Trump': 'LaraLeaTrump',
+
+    // Cabinet/Admin
+    'Pete Hegseth': 'PeteHegseth',
+    'Kash Patel': 'Kaborh_Patel',
+    'Doug Burgum': 'DougBurgum',
+    'Ben Carson': 'RealBenCarson',
+    'Linda McMahon': 'LindaMcMahon',
+  };
+
+  return handles[name];
+}
+
 // Get image zoom/position settings per candidate
 // scale: zoom level (1 = no zoom, 2 = 2x zoom)
 // position: CSS object-position value
@@ -109,6 +224,7 @@ export function CandidateRow({ contract, rank, sources, changePeriod = '1d' }: C
   const initials = getInitials(contract.name);
   const avatarColor = getAvatarColor(contract.name);
   const imageSettings = getImageSettings(contract.name);
+  const twitterHandle = getTwitterHandle(contract.name);
 
   return (
     <tr className="border-b hover:bg-muted/50 transition-colors">
@@ -140,7 +256,19 @@ export function CandidateRow({ contract, rank, sources, changePeriod = '1d' }: C
               {initials}
             </div>
           )}
-          <span>{contract.name}</span>
+          <div className="flex flex-col">
+            <span>{contract.name}</span>
+            {twitterHandle && (
+              <a
+                href={`https://x.com/${twitterHandle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                @{twitterHandle}
+              </a>
+            )}
+          </div>
         </div>
       </td>
 
