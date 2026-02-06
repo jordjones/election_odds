@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getMarket } from '@/lib/db';
+import type { TimeFilter } from '@/lib/types';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const { searchParams } = new URL(request.url);
+  const changePeriod = (searchParams.get('changePeriod') as TimeFilter) || '1d';
 
   try {
-    const market = getMarket(id);
+    const market = getMarket(id, changePeriod);
 
     if (!market) {
       return NextResponse.json(

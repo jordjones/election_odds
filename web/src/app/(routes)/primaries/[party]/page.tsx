@@ -24,6 +24,7 @@ export default function PrimaryPage() {
   const params = useParams();
   const party = params.party as string;
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
 
   const config = PARTY_CONFIG[party];
 
@@ -31,7 +32,7 @@ export default function PrimaryPage() {
     notFound();
   }
 
-  const { data: markets, isLoading: marketsLoading } = useMarketsByCategory(config.category);
+  const { data: markets, isLoading: marketsLoading } = useMarketsByCategory(config.category, changePeriod);
   const market = markets?.[0];
 
   const { data: chartData, isLoading: chartLoading } = useChartData(
@@ -83,7 +84,12 @@ export default function PrimaryPage() {
         {/* Odds Table */}
         <section>
           <h2 className="text-xl font-bold mb-4">Current Odds</h2>
-          <OddsTable market={market} showAllSources />
+          <OddsTable
+            market={market}
+            showAllSources
+            changePeriod={changePeriod}
+            onChangePeriodChange={setChangePeriod}
+          />
         </section>
       </div>
     </div>

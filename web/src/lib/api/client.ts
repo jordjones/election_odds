@@ -71,8 +71,9 @@ class ApiClient {
   /**
    * Get a specific market by ID or slug
    */
-  async getMarket(idOrSlug: string): Promise<Market> {
-    return this.fetch<Market>(`/markets/${idOrSlug}`);
+  async getMarket(idOrSlug: string, changePeriod?: TimeFilter): Promise<Market> {
+    const query = changePeriod ? `?changePeriod=${changePeriod}` : '';
+    return this.fetch<Market>(`/markets/${idOrSlug}${query}`);
   }
 
   /**

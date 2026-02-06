@@ -1163,8 +1163,8 @@ export function getMarkets(options?: {
 /**
  * Get a specific market by ID or slug
  */
-export function getMarket(idOrSlug: string): Market | null {
-  const markets = getMarkets();
+export function getMarket(idOrSlug: string, changePeriod?: string): Market | null {
+  const markets = getMarkets({ changePeriod });
   return markets.find(m => m.id === idOrSlug || m.slug === idOrSlug || m.slug.includes(idOrSlug)) || null;
 }
 

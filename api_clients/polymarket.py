@@ -250,6 +250,85 @@ class PolymarketClient(BaseMarketClient):
                                   {'condition_ids': condition_id})
         return data
 
+    def get_price_history(self, token_id: str, start_ts: Optional[int] = None,
+                          end_ts: Optional[int] = None, interval: Optional[str] = None,
+                          fidelity: int = 60) -> Optional[List[Dict]]:
+        """
+        Fetch historical price data for a market token.
+
+        Args:
+            token_id: The CLOB token ID
+            start_ts: Unix timestamp (UTC) for start time
+            end_ts: Unix timestamp (UTC) for end time
+            interval: Duration string - "1m", "1w", "1d", "6h", "1h", or "max"
+                     (mutually exclusive with start_ts/end_ts)
+            fidelity: Data resolution in minutes (default 60)
+
+        Returns:
+            List of {"t": timestamp, "p": price} dicts, or None on error
+        """
+        params = {'market': token_id, 'fidelity': fidelity}
+
+        if interval:
+            params['interval'] = interval
+        else:
+            if start_ts:
+                params['startTs'] = start_ts
+            if end_ts:
+                params['endTs'] = end_ts
+
+        data = self._make_request(self.CLOB_API, "prices-history", params)
+
+        if data and 'history' in data:
+            return data['history']
+        return data if isinstance(data, list) else None
+
+    def get_all_token_ids(self) -> Dict[str, Dict[str, str]]:
+        """
+        Get all token IDs for political markets.
+
+        Returns:
+            Dict mapping market_id -> {contract_name: token_id}
+        """
+        markets = self.get_political_markets()
+        token_map = {}
+
+        for market in markets:
+            market_tokens = {}
+            raw_data = market.raw_data or {}
+            nested_markets = raw_data.get('markets', [])
+
+            for m in nested_markets:
+                # Token IDs are in clobTokenIds field (may be JSON string)
+                clob_ids = m.get('clobTokenIds', [])
+                if isinstance(clob_ids, str):
+                    try:
+                        clob_ids = json.loads(clob_ids)
+                    except json.JSONDecodeError:
+                        clob_ids = []
+
+                # Outcomes may also be JSON string
+                outcomes = m.get('outcomes', '["Yes", "No"]')
+                if isinstance(outcomes, str):
+                    try:
+                        outcomes = json.loads(outcomes)
+                    except json.JSONDecodeError:
+                        outcomes = ['Yes', 'No']
+
+                question = m.get('question', m.get('title', ''))
+
+                # Map each outcome to its token ID
+                for i, token_id in enumerate(clob_ids):
+                    if i < len(outcomes):
+                        outcome_name = outcomes[i]
+                        key = f"{question} - {outcome_name}" if question else outcome_name
+                        market_tokens[key] = token_id
+
+            if market_tokens:
+                token_map[market.market_id] = market_tokens
+
+        return token_map
+
 
 # Quick test
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useFeaturedMarkets, useStats, useMarketsByCategory } from '@/hooks/useMarkets';
 import { MarketCard, OddsTable } from '@/components/odds';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,11 +8,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatVolume } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import type { TimeFilter } from '@/lib/types';
 
 export default function HomePage() {
+  const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
   const { data: featuredMarkets, isLoading: marketsLoading } = useFeaturedMarkets();
   const { data: stats, isLoading: statsLoading } = useStats();
-  const { data: presidentialMarkets, isLoading: presidentialLoading } = useMarketsByCategory('presidential');
+  const { data: presidentialMarkets, isLoading: presidentialLoading } = useMarketsByCategory('presidential', changePeriod);
 
   // Get the main presidential candidate market (not party)
   const presidentialMarket = presidentialMarkets?.find(
@@ -83,7 +86,11 @@ export default function HomePage() {
         {presidentialLoading ? (
           <Skeleton className="h-[300px] w-full" />
         ) : presidentialMarket ? (
-          <OddsTable market={presidentialMarket} />
+          <OddsTable
+            market={presidentialMarket}
+            changePeriod={changePeriod}
+            onChangePeriodChange={setChangePeriod}
+          />
         ) : (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">

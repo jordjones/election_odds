@@ -11,8 +11,9 @@ export default function MarketDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
 
-  const { data: market, isLoading: marketLoading, error: marketError } = useMarket(slug);
+  const { data: market, isLoading: marketLoading, error: marketError } = useMarket(slug, changePeriod);
   const { data: chartData, isLoading: chartLoading } = useChartData(slug, timeFilter);
 
   if (marketLoading) {
@@ -56,7 +57,12 @@ export default function MarketDetailPage() {
         {/* Odds Table */}
         <section>
           <h2 className="text-xl font-bold mb-4">Current Odds</h2>
-          <OddsTable market={market} showAllSources />
+          <OddsTable
+            market={market}
+            showAllSources
+            changePeriod={changePeriod}
+            onChangePeriodChange={setChangePeriod}
+          />
         </section>
       </div>
     </div>

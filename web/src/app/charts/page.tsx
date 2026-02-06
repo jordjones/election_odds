@@ -18,12 +18,13 @@ export default function ChartsPage() {
   const { data: markets, isLoading: marketsLoading } = useMarkets();
   const [selectedMarketId, setSelectedMarketId] = useState<string>('');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
 
   // Auto-select first market when data loads
   const marketId = selectedMarketId || markets?.[0]?.id || '';
 
   const { data: chartData, isLoading: chartLoading } = useChartData(marketId, timeFilter);
-  const { data: market, isLoading: marketLoading } = useMarket(marketId);
+  const { data: market, isLoading: marketLoading } = useMarket(marketId, changePeriod);
 
   return (
     <div className="container py-8">
@@ -77,7 +78,12 @@ export default function ChartsPage() {
             {marketLoading ? (
               <Skeleton className="h-[300px] w-full" />
             ) : market ? (
-              <OddsTable market={market} showAllSources />
+              <OddsTable
+                market={market}
+                showAllSources
+                changePeriod={changePeriod}
+                onChangePeriodChange={setChangePeriod}
+              />
             ) : null}
           </section>
         </div>

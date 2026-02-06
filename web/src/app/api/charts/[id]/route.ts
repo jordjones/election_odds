@@ -3,6 +3,25 @@ import { getChartData, isDatabaseAvailable, getMarket, type DataGranularity } fr
 import { mockMarkets, generateMockChartData } from '@/lib/api/mock-data';
 import type { TimeFilter } from '@/lib/types';
 
+// Candidate party affiliations for filtering primary charts
+const DEMOCRAT_CANDIDATES = new Set([
+  'Newsom', 'Cortez', 'Shapiro', 'Buttigieg', 'Whitmer', 'Harris', 'Pritzker',
+  'Beshear', 'Moore', 'Ossoff', 'Kelly', 'Booker', 'Klobuchar', 'Sanders',
+  'Warren', 'M_Obama', 'Obama', 'H_Clinton', 'Fetterman', 'Warnock', 'Murphy',
+  'Khanna', 'Gallego', 'P_Murphy', 'Polis', 'Cooper', 'Cuomo', 'Yang',
+  'Slotkin', 'Crockett', 'Mamdani', 'Talarico', 'Emanuel', 'Raimondo',
+  'Jeffries', 'Abrams', 'Walz', 'C_Clinton',
+]);
+
+const REPUBLICAN_CANDIDATES = new Set([
+  'Vance', 'Rubio', 'DeSantis', 'Haley', 'Ramaswamy', 'Trump', 'Trump_Jr',
+  'I_Trump', 'Youngkin', 'Gabbard', 'Carlson', 'Cruz', 'Hawley', 'S_Sanders',
+  'Kemp', 'Noem', 'Pence', 'R_Paul', 'Cotton', 'Kennedy', 'Musk', 'Abbott',
+  'Gaetz', 'M_Greene', 'Donalds', 'Stefanik', 'Thune', 'Britt', 'Massie',
+  'Bannon', 'T_Scott', 'R_Scott', 'Hagerty', 'Ernst', 'Crenshaw', 'Cheney',
+  'E_Trump', 'L_Trump', 'Hegseth', 'Patel', 'Burgum', 'Carson', 'McMahon',
+]);
+
 // Map market IDs to chart data IDs in the database
 // Note: electionbettingodds only has presidential candidate data
 function getChartMarketId(marketId: string): string | null {
@@ -11,7 +30,7 @@ function getChartMarketId(marketId: string): string | null {
       marketId.includes('presidential-election-winner')) {
     return 'presidential-2028';
   }
-  // Primary markets use the same presidential data for now
+  // Primary markets use the same presidential data (filtered by party)
   if (marketId === 'gop-nominee-2028' || marketId === 'dem-nominee-2028') {
     return 'presidential-2028';
   }
@@ -22,6 +41,24 @@ function getChartMarketId(marketId: string): string | null {
     return null;
   }
   return 'presidential-2028'; // fallback
+}
+
+// Get party filter for a market
+function getPartyFilter(marketId: string): 'dem' | 'gop' | null {
+  if (marketId === 'dem-nominee-2028' || marketId.includes('dem-primary') || marketId.includes('democratic')) {
+    return 'dem';
+  }
+  if (marketId === 'gop-nominee-2028' || marketId.includes('gop-primary') || marketId.includes('republican')) {
+    return 'gop';
+  }
+  return null;
+}
+
+// Filter candidates by party
+function filterByParty(candidates: string[], party: 'dem' | 'gop' | null): string[] {
+  if (!party) return candidates;
+  const partySet = party === 'dem' ? DEMOCRAT_CANDIDATES : REPUBLICAN_CANDIDATES;
+  return candidates.filter(c => partySet.has(c));
 }
 
 export async function GET(
@@ -79,9 +116,16 @@ export async function GET(
         const allChartData = getChartData(chartMarketId, undefined, undefined, undefined, granularity);
 
         if (allChartData.length > 0) {
-          // Get top 10 contracts by latest value for display
+          // Get party filter for primary markets
+          const partyFilter = getPartyFilter(id);
+
+          // Get top 10 contracts by latest value for display (filtered by party if applicable)
           const latestValues = allChartData[allChartData.length - 1]?.values || {};
+          const allCandidates = Object.keys(latestValues);
+          const partyCandidates = filterByParty(allCandidates, partyFilter);
+
           const topContracts = Object.entries(latestValues)
+            .filter(([name]) => partyCandidates.includes(name))
             .sort(([, a], [, b]) => b - a)
             .slice(0, 10)
             .map(([name]) => name);

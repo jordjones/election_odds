@@ -21,10 +21,10 @@ export function useMarkets(params?: {
 /**
  * Fetch a single market by ID or slug
  */
-export function useMarket(idOrSlug: string) {
+export function useMarket(idOrSlug: string, changePeriod?: TimeFilter) {
   return useQuery<Market>({
-    queryKey: ['market', idOrSlug],
-    queryFn: () => apiClient.getMarket(idOrSlug),
+    queryKey: ['market', idOrSlug, changePeriod],
+    queryFn: () => apiClient.getMarket(idOrSlug, changePeriod),
     enabled: !!idOrSlug,
   });
 }
