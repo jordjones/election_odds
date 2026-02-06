@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
-import { useMarketsByCategory, useMarkets, useChartData } from '@/hooks/useMarkets';
+import { useMarketsByCategory, useChartData } from '@/hooks/useMarkets';
 import { OddsTable, OddsChart } from '@/components/odds';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { TimeFilter } from '@/lib/types';
@@ -22,6 +22,7 @@ export default function PresidentialPage() {
   const params = useParams();
   const view = params.view as string;
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
 
   const config = VIEW_CONFIG[view];
 
@@ -29,7 +30,7 @@ export default function PresidentialPage() {
     notFound();
   }
 
-  const { data: markets, isLoading: marketsLoading } = useMarketsByCategory('presidential');
+  const { data: markets, isLoading: marketsLoading } = useMarketsByCategory('presidential', changePeriod);
 
   // Find the appropriate market based on view
   const market = markets?.find((m) => {
@@ -86,7 +87,12 @@ export default function PresidentialPage() {
         {/* Odds Table */}
         <section>
           <h2 className="text-xl font-bold mb-4">Current Odds</h2>
-          <OddsTable market={market} showAllSources />
+          <OddsTable
+            market={market}
+            showAllSources
+            changePeriod={changePeriod}
+            onChangePeriodChange={setChangePeriod}
+          />
         </section>
       </div>
     </div>

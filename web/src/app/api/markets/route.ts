@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getMarkets } from '@/lib/db';
-import type { MarketCategory } from '@/lib/types';
+import type { MarketCategory, TimeFilter } from '@/lib/types';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,17 +8,16 @@ export async function GET(request: Request) {
   const status = searchParams.get('status') as 'open' | 'all' | null;
   const limitStr = searchParams.get('limit');
   const limit = limitStr ? parseInt(limitStr, 10) : undefined;
-
-  console.log('[API /markets] Request received:', { category, status, limit });
+  const changePeriod = searchParams.get('changePeriod') as TimeFilter | null;
 
   try {
     const markets = getMarkets({
       category: category || undefined,
       status: status || undefined,
       limit,
+      changePeriod: changePeriod || '1d',
     });
 
-    console.log('[API /markets] Returning', markets.length, 'markets');
     return NextResponse.json(markets);
   } catch (error) {
     console.error('[API /markets] Error fetching markets:', error);

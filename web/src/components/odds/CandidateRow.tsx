@@ -1,6 +1,6 @@
 'use client';
 
-import type { Contract, MarketSource } from '@/lib/types';
+import type { Contract, MarketSource, TimeFilter } from '@/lib/types';
 import { MARKET_SOURCES } from '@/lib/types';
 import { formatPercent, formatPriceChange, formatVolume, getPriceChangeColor, cn } from '@/lib/utils';
 import { MarketPriceCell } from './MarketPriceCell';
@@ -9,6 +9,7 @@ interface CandidateRowProps {
   contract: Contract;
   rank: number;
   sources: MarketSource[];
+  changePeriod?: TimeFilter;
 }
 
 // Get initials from a name (e.g., "Joe Biden" -> "JB")
@@ -99,7 +100,7 @@ function getImageSettings(name: string): { scale: number; position: string } {
   return settings[name] || { scale: 1.5, position: '50% 20%' };
 }
 
-export function CandidateRow({ contract, rank, sources }: CandidateRowProps) {
+export function CandidateRow({ contract, rank, sources, changePeriod = '1d' }: CandidateRowProps) {
   // Get price for each source
   const getPriceForSource = (source: MarketSource) => {
     return contract.prices.find((p) => p.source === source);

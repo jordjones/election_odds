@@ -56,11 +56,13 @@ class ApiClient {
     category?: MarketCategory;
     status?: 'open' | 'all';
     limit?: number;
+    changePeriod?: TimeFilter;
   }): Promise<Market[]> {
     const searchParams = new URLSearchParams();
     if (params?.category) searchParams.set('category', params.category);
     if (params?.status) searchParams.set('status', params.status);
     if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.changePeriod) searchParams.set('changePeriod', params.changePeriod);
 
     const query = searchParams.toString();
     return this.fetch<Market[]>(`/markets${query ? `?${query}` : ''}`);
@@ -76,8 +78,8 @@ class ApiClient {
   /**
    * Get markets by category
    */
-  async getMarketsByCategory(category: MarketCategory): Promise<Market[]> {
-    return this.getMarkets({ category, status: 'open' });
+  async getMarketsByCategory(category: MarketCategory, changePeriod?: TimeFilter): Promise<Market[]> {
+    return this.getMarkets({ category, status: 'open', changePeriod });
   }
 
   /**

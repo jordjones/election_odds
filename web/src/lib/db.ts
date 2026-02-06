@@ -797,6 +797,89 @@ function createSlug(name: string, id: string): string {
   return `${slug}-${id}`;
 }
 
+// Helper to get timestamp for change period
+function getChangePeriodTimestamp(period: string): string {
+  const now = new Date();
+  switch (period) {
+    case '1d':
+      now.setDate(now.getDate() - 1);
+      break;
+    case '1w':
+      now.setDate(now.getDate() - 7);
+      break;
+    case '30d':
+      now.setDate(now.getDate() - 30);
+      break;
+    default:
+      now.setDate(now.getDate() - 1);
+  }
+  return now.toISOString();
+}
+
+/**
+ * Get historical prices from electionbettingodds for change calculation
+ * Returns a map of candidate name -> { current: price, historical: price }
+ */
+function getChartBasedPriceChanges(
+  dbMarketId: string,
+  changePeriod: string
+): Map<string, { current: number; historical: number }> {
+  const db = getDb();
+  const changeTimestamp = getChangePeriodTimestamp(changePeriod);
+
+  const result = new Map<string, { current: number; historical: number }>();
+
+  // Get the most recent prices from electionbettingodds (current)
+  const currentPricesQuery = `
+    SELECT
+      c.contract_name,
+      ps.yes_price
+    FROM contracts c
+    INNER JOIN (
+      SELECT contract_id, market_id, source, yes_price, snapshot_time,
+             ROW_NUMBER() OVER (PARTITION BY contract_id ORDER BY snapshot_time DESC) as rn
+      FROM price_snapshots
+      WHERE source = 'electionbettingodds'
+    ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
+    WHERE c.source = 'electionbettingodds' AND c.market_id = ?
+    AND ps.yes_price IS NOT NULL
+  `;
+
+  // Get the historical prices (closest to the change period timestamp)
+  const historicalPricesQuery = `
+    SELECT
+      c.contract_name,
+      ps.yes_price
+    FROM contracts c
+    INNER JOIN (
+      SELECT contract_id, market_id, source, yes_price, snapshot_time,
+             ROW_NUMBER() OVER (PARTITION BY contract_id ORDER BY snapshot_time DESC) as rn
+      FROM price_snapshots
+      WHERE source = 'electionbettingodds' AND snapshot_time <= ?
+    ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
+    WHERE c.source = 'electionbettingodds' AND c.market_id = ?
+    AND ps.yes_price IS NOT NULL
+  `;
+
+  const currentPrices = db.prepare(currentPricesQuery).all(dbMarketId) as { contract_name: string; yes_price: number }[];
+  const historicalPrices = db.prepare(historicalPricesQuery).all(changeTimestamp, dbMarketId) as { contract_name: string; yes_price: number }[];
+
+  // Build the result map with current prices
+  for (const row of currentPrices) {
+    result.set(row.contract_name.toLowerCase(), { current: row.yes_price, historical: row.yes_price });
+  }
+
+  // Update with historical prices
+  for (const row of historicalPrices) {
+    const key = row.contract_name.toLowerCase();
+    if (result.has(key)) {
+      result.get(key)!.historical = row.yes_price;
+    }
+  }
+
+  return result;
+}
+
 /**
  * Get all markets with their contracts and latest prices from all sources
  */
@@ -804,8 +887,11 @@ export function getMarkets(options?: {
   category?: MarketCategory;
   status?: 'open' | 'all';
   limit?: number;
+  changePeriod?: string;
 }): Market[] {
   const db = getDb();
+  const changePeriod = options?.changePeriod || '1d';
+  const changeTimestamp = getChangePeriodTimestamp(changePeriod);
 
   // Get all markets from all sources
   const marketsQuery = `
@@ -863,6 +949,24 @@ export function getMarkets(options?: {
     AND ps.yes_price IS NOT NULL
   `;
 
+  // Query for historical prices (closest to change period timestamp)
+  // Gets the most recent price before or at the cutoff timestamp
+  const historicalPricesQuery = `
+    SELECT
+      c.contract_id,
+      c.contract_name,
+      ps.yes_price,
+      ps.snapshot_time
+    FROM contracts c
+    INNER JOIN (
+      SELECT contract_id, market_id, source, yes_price, snapshot_time,
+             ROW_NUMBER() OVER (PARTITION BY source, market_id, contract_id ORDER BY snapshot_time DESC) as rn
+      FROM price_snapshots
+      WHERE snapshot_time <= ?
+    ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
+    WHERE c.market_id = ? AND c.source = ?
+  `;
+
   const markets: Market[] = [];
 
   // Process each canonical market type
@@ -904,6 +1008,16 @@ export function getMarkets(options?: {
     if (options?.category && category !== options.category) {
       continue;
     }
+
+    // Get chart-based price changes from electionbettingodds
+    // Map canonical type to electionbettingodds market ID
+    const eboMarketId = canonicalType === 'presidential-winner-2028' ? 'president_2028' :
+                        canonicalType === 'gop-nominee-2028' ? 'president_2028' :
+                        canonicalType === 'dem-nominee-2028' ? 'president_2028' : null;
+
+    const chartPriceChanges = eboMarketId
+      ? getChartBasedPriceChanges(eboMarketId, changePeriod)
+      : new Map<string, { current: number; historical: number }>();
 
     // Aggregate contracts from all sources
     // Map: normalized candidate name -> Contract with prices from all sources
@@ -983,13 +1097,34 @@ export function getMarkets(options?: {
       }
     }
 
-    // Convert to array and calculate aggregated prices
+    // Convert to array and calculate aggregated prices and price changes
     const contracts = Array.from(contractsByCandidate.values()).map(contract => {
       // Calculate average price across all sources
       const avgPrice = contract.prices.reduce((sum, p) => sum + p.yesPrice, 0) / contract.prices.length;
+
+      // Calculate price change from electionbettingodds chart data
+      // This matches what the chart shows
+      let priceChange = 0;
+
+      // Try to match the candidate name to the chart data
+      // Chart uses short names like "Vance", "Newsom", etc.
+      const shortName = contract.name.split(' ').pop()?.toLowerCase() || '';
+      const firstName = contract.name.split(' ')[0]?.toLowerCase() || '';
+
+      // Try different matching strategies
+      const chartData = chartPriceChanges.get(shortName) ||
+                        chartPriceChanges.get(firstName) ||
+                        chartPriceChanges.get(contract.name.toLowerCase());
+
+      if (chartData) {
+        // Price change = current chart price - historical chart price
+        priceChange = chartData.current - chartData.historical;
+      }
+
       return {
         ...contract,
         aggregatedPrice: avgPrice,
+        priceChange,
       };
     });
 

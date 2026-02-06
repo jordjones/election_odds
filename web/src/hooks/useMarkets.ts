@@ -32,10 +32,10 @@ export function useMarket(idOrSlug: string) {
 /**
  * Fetch markets by category
  */
-export function useMarketsByCategory(category: MarketCategory) {
+export function useMarketsByCategory(category: MarketCategory, changePeriod?: TimeFilter) {
   return useQuery<Market[]>({
-    queryKey: ['markets', 'category', category],
-    queryFn: () => apiClient.getMarketsByCategory(category),
+    queryKey: ['markets', 'category', category, changePeriod],
+    queryFn: () => apiClient.getMarketsByCategory(category, changePeriod),
     enabled: !!category,
   });
 }
