@@ -621,19 +621,147 @@ export async function getFeaturedMarketsAsync(): Promise<Market[]> {
   return featured.slice(0, 4);
 }
 
+type ChartGranularity = '5min' | '15min' | '1hour' | '6hour' | '3.5day' | '1day';
+
+// Interval in milliseconds for each granularity
+const GRANULARITY_MS: Record<ChartGranularity, number> = {
+  '5min': 5 * 60 * 1000,
+  '15min': 15 * 60 * 1000,
+  '1hour': 60 * 60 * 1000,
+  '6hour': 6 * 60 * 60 * 1000,
+  '3.5day': 3.5 * 24 * 60 * 60 * 1000,
+  '1day': 24 * 60 * 60 * 1000,
+};
+
+// Get time bucket string for a timestamp based on granularity
+function getTimeBucket(timestamp: string, granularity: ChartGranularity): string {
+  const date = new Date(timestamp);
+  switch (granularity) {
+    case '5min': {
+      const mins = Math.floor(date.getMinutes() / 5) * 5;
+      return `${date.toISOString().slice(0, 14)}${mins.toString().padStart(2, '0')}:00Z`;
+    }
+    case '15min': {
+      const mins = Math.floor(date.getMinutes() / 15) * 15;
+      return `${date.toISOString().slice(0, 14)}${mins.toString().padStart(2, '0')}:00Z`;
+    }
+    case '1hour':
+      return `${date.toISOString().slice(0, 13)}:00:00Z`;
+    case '6hour': {
+      const hours = Math.floor(date.getHours() / 6) * 6;
+      return `${date.toISOString().slice(0, 11)}${hours.toString().padStart(2, '0')}:00:00Z`;
+    }
+    case '3.5day':
+    case '1day':
+    default:
+      return `${date.toISOString().slice(0, 10)}T00:00:00Z`;
+  }
+}
+
+// Interpolate between data points to fill gaps
+function interpolateChartData(
+  data: { timestamp: string; values: Record<string, number> }[],
+  granularity: ChartGranularity
+): { timestamp: string; values: Record<string, number> }[] {
+  if (data.length < 2) return data;
+
+  const interval = GRANULARITY_MS[granularity];
+  const result: { timestamp: string; values: Record<string, number> }[] = [];
+  const allContracts = new Set<string>();
+
+  for (const point of data) {
+    for (const name of Object.keys(point.values)) {
+      allContracts.add(name);
+    }
+  }
+
+  for (let i = 0; i < data.length - 1; i++) {
+    const current = data[i];
+    const next = data[i + 1];
+    const currentTime = new Date(current.timestamp).getTime();
+    const nextTime = new Date(next.timestamp).getTime();
+
+    result.push(current);
+
+    const gap = nextTime - currentTime;
+    const steps = Math.floor(gap / interval);
+
+    if (steps > 1 && steps < 500) {
+      for (let step = 1; step < steps; step++) {
+        const t = step / steps;
+        const interpolatedTime = new Date(currentTime + step * interval);
+        const interpolatedValues: Record<string, number> = {};
+
+        for (const name of allContracts) {
+          const v1 = current.values[name];
+          const v2 = next.values[name];
+          if (v1 !== undefined && v2 !== undefined) {
+            interpolatedValues[name] = v1 + (v2 - v1) * t;
+          } else if (v1 !== undefined) {
+            interpolatedValues[name] = v1;
+          } else if (v2 !== undefined) {
+            interpolatedValues[name] = v2;
+          }
+        }
+
+        result.push({ timestamp: interpolatedTime.toISOString(), values: interpolatedValues });
+      }
+    }
+  }
+
+  result.push(data[data.length - 1]);
+  return result;
+}
+
+// Extract short candidate name for chart display from Polymarket contract names
+function extractChartCandidateName(contractName: string): string | null {
+  if (!contractName) return null;
+
+  // Skip "No" contracts
+  if (contractName.endsWith(' - No')) return null;
+
+  // Remove " - Yes" suffix
+  const cleanName = contractName.replace(/ - Yes$/, '');
+
+  const willMatch = cleanName.match(/^Will (.+?) (win|be) the 2028/i);
+  if (willMatch) {
+    const fullName = willMatch[1].trim();
+    if (/^(Person|Party|Candidate)\s+[A-Z]{1,2}$/i.test(fullName)) return null;
+    if (fullName.toLowerCase() === 'another person') return null;
+
+    // Special cases
+    if (fullName === 'Donald Trump Jr.') return 'Trump_Jr';
+    if (fullName.includes("'The Rock'")) return 'Johnson';
+    if (fullName === 'Robert F. Kennedy Jr.') return 'Kennedy';
+    if (fullName === 'Alexandria Ocasio-Cortez') return 'Ocasio-Cortez';
+    if (fullName === 'Sarah Huckabee Sanders') return 'S_Sanders';
+    if (fullName === 'Ivanka Trump') return 'I_Trump';
+    if (fullName === 'Michelle Obama') return 'M_Obama';
+    if (fullName === 'Hillary Clinton') return 'H_Clinton';
+    if (fullName === 'Chelsea Clinton') return 'C_Clinton';
+    if (fullName === 'Marjorie Taylor Greene') return 'M_Greene';
+    if (fullName === 'Phil Murphy') return 'P_Murphy';
+    if (fullName === 'Rand Paul') return 'R_Paul';
+
+    const parts = fullName.split(' ');
+    return parts[parts.length - 1];
+  }
+  return null;
+}
+
 /**
- * Get chart data (simplified for PostgreSQL)
+ * Get chart data with granularity and interpolation (PostgreSQL version)
  */
 export async function getChartDataAsync(
   marketId: string,
   startDate?: string,
   endDate?: string,
+  granularity: ChartGranularity = '1day',
 ): Promise<{ timestamp: string; values: Record<string, number> }[]> {
   const pool = getPool();
   const client = await pool.connect();
 
   try {
-    // Map market ID to Polymarket market ID
     const polymarketMapping: Record<string, string> = {
       'presidential-2028': '31552',
       'presidential-winner-2028': '31552',
@@ -645,14 +773,16 @@ export async function getChartDataAsync(
 
     const dbMarketId = polymarketMapping[marketId] || marketId;
 
+    // Query raw snapshots (not grouped by date) so we can bucket at any granularity
     let query = `
       SELECT
-        DATE(snapshot_time) as date,
+        ps.snapshot_time,
         c.contract_name,
-        AVG(ps.yes_price) as avg_price
+        ps.yes_price
       FROM price_snapshots ps
       JOIN contracts c ON ps.source = c.source AND ps.market_id = c.market_id AND ps.contract_id = c.contract_id
       WHERE ps.source = 'Polymarket' AND ps.market_id = $1
+        AND ps.yes_price IS NOT NULL
     `;
 
     const params: any[] = [dbMarketId];
@@ -670,30 +800,51 @@ export async function getChartDataAsync(
       paramIndex++;
     }
 
-    query += ` GROUP BY DATE(snapshot_time), c.contract_name ORDER BY date`;
+    query += ` ORDER BY ps.snapshot_time ASC`;
 
     const result = await client.query(query, params);
 
-    // Group by date
-    const byDate = new Map<string, Record<string, number>>();
+    // Group by time bucket based on granularity
+    const byBucket = new Map<string, { values: Record<string, number[]>; timestamp: string }>();
+
     for (const row of result.rows) {
-      const dateStr = row.date.toISOString().slice(0, 10);
-      if (!byDate.has(dateStr)) {
-        byDate.set(dateStr, {});
+      const ts = row.snapshot_time instanceof Date
+        ? row.snapshot_time.toISOString()
+        : String(row.snapshot_time);
+
+      const bucket = getTimeBucket(ts, granularity);
+
+      if (!byBucket.has(bucket)) {
+        byBucket.set(bucket, { values: {}, timestamp: bucket });
       }
 
-      // Extract candidate name from contract name
-      const candidateName = extractCandidateName(row.contract_name);
-      if (candidateName) {
-        const shortName = candidateName.split(' ').pop() || candidateName;
-        byDate.get(dateStr)![shortName] = parseFloat(row.avg_price) * 100;
+      const entry = byBucket.get(bucket)!;
+      const name = extractChartCandidateName(row.contract_name);
+      if (!name) continue;
+
+      const price = parseFloat(row.yes_price);
+      if (!entry.values[name]) {
+        entry.values[name] = [];
       }
+      entry.values[name].push(price * 100);
     }
 
-    return Array.from(byDate.entries()).map(([date, values]) => ({
-      timestamp: `${date}T00:00:00Z`,
-      values,
-    }));
+    // Average values within each bucket
+    const chartData: { timestamp: string; values: Record<string, number> }[] = [];
+    for (const [, entry] of byBucket) {
+      const avgValues: Record<string, number> = {};
+      for (const [name, prices] of Object.entries(entry.values)) {
+        avgValues[name] = prices.reduce((a, b) => a + b, 0) / prices.length;
+      }
+      chartData.push({ timestamp: entry.timestamp, values: avgValues });
+    }
+
+    // Interpolate to fill gaps for sub-daily granularities
+    if (chartData.length >= 2 && granularity !== '1day') {
+      return interpolateChartData(chartData, granularity);
+    }
+
+    return chartData;
   } finally {
     client.release();
   }

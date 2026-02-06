@@ -82,7 +82,7 @@ async function getDbMarket(id: string) {
 async function getDbChartData(chartMarketId: string, granularity: string, startDate?: string, endDate?: string) {
   if (usePostgres()) {
     const { getChartDataAsync } = await import('@/lib/db-pg');
-    return getChartDataAsync(chartMarketId, startDate, endDate);
+    return getChartDataAsync(chartMarketId, startDate, endDate, granularity as any);
   } else {
     const { getChartData } = await import('@/lib/db');
     return getChartData(chartMarketId, startDate, endDate, undefined, granularity as any);
@@ -113,16 +113,16 @@ export async function GET(
 
       switch (period) {
         case '1d':
-          granularity = '15min';
-          targetDataPoints = 96;
+          granularity = '5min';
+          targetDataPoints = 288; // 24h * 60min / 5min
           break;
         case '1w':
-          granularity = '1hour';
-          targetDataPoints = 168;
+          granularity = '6hour';
+          targetDataPoints = 28; // 7d * 24h / 6h
           break;
         case '30d':
-          granularity = '6hour';
-          targetDataPoints = 120;
+          granularity = '3.5day';
+          targetDataPoints = 9; // ~2 per week for 30 days
           break;
         case 'all':
         default:
