@@ -1,7 +1,7 @@
 'use client';
 
-import { useFeaturedMarkets, useStats } from '@/hooks/useMarkets';
-import { MarketCard } from '@/components/odds';
+import { useFeaturedMarkets, useStats, useMarketsByCategory } from '@/hooks/useMarkets';
+import { MarketCard, OddsTable } from '@/components/odds';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatVolume } from '@/lib/utils';
@@ -11,6 +11,12 @@ import { Button } from '@/components/ui/button';
 export default function HomePage() {
   const { data: featuredMarkets, isLoading: marketsLoading } = useFeaturedMarkets();
   const { data: stats, isLoading: statsLoading } = useStats();
+  const { data: presidentialMarkets, isLoading: presidentialLoading } = useMarketsByCategory('presidential');
+
+  // Get the main presidential candidate market (not party)
+  const presidentialMarket = presidentialMarkets?.find(
+    (m) => !m.name.toLowerCase().includes('party')
+  ) || presidentialMarkets?.[0];
 
   return (
     <div className="container py-8">
@@ -64,6 +70,27 @@ export default function HomePage() {
             </Card>
           </>
         ) : null}
+      </section>
+
+      {/* 2028 Presidential Odds */}
+      <section className="mb-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">2028 Presidential Odds</h2>
+          <Button variant="outline" asChild>
+            <Link href="/presidential/candidates">View Details</Link>
+          </Button>
+        </div>
+        {presidentialLoading ? (
+          <Skeleton className="h-[300px] w-full" />
+        ) : presidentialMarket ? (
+          <OddsTable market={presidentialMarket} />
+        ) : (
+          <Card>
+            <CardContent className="p-8 text-center text-muted-foreground">
+              Presidential market data unavailable
+            </CardContent>
+          </Card>
+        )}
       </section>
 
       {/* Featured Markets */}

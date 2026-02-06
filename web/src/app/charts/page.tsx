@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useMarkets, useChartData } from '@/hooks/useMarkets';
-import { OddsChart } from '@/components/odds';
+import { useMarkets, useChartData, useMarket } from '@/hooks/useMarkets';
+import { OddsChart, OddsTable } from '@/components/odds';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -23,6 +23,7 @@ export default function ChartsPage() {
   const marketId = selectedMarketId || markets?.[0]?.id || '';
 
   const { data: chartData, isLoading: chartLoading } = useChartData(marketId, timeFilter);
+  const { data: market, isLoading: marketLoading } = useMarket(marketId);
 
   return (
     <div className="container py-8">
@@ -60,12 +61,26 @@ export default function ChartsPage() {
 
       {/* Chart */}
       {marketId ? (
-        <OddsChart
-          data={chartData}
-          isLoading={chartLoading}
-          timeFilter={timeFilter}
-          onTimeFilterChange={setTimeFilter}
-        />
+        <div className="grid gap-8">
+          <section>
+            <OddsChart
+              data={chartData}
+              isLoading={chartLoading}
+              timeFilter={timeFilter}
+              onTimeFilterChange={setTimeFilter}
+            />
+          </section>
+
+          {/* Current Odds Table */}
+          <section>
+            <h2 className="text-xl font-bold mb-4">Current Odds</h2>
+            {marketLoading ? (
+              <Skeleton className="h-[300px] w-full" />
+            ) : market ? (
+              <OddsTable market={market} showAllSources />
+            ) : null}
+          </section>
+        </div>
       ) : (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
