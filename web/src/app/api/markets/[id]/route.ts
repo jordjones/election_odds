@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
-import { getMarket } from '@/lib/db';
-import { getMarketAsync, isPostgresAvailable } from '@/lib/db-pg';
 import type { TimeFilter } from '@/lib/types';
+
+// Dynamic import to avoid loading better-sqlite3 on Netlify
+async function getMarketFromDb(id: string, changePeriod: string) {
+  if (process.env.DATABASE_URL) {
+    const { getMarketAsync } = await import('@/lib/db-pg');
+    return getMarketAsync(id, changePeriod);
+  } else {
+    const { getMarket } = await import('@/lib/db');
+    return getMarket(id, changePeriod);
+  }
+}
 
 export async function GET(
   request: Request,
@@ -12,13 +21,7 @@ export async function GET(
   const changePeriod = (searchParams.get('changePeriod') as TimeFilter) || '1d';
 
   try {
-    let market;
-
-    if (isPostgresAvailable()) {
-      market = await getMarketAsync(id, changePeriod);
-    } else {
-      market = getMarket(id, changePeriod);
-    }
+    const market = await getMarketFromDb(id, changePeriod);
 
     if (!market) {
       return NextResponse.json(

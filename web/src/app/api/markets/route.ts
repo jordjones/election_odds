@@ -1,7 +1,22 @@
 import { NextResponse } from 'next/server';
-import { getMarkets } from '@/lib/db';
-import { getMarketsAsync, isPostgresAvailable } from '@/lib/db-pg';
 import type { MarketCategory, TimeFilter } from '@/lib/types';
+
+// Dynamic import to avoid loading better-sqlite3 on Netlify
+async function getMarketsFromDb(options: {
+  category?: MarketCategory;
+  status?: 'open' | 'all';
+  limit?: number;
+  changePeriod?: string;
+}) {
+  // Use PostgreSQL in production (Netlify), SQLite locally
+  if (process.env.DATABASE_URL) {
+    const { getMarketsAsync } = await import('@/lib/db-pg');
+    return getMarketsAsync(options);
+  } else {
+    const { getMarkets } = await import('@/lib/db');
+    return getMarkets(options);
+  }
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -12,24 +27,12 @@ export async function GET(request: Request) {
   const changePeriod = searchParams.get('changePeriod') as TimeFilter | null;
 
   try {
-    let markets;
-
-    // Use PostgreSQL in production, SQLite locally
-    if (isPostgresAvailable()) {
-      markets = await getMarketsAsync({
-        category: category || undefined,
-        status: status || undefined,
-        limit,
-        changePeriod: changePeriod || '1d',
-      });
-    } else {
-      markets = getMarkets({
-        category: category || undefined,
-        status: status || undefined,
-        limit,
-        changePeriod: changePeriod || '1d',
-      });
-    }
+    const markets = await getMarketsFromDb({
+      category: category || undefined,
+      status: status || undefined,
+      limit,
+      changePeriod: changePeriod || '1d',
+    });
 
     return NextResponse.json(markets);
   } catch (error) {
