@@ -37,6 +37,11 @@ export async function GET(request: Request) {
     return NextResponse.json(markets);
   } catch (error) {
     console.error('[API /markets] Error fetching markets:', error);
-    return NextResponse.json({ error: 'Failed to fetch markets', details: String(error) }, { status: 500 });
+    return NextResponse.json({
+      error: 'Failed to fetch markets',
+      details: String(error),
+      hasDbUrl: !!process.env.DATABASE_URL,
+      dbUrlPrefix: process.env.DATABASE_URL?.slice(0, 15) || 'not set',
+    }, { status: 500 });
   }
 }
