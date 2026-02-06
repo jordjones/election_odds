@@ -17,7 +17,7 @@ import type { TimeFilter } from '@/lib/types';
 export default function ChartsPage() {
   const { data: markets, isLoading: marketsLoading } = useMarkets();
   const [selectedMarketId, setSelectedMarketId] = useState<string>('');
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('1w');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
 
   // Auto-select first market when data loads
   const marketId = selectedMarketId || markets?.[0]?.id || '';

@@ -2,7 +2,7 @@
  * Core types for the Election Odds Aggregator
  */
 
-export type MarketSource = 'PredictIt' | 'Kalshi' | 'Polymarket' | 'Smarkets' | 'Betfair';
+export type MarketSource = 'PredictIt' | 'Kalshi' | 'Polymarket' | 'Smarkets';
 
 export type MarketRegion = 'US' | 'UK' | 'International';
 
@@ -101,7 +101,7 @@ export interface ApiError {
 }
 
 // Time filter options
-export type TimeFilter = '4h' | '1d' | '1w' | '30d' | 'all';
+export type TimeFilter = '1d' | '1w' | '30d' | 'all';
 
 export interface TimeFilterOption {
   value: TimeFilter;
@@ -109,8 +109,7 @@ export interface TimeFilterOption {
 }
 
 export const TIME_FILTER_OPTIONS: TimeFilterOption[] = [
-  { value: '4h', label: 'Last 4 hours' },
-  { value: '1d', label: 'Last day' },
+  { value: '1d', label: 'Last 24 hours' },
   { value: '1w', label: 'Last week' },
   { value: '30d', label: 'Last 30 days' },
   { value: 'all', label: 'All time' },
@@ -154,5 +153,4 @@ export const MARKET_SOURCES: Record<MarketSource, { name: string; region: Market
   Kalshi: { name: 'Kalshi', region: 'US', flag: '🇺🇸', url: 'https://kalshi.com' },
   Polymarket: { name: 'Polymarket', region: 'International', flag: '🌎', url: 'https://polymarket.com' },
   Smarkets: { name: 'Smarkets', region: 'UK', flag: '🇬🇧', url: 'https://smarkets.com' },
-  Betfair: { name: 'Betfair', region: 'UK', flag: '🇬🇧', url: 'https://betfair.com' },
 };

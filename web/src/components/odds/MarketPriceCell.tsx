@@ -37,7 +37,7 @@ export function MarketPriceCell({ price, source }: MarketPriceCellProps) {
               price.yesPrice >= 0.5 ? 'font-medium' : ''
             )}
           >
-            {formatPercent(price.yesPrice, 0)}
+            {formatPercent(price.yesPrice, 1)}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs">

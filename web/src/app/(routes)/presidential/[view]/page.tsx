@@ -21,7 +21,7 @@ const VIEW_CONFIG: Record<string, { title: string; description: string }> = {
 export default function PresidentialPage() {
   const params = useParams();
   const view = params.view as string;
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('1w');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
 
   const config = VIEW_CONFIG[view];
 

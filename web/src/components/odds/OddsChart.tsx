@@ -86,13 +86,6 @@ function formatTimestamp(timestamp: string, timeFilter: TimeFilter): string {
   const date = new Date(timestamp);
 
   switch (timeFilter) {
-    case '4h':
-      // Show time only: "2:30 PM"
-      return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
     case '1d':
       // Show time with hour: "Jan 23 2:00 PM"
       return date.toLocaleString('en-US', {

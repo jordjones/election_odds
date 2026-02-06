@@ -43,7 +43,7 @@ export function useMarketsByCategory(category: MarketCategory) {
 /**
  * Fetch chart data for a market
  */
-export function useChartData(marketId: string, timeFilter: TimeFilter = '1w') {
+export function useChartData(marketId: string, timeFilter: TimeFilter = 'all') {
   return useQuery<ChartData>({
     queryKey: ['chart', marketId, timeFilter],
     queryFn: () => apiClient.getChartData(marketId, timeFilter),

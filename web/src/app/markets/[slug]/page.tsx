@@ -10,7 +10,7 @@ import type { TimeFilter } from '@/lib/types';
 export default function MarketDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('1w');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
 
   const { data: market, isLoading: marketLoading, error: marketError } = useMarket(slug);
   const { data: chartData, isLoading: chartLoading } = useChartData(slug, timeFilter);

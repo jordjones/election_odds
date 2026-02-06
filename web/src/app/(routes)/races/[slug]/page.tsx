@@ -21,7 +21,7 @@ const RACE_CONFIG: Record<string, { category: MarketCategory; title: string }> =
 export default function RacePage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('1w');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
 
   const config = RACE_CONFIG[slug];
 

@@ -48,7 +48,7 @@ export function MarketCard({ market, linkTo }: MarketCardProps) {
                   {formatPriceChange(contract.priceChange)}
                 </span>
                 <span className="font-mono font-bold">
-                  {formatPercent(contract.aggregatedPrice, 0)}
+                  {formatPercent(contract.aggregatedPrice, 1)}
                 </span>
               </div>
             </div>

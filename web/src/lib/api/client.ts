@@ -83,7 +83,7 @@ class ApiClient {
   /**
    * Get chart data for a market
    */
-  async getChartData(marketId: string, timeFilter: TimeFilter = '1w'): Promise<ChartData> {
+  async getChartData(marketId: string, timeFilter: TimeFilter = 'all'): Promise<ChartData> {
     return this.fetch<ChartData>(`/charts/${marketId}?period=${timeFilter}`);
   }
 

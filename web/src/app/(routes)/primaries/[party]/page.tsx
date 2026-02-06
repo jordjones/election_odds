@@ -23,7 +23,7 @@ const PARTY_CONFIG: Record<string, { category: MarketCategory; title: string; co
 export default function PrimaryPage() {
   const params = useParams();
   const party = params.party as string;
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('1w');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
 
   const config = PARTY_CONFIG[party];
 
