@@ -332,17 +332,18 @@ function getChangePeriodTimestamp(period: string): string {
 }
 
 /**
- * Get historical prices from electionbettingodds for change calculation (PostgreSQL version)
+ * Get price changes from Polymarket data (matches chart source).
+ * Returns map of short candidate name (lowercase) -> { current, historical }
  */
 async function getChartBasedPriceChangesAsync(
   client: any,
-  dbMarketId: string,
+  polymarketMarketId: string,
   changePeriod: string
 ): Promise<Map<string, { current: number; historical: number }>> {
   const changeTimestamp = getChangePeriodTimestamp(changePeriod);
   const result = new Map<string, { current: number; historical: number }>();
 
-  // Get the most recent prices from electionbettingodds (current)
+  // Get the most recent Polymarket prices (current)
   const currentPricesResult = await client.query(`
     SELECT
       c.contract_name,
@@ -352,13 +353,13 @@ async function getChartBasedPriceChangesAsync(
       SELECT contract_id, market_id, source, yes_price, snapshot_time,
              ROW_NUMBER() OVER (PARTITION BY contract_id ORDER BY snapshot_time DESC) as rn
       FROM price_snapshots
-      WHERE source = 'electionbettingodds'
+      WHERE source = 'Polymarket'
     ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
-    WHERE c.source = 'electionbettingodds' AND c.market_id = $1
+    WHERE c.source = 'Polymarket' AND c.market_id = $1
     AND ps.yes_price IS NOT NULL
-  `, [dbMarketId]);
+  `, [polymarketMarketId]);
 
-  // Get the historical prices (closest to the change period timestamp)
+  // Get the historical Polymarket prices (closest to the change period timestamp)
   const historicalPricesResult = await client.query(`
     SELECT
       c.contract_name,
@@ -368,15 +369,17 @@ async function getChartBasedPriceChangesAsync(
       SELECT contract_id, market_id, source, yes_price, snapshot_time,
              ROW_NUMBER() OVER (PARTITION BY contract_id ORDER BY snapshot_time DESC) as rn
       FROM price_snapshots
-      WHERE source = 'electionbettingodds' AND snapshot_time <= $1
+      WHERE source = 'Polymarket' AND snapshot_time <= $1
     ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
-    WHERE c.source = 'electionbettingodds' AND c.market_id = $2
+    WHERE c.source = 'Polymarket' AND c.market_id = $2
     AND ps.yes_price IS NOT NULL
-  `, [changeTimestamp, dbMarketId]);
+  `, [changeTimestamp, polymarketMarketId]);
 
-  // Build the result map with current prices
+  // Build the result map keyed by short chart name (lowercase)
   for (const row of currentPricesResult.rows) {
-    result.set(row.contract_name.toLowerCase(), {
+    const name = extractChartCandidateName(row.contract_name);
+    if (!name) continue;
+    result.set(name.toLowerCase(), {
       current: parseFloat(row.yes_price),
       historical: parseFloat(row.yes_price),
     });
@@ -384,7 +387,9 @@ async function getChartBasedPriceChangesAsync(
 
   // Update with historical prices
   for (const row of historicalPricesResult.rows) {
-    const key = row.contract_name.toLowerCase();
+    const name = extractChartCandidateName(row.contract_name);
+    if (!name) continue;
+    const key = name.toLowerCase();
     if (result.has(key)) {
       result.get(key)!.historical = parseFloat(row.yes_price);
     }
@@ -469,13 +474,13 @@ export async function getMarketsAsync(options?: {
         continue;
       }
 
-      // Get chart-based price changes from electionbettingodds
-      const eboMarketId = canonicalType === 'presidential-winner-2028' ? 'president_2028' :
-                          canonicalType === 'gop-nominee-2028' ? 'president_2028' :
-                          canonicalType === 'dem-nominee-2028' ? 'president_2028' : null;
+      // Get price changes from Polymarket data (same source as charts)
+      const polymarketMarketId = canonicalType === 'presidential-winner-2028' ? '31552' :
+                                 canonicalType === 'gop-nominee-2028' ? '31875' :
+                                 canonicalType === 'dem-nominee-2028' ? '30829' : null;
 
-      const chartPriceChanges = eboMarketId
-        ? await getChartBasedPriceChangesAsync(client, eboMarketId, changePeriod)
+      const chartPriceChanges = polymarketMarketId
+        ? await getChartBasedPriceChangesAsync(client, polymarketMarketId, changePeriod)
         : new Map<string, { current: number; historical: number }>();
 
       // Aggregate contracts from all sources
