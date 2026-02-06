@@ -38,7 +38,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python scripts/sync_supabase.py --all --featured-only
+          python scripts/sync_supabase.py --source all --featured-only
 
   sync-all:
     runs-on: ubuntu-latest

@@ -27,4 +27,4 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          python scripts/sync_supabase.py --all
+          python scripts/sync_supabase.py --source all
