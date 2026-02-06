@@ -138,7 +138,30 @@ function extractCandidateName(contractName: string, contractId?: string): string
 
 // Normalize candidate name for matching
 function normalizeCandidateName(name: string): string {
-  return name.toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
+  let normalized = name
+    .toLowerCase()
+    .replace(/\./g, '')
+    .replace(/[\u0027\u0060\u00B4\u2018\u2019\u201B\u2032\u02B9\u02BC]/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const nameAliases: Record<string, string> = {
+    'a ocasio-cortez': 'alexandria ocasio-cortez',
+    'aoc': 'alexandria ocasio-cortez',
+    'ocasio-cortez': 'alexandria ocasio-cortez',
+    'donald j trump': 'donald trump',
+    'donald j trump jr': 'donald trump jr',
+    'm taylor greene': 'marjorie taylor greene',
+    'mtg': 'marjorie taylor greene',
+    'mayor pete': 'pete buttigieg',
+    'j hawley': 'josh hawley',
+    'g youngkin': 'glenn youngkin',
+    "beto o'rourke": "beto o'rourke",
+    'beto orourke': "beto o'rourke",
+    'stephen smith': 'stephen a smith',
+  };
+
+  return nameAliases[normalized] || normalized;
 }
 
 // Get image URL for candidate
@@ -522,9 +545,12 @@ export async function getMarketsAsync(options?: {
         let priceChange = 0;
         const shortName = contract.name.split(' ').pop()?.toLowerCase() || '';
         const firstName = contract.name.split(' ')[0]?.toLowerCase() || '';
+        // Also try last segment after hyphen (e.g. "Ocasio-Cortez" -> "cortez")
+        const lastHyphenPart = shortName.includes('-') ? shortName.split('-').pop() || '' : '';
         const chartData = chartPriceChanges.get(shortName) ||
                           chartPriceChanges.get(firstName) ||
-                          chartPriceChanges.get(contract.name.toLowerCase());
+                          chartPriceChanges.get(contract.name.toLowerCase()) ||
+                          (lastHyphenPart ? chartPriceChanges.get(lastHyphenPart) : undefined);
         if (chartData) {
           priceChange = chartData.current - chartData.historical;
         }
