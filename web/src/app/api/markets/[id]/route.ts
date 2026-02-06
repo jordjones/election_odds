@@ -1,12 +1,5 @@
 import { NextResponse } from 'next/server';
-import {
-  mockMarkets,
-  mockGOPPrimary,
-  mockDEMPrimary,
-  mockPresidential,
-  mockHouseControl,
-  mockSenateControl,
-} from '@/lib/api/mock-data';
+import { getMarket } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -14,15 +7,19 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  // Find market by id or slug
-  const market = mockMarkets.find((m) => m.id === id || m.slug === id);
+  try {
+    const market = getMarket(id);
 
-  if (!market) {
-    return NextResponse.json(
-      { error: 'Market not found' },
-      { status: 404 }
-    );
+    if (!market) {
+      return NextResponse.json(
+        { error: 'Market not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(market);
+  } catch (error) {
+    console.error('Error fetching market:', error);
+    return NextResponse.json({ error: 'Failed to fetch market' }, { status: 500 });
   }
-
-  return NextResponse.json(market);
 }

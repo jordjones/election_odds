@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { mockMarkets } from '@/lib/api/mock-data';
+import { getFeaturedMarkets } from '@/lib/db';
 
 export async function GET() {
-  // Return top 4 markets by volume for featured section
-  const featured = [...mockMarkets]
-    .sort((a, b) => b.totalVolume - a.totalVolume)
-    .slice(0, 4);
-
-  return NextResponse.json(featured);
+  try {
+    const featured = getFeaturedMarkets();
+    return NextResponse.json(featured);
+  } catch (error) {
+    console.error('Error fetching featured markets:', error);
+    return NextResponse.json({ error: 'Failed to fetch featured markets' }, { status: 500 });
+  }
 }
