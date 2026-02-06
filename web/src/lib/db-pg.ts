@@ -346,36 +346,29 @@ async function getChartBasedPriceChangesAsync(
   const changeTimestamp = getChangePeriodTimestamp(changePeriod);
   const result = new Map<string, { current: number; historical: number }>();
 
-  // Get the most recent Polymarket prices (current)
+  // Get the most recent Polymarket prices (current) using DISTINCT ON for index efficiency
   const currentPricesResult = await client.query(`
-    SELECT
+    SELECT DISTINCT ON (ps.contract_id)
       c.contract_name,
       ps.yes_price
-    FROM contracts c
-    INNER JOIN (
-      SELECT contract_id, market_id, source, yes_price, snapshot_time,
-             ROW_NUMBER() OVER (PARTITION BY contract_id ORDER BY snapshot_time DESC) as rn
-      FROM price_snapshots
-      WHERE source = 'Polymarket'
-    ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
-    WHERE c.source = 'Polymarket' AND c.market_id = $1
-    AND ps.yes_price IS NOT NULL
+    FROM price_snapshots ps
+    JOIN contracts c ON ps.source = c.source AND ps.market_id = c.market_id AND ps.contract_id = c.contract_id
+    WHERE ps.source = 'Polymarket' AND ps.market_id = $1
+      AND ps.yes_price IS NOT NULL
+    ORDER BY ps.contract_id, ps.snapshot_time DESC
   `, [polymarketMarketId]);
 
   // Get the historical Polymarket prices (closest to the change period timestamp)
   const historicalPricesResult = await client.query(`
-    SELECT
+    SELECT DISTINCT ON (ps.contract_id)
       c.contract_name,
       ps.yes_price
-    FROM contracts c
-    INNER JOIN (
-      SELECT contract_id, market_id, source, yes_price, snapshot_time,
-             ROW_NUMBER() OVER (PARTITION BY contract_id ORDER BY snapshot_time DESC) as rn
-      FROM price_snapshots
-      WHERE source = 'Polymarket' AND snapshot_time <= $1
-    ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
-    WHERE c.source = 'Polymarket' AND c.market_id = $2
-    AND ps.yes_price IS NOT NULL
+    FROM price_snapshots ps
+    JOIN contracts c ON ps.source = c.source AND ps.market_id = c.market_id AND ps.contract_id = c.contract_id
+    WHERE ps.source = 'Polymarket' AND ps.market_id = $2
+      AND ps.snapshot_time <= $1
+      AND ps.yes_price IS NOT NULL
+    ORDER BY ps.contract_id, ps.snapshot_time DESC
   `, [changeTimestamp, polymarketMarketId]);
 
   // Build the result map keyed by short chart name (lowercase)
@@ -486,28 +479,36 @@ export async function getMarketsAsync(options?: {
         ? await getChartBasedPriceChangesAsync(client, polymarketMarketId, changePeriod)
         : new Map<string, { current: number; historical: number }>();
 
-      // Aggregate contracts from all sources
+      // Aggregate contracts from all sources — batched into one query
       const contractsByCandidate = new Map<string, Contract>();
 
+      // Build WHERE conditions for all (market_id, source) pairs in this canonical type
+      const conditions: string[] = [];
+      const queryParams: any[] = [];
+      let paramIdx = 1;
       for (const dbMarket of relatedMarkets) {
-        // Get contracts with latest prices
-        const contractsResult = await client.query(`
-          SELECT
-            c.id, c.source, c.market_id, c.contract_id, c.contract_name,
-            ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
-          FROM contracts c
-          INNER JOIN LATERAL (
-            SELECT yes_price, no_price, volume, snapshot_time
-            FROM price_snapshots
-            WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
-            ORDER BY snapshot_time DESC
-            LIMIT 1
-          ) ps ON true
-          WHERE c.market_id = $1 AND c.source = $2
-          AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
-        `, [dbMarket.market_id, dbMarket.source]);
+        conditions.push(`(c.market_id = $${paramIdx} AND c.source = $${paramIdx + 1})`);
+        queryParams.push(dbMarket.market_id, dbMarket.source);
+        paramIdx += 2;
+      }
 
-        for (const contract of contractsResult.rows) {
+      const contractsResult = await client.query(`
+        SELECT
+          c.id, c.source, c.market_id, c.contract_id, c.contract_name,
+          ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
+        FROM contracts c
+        INNER JOIN LATERAL (
+          SELECT yes_price, no_price, volume, snapshot_time
+          FROM price_snapshots
+          WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
+          ORDER BY snapshot_time DESC
+          LIMIT 1
+        ) ps ON true
+        WHERE (${conditions.join(' OR ')})
+        AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
+      `, queryParams);
+
+      for (const contract of contractsResult.rows) {
           const candidateName = extractCandidateName(contract.contract_name, contract.contract_id);
           if (!candidateName) continue;
 
@@ -543,7 +544,6 @@ export async function getMarketsAsync(options?: {
             });
           }
         }
-      }
 
       // Calculate aggregated prices and price changes
       const contracts = Array.from(contractsByCandidate.values()).map(contract => {
@@ -779,7 +779,51 @@ export async function getChartDataAsync(
 
     const dbMarketId = polymarketMapping[marketId] || marketId;
 
-    // Query raw snapshots (not grouped by date) so we can bucket at any granularity
+    // For daily granularity, aggregate in SQL to avoid transferring 100K+ rows
+    if (granularity === '1day') {
+      let query = `
+        SELECT
+          DATE_TRUNC('day', ps.snapshot_time) as bucket,
+          c.contract_name,
+          AVG(ps.yes_price) as yes_price
+        FROM price_snapshots ps
+        JOIN contracts c ON ps.source = c.source AND ps.market_id = c.market_id AND ps.contract_id = c.contract_id
+        WHERE ps.source = 'Polymarket' AND ps.market_id = $1
+          AND ps.yes_price IS NOT NULL
+      `;
+      const params: any[] = [dbMarketId];
+      let paramIndex = 2;
+      if (startDate) {
+        query += ` AND ps.snapshot_time >= $${paramIndex}`;
+        params.push(startDate);
+        paramIndex++;
+      }
+      if (endDate) {
+        query += ` AND ps.snapshot_time <= $${paramIndex}`;
+        params.push(endDate);
+        paramIndex++;
+      }
+      query += ` GROUP BY bucket, c.contract_name ORDER BY bucket ASC`;
+
+      const result = await client.query(query, params);
+
+      // Group pre-aggregated rows by bucket
+      const byBucket = new Map<string, { timestamp: string; values: Record<string, number> }>();
+      for (const row of result.rows) {
+        const ts = row.bucket instanceof Date ? row.bucket.toISOString() : String(row.bucket);
+        const bucketKey = `${ts.slice(0, 10)}T00:00:00Z`;
+        if (!byBucket.has(bucketKey)) {
+          byBucket.set(bucketKey, { timestamp: bucketKey, values: {} });
+        }
+        const name = extractChartCandidateName(row.contract_name);
+        if (!name) continue;
+        byBucket.get(bucketKey)!.values[name] = parseFloat(row.yes_price) * 100;
+      }
+
+      return Array.from(byBucket.values());
+    }
+
+    // For sub-daily granularity, fetch raw snapshots and bucket in JS
     let query = `
       SELECT
         ps.snapshot_time,
@@ -846,7 +890,7 @@ export async function getChartDataAsync(
     }
 
     // Interpolate to fill gaps for sub-daily granularities
-    if (chartData.length >= 2 && granularity !== '1day') {
+    if (chartData.length >= 2) {
       return interpolateChartData(chartData, granularity);
     }
 

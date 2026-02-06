@@ -35,7 +35,11 @@ export async function GET(request: Request) {
       changePeriod: changePeriod || '1d',
     });
 
-    return NextResponse.json(markets);
+    return NextResponse.json(markets, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error('[API /markets] Error fetching markets:', error);
     return NextResponse.json({ error: 'Failed to fetch markets', details: String(error) }, { status: 500 });

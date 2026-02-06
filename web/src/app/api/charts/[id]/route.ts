@@ -201,11 +201,19 @@ export async function GET(
           ),
         }));
 
+        // Cache based on period: 1d changes faster, longer periods are more stable
+        const cacheMaxAge = period === '1d' ? 60 : 300;
+        const cacheStale = period === '1d' ? 120 : 600;
+
         return NextResponse.json({
           marketId: id,
           marketName: dbMarket.name,
           series: filteredSeries,
           contracts: topContracts,
+        }, {
+          headers: {
+            'Cache-Control': `public, s-maxage=${cacheMaxAge}, stale-while-revalidate=${cacheStale}`,
+          },
         });
       }
     }
