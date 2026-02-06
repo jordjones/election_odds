@@ -46,11 +46,11 @@ export function getChartData(
 ): ChartDataPoint[] {
   const db = getDb();
 
-  // Default to electionbettingodds source for historical data
-  const selectedSource = source || 'electionbettingodds';
+  // Default to Polymarket source for chart data (more accurate, matches table)
+  const selectedSource = source || 'Polymarket';
 
   // Map frontend market IDs to database market IDs
-  const dbMarketId = mapMarketId(marketId);
+  const dbMarketId = mapMarketIdForSource(marketId, selectedSource);
 
   let query = `
     SELECT
@@ -93,7 +93,13 @@ export function getChartData(
     }
 
     const entry = byTimestamp.get(bucket)!;
-    const name = row.contract_name || row.contract_id;
+    // Extract candidate name from contract name (handles Polymarket format)
+    const name = extractChartCandidateName(row.contract_name || row.contract_id, selectedSource);
+
+    // Skip placeholder contracts
+    if (!name || name.startsWith('Person ') || name.startsWith('Party ')) {
+      continue;
+    }
 
     if (row.yes_price !== null) {
       if (!entry.values[name]) {
@@ -203,6 +209,50 @@ function interpolateChartData(
 }
 
 /**
+ * Extract candidate name from contract name for chart display
+ * Handles different source formats (Polymarket, electionbettingodds, etc.)
+ */
+function extractChartCandidateName(contractName: string, source: string): string | null {
+  if (!contractName) return null;
+
+  // Polymarket format: "Will JD Vance win the 2028 US Presidential Election? - Yes"
+  // or "Will JD Vance be the 2028 Republican presidential nominee? - Yes"
+  if (source === 'Polymarket') {
+    // Skip "No" contracts - we only want "Yes" prices
+    if (contractName.endsWith(' - No')) {
+      return null;
+    }
+
+    // Remove " - Yes" suffix if present
+    const cleanName = contractName.replace(/ - Yes$/, '');
+
+    const willMatch = cleanName.match(/^Will (.+?) (win|be) the 2028/i);
+    if (willMatch) {
+      const fullName = willMatch[1].trim();
+      // Skip placeholder names
+      if (/^Person [A-Z]{1,2}$/i.test(fullName)) {
+        return null;
+      }
+      if (fullName.toLowerCase() === 'another person') {
+        return null;
+      }
+      // Return last name only for chart display (matches electionbettingodds style)
+      // Special handling for names that should keep multiple parts
+      if (fullName === 'Donald Trump Jr.') return 'Trump Jr.';
+      if (fullName === "Dwayne 'The Rock' Johnson") return 'Johnson';
+      if (fullName === 'Robert F. Kennedy Jr.') return 'RFK Jr.';
+
+      const parts = fullName.split(' ');
+      return parts[parts.length - 1];
+    }
+    return null;
+  }
+
+  // electionbettingodds format: just the candidate name (e.g., "Vance", "Newsom")
+  return contractName;
+}
+
+/**
  * Get time bucket string for a timestamp based on granularity
  */
 function getTimeBucket(timestamp: string, granularity: DataGranularity): string {
@@ -275,10 +325,27 @@ export function getDataRange(marketId?: string, source?: string): { earliest: st
 }
 
 /**
- * Map frontend market IDs to database market IDs
+ * Map frontend market IDs to database market IDs for a specific source
  */
-function mapMarketId(frontendId: string): string {
-  const mapping: Record<string, string> = {
+function mapMarketIdForSource(frontendId: string, source: string): string {
+  // Polymarket uses numeric market IDs
+  if (source === 'Polymarket') {
+    const polymarketMapping: Record<string, string> = {
+      'presidential-2028': '31552',        // Presidential Election Winner 2028
+      'pres-2028': '31552',
+      'president-2028': '31552',
+      'presidential-winner-2028': '31552',
+      'gop-primary-2028': '31875',         // Republican Presidential Nominee 2028
+      'gop-nominee-2028': '31875',
+      'dem-primary-2028': '30829',         // Democratic Presidential Nominee 2028
+      'dem-nominee-2028': '30829',
+      'presidential-party-2028': '33228',  // Which party wins 2028 US Presidential Election?
+    };
+    return polymarketMapping[frontendId] || frontendId;
+  }
+
+  // electionbettingodds uses text-based IDs
+  const eboMapping: Record<string, string> = {
     'presidential-2028': 'president_2028',
     'pres-2028': 'president_2028',
     'president-2028': 'president_2028',
@@ -286,7 +353,14 @@ function mapMarketId(frontendId: string): string {
     'dem-primary-2028': 'president_2028',  // Same data for now
   };
 
-  return mapping[frontendId] || frontendId;
+  return eboMapping[frontendId] || frontendId;
+}
+
+/**
+ * Map frontend market IDs to database market IDs (legacy, defaults to ebo)
+ */
+function mapMarketId(frontendId: string): string {
+  return mapMarketIdForSource(frontendId, 'electionbettingodds');
 }
 
 /**
@@ -390,8 +464,16 @@ const KALSHI_PERSON_MAP: Record<string, string> = {
 };
 
 // Extract candidate name from contract name or ID
-// Returns null if the contract should be skipped (unmapped Kalshi contracts)
+// Returns null if the contract should be skipped (unmapped Kalshi contracts, "No" contracts)
 function extractCandidateName(contractName: string, contractId?: string): string | null {
+  // Skip "No" contracts from Polymarket - we only want "Yes" prices
+  if (contractName.endsWith(' - No')) {
+    return null;
+  }
+
+  // Remove " - Yes" suffix if present (Polymarket format)
+  const cleanName = contractName.replace(/ - Yes$/, '');
+
   // Handle Kalshi KXPRESPERSON contracts - extract from contract ID
   if (contractId && contractId.startsWith('KXPRESPERSON-28-')) {
     const suffix = contractId.replace('KXPRESPERSON-28-', '');
@@ -402,22 +484,30 @@ function extractCandidateName(contractName: string, contractId?: string): string
     return null;
   }
 
-  // Handle "Will X win..." or "Will X be the nominee..." format (Kalshi)
-  const willMatch = contractName.match(/Will (.+?) (win|be the)/i);
+  // Handle "Will X win..." or "Will X be the nominee..." format (Polymarket/Kalshi)
+  const willMatch = cleanName.match(/Will (.+?) (win|be the)/i);
   if (willMatch) {
-    return willMatch[1].trim();
+    const name = willMatch[1].trim();
+    // Skip placeholder names
+    if (/^Person [A-Z]{1,2}$/i.test(name)) {
+      return null;
+    }
+    if (name.toLowerCase() === 'another person') {
+      return null;
+    }
+    return name;
   }
 
   // Handle party names
-  if (contractName.toLowerCase().includes('democrat')) return 'Democratic Party';
-  if (contractName.toLowerCase().includes('republican')) return 'Republican Party';
+  if (cleanName.toLowerCase().includes('democrat')) return 'Democratic Party';
+  if (cleanName.toLowerCase().includes('republican')) return 'Republican Party';
 
   // Skip generic question-style contract names
-  if (contractName.toLowerCase().startsWith('who will win')) {
+  if (cleanName.toLowerCase().startsWith('who will win')) {
     return null;
   }
 
-  return contractName;
+  return cleanName;
 }
 
 // Normalize candidate name for matching across sources

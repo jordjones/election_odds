@@ -22,25 +22,31 @@ const REPUBLICAN_CANDIDATES = new Set([
   'E_Trump', 'L_Trump', 'Hegseth', 'Patel', 'Burgum', 'Carson', 'McMahon',
 ]);
 
-// Map market IDs to chart data IDs in the database
-// Note: electionbettingodds only has presidential candidate data
+// Map frontend market IDs to chart data market IDs
+// Now uses Polymarket data which has separate markets for presidential, GOP, and DEM
 function getChartMarketId(marketId: string): string | null {
-  // Presidential candidate markets -> president_2028
+  // Presidential candidate markets
   if (marketId === 'presidential-winner-2028' ||
       marketId.includes('presidential-election-winner')) {
-    return 'presidential-2028';
+    return 'presidential-winner-2028';
   }
-  // Primary markets use the same presidential data (filtered by party)
-  if (marketId === 'gop-nominee-2028' || marketId === 'dem-nominee-2028') {
-    return 'presidential-2028';
+  // GOP primary market
+  if (marketId === 'gop-nominee-2028' || marketId.includes('gop-primary')) {
+    return 'gop-nominee-2028';
   }
-  // Party/House/Senate markets don't have historical data
-  if (marketId.includes('party') ||
-      marketId.includes('house') ||
-      marketId.includes('senate')) {
+  // DEM primary market
+  if (marketId === 'dem-nominee-2028' || marketId.includes('dem-primary')) {
+    return 'dem-nominee-2028';
+  }
+  // Party markets
+  if (marketId === 'presidential-party-2028' || marketId.includes('party-2028')) {
+    return 'presidential-party-2028';
+  }
+  // House/Senate markets don't have Polymarket historical data yet
+  if (marketId.includes('house') || marketId.includes('senate')) {
     return null;
   }
-  return 'presidential-2028'; // fallback
+  return marketId; // pass through for other markets
 }
 
 // Get party filter for a market
