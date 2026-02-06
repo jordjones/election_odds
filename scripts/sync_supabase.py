@@ -32,36 +32,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Featured market keywords - these get synced every 5 minutes
-FEATURED_KEYWORDS = [
-    # Presidential 2028
-    'presidential election winner 2028',
-    'presidential election 2028',
-    '2028 us presidential',
-    'next u.s. presidential',
-    # Primary nominees
-    'republican presidential nominee 2028',
-    'democratic presidential nominee 2028',
-    'republican nominee 2028',
-    'democratic nominee 2028',
-    '2028 republican nominee',
-    '2028 democratic nominee',
-    # Party control
-    'which party wins 2028',
-    'party wins the 2028',
-    # Congress 2026
-    'house 2026',
-    'senate 2026',
-    'which party will win the house',
-    'which party will win the senate',
-    'which party will control',
-]
 
-
-def is_featured_market(market_name: str) -> bool:
-    """Check if a market is a featured market."""
-    name_lower = market_name.lower()
-    return any(kw in name_lower for kw in FEATURED_KEYWORDS)
+def get_featured_market_ids(storage: SupabaseStorage, source: str) -> set:
+    """Get the set of market_ids from site_markets for this source."""
+    ids = storage.get_site_market_ids(source)
+    logger.info(f"Loaded {len(ids)} site market IDs for {source}")
+    return ids
 
 
 def sync_polymarket(storage: SupabaseStorage, featured_only: bool = False) -> dict:
@@ -74,8 +50,9 @@ def sync_polymarket(storage: SupabaseStorage, featured_only: bool = False) -> di
     logger.info(f"Found {len(markets)} political markets")
 
     if featured_only:
+        site_ids = get_featured_market_ids(storage, 'Polymarket')
         original_count = len(markets)
-        markets = [m for m in markets if is_featured_market(m.market_name)]
+        markets = [m for m in markets if m.market_id in site_ids]
         stats['skipped'] = original_count - len(markets)
         logger.info(f"Filtering to {len(markets)} featured markets (skipped {stats['skipped']})")
 
@@ -132,8 +109,9 @@ def sync_kalshi(storage: SupabaseStorage, featured_only: bool = False) -> dict:
     logger.info(f"Found {len(markets)} political markets")
 
     if featured_only:
+        site_ids = get_featured_market_ids(storage, 'Kalshi')
         original_count = len(markets)
-        markets = [m for m in markets if is_featured_market(m.market_name)]
+        markets = [m for m in markets if m.market_id in site_ids]
         stats['skipped'] = original_count - len(markets)
         logger.info(f"Filtering to {len(markets)} featured markets (skipped {stats['skipped']})")
 
@@ -190,8 +168,9 @@ def sync_predictit(storage: SupabaseStorage, featured_only: bool = False) -> dic
     logger.info(f"Found {len(markets)} political markets")
 
     if featured_only:
+        site_ids = get_featured_market_ids(storage, 'PredictIt')
         original_count = len(markets)
-        markets = [m for m in markets if is_featured_market(m.market_name)]
+        markets = [m for m in markets if m.market_id in site_ids]
         stats['skipped'] = original_count - len(markets)
         logger.info(f"Filtering to {len(markets)} featured markets (skipped {stats['skipped']})")
 

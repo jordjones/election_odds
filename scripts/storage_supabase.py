@@ -8,7 +8,7 @@ PostgreSQL (Supabase) instead of SQLite.
 import os
 import logging
 from datetime import datetime
-from typing import Optional, Tuple, List, Dict, Any
+from typing import Optional, Set, Tuple, List, Dict, Any
 
 import psycopg2
 from psycopg2.extras import execute_values
@@ -149,6 +149,15 @@ class SupabaseStorage:
             """, values)
 
             return len(values)
+
+    def get_site_market_ids(self, source: str) -> Set[str]:
+        """Get active market_ids from site_markets for a given source."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "SELECT market_id FROM site_markets WHERE source = %s AND is_active = true",
+                (source,)
+            )
+            return {row[0] for row in cur.fetchall()}
 
     def get_latest_snapshot_time(self, source: str) -> Optional[str]:
         """Get the most recent snapshot time for a source."""
