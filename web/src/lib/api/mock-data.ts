@@ -271,6 +271,5 @@ export const mockStats: AggregatedStats = {
     Kalshi: 128,
     Polymarket: 346,
     Smarkets: 10,
-    Betfair: 0,
   },
 };
