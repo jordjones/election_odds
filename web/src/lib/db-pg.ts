@@ -621,7 +621,7 @@ export async function getFeaturedMarketsAsync(): Promise<Market[]> {
   return featured.slice(0, 4);
 }
 
-type ChartGranularity = '5min' | '15min' | '1hour' | '6hour' | '3.5day' | '1day';
+type ChartGranularity = '5min' | '15min' | '1hour' | '6hour' | '1day';
 
 // Interval in milliseconds for each granularity
 const GRANULARITY_MS: Record<ChartGranularity, number> = {
@@ -629,7 +629,6 @@ const GRANULARITY_MS: Record<ChartGranularity, number> = {
   '15min': 15 * 60 * 1000,
   '1hour': 60 * 60 * 1000,
   '6hour': 6 * 60 * 60 * 1000,
-  '3.5day': 3.5 * 24 * 60 * 60 * 1000,
   '1day': 24 * 60 * 60 * 1000,
 };
 
@@ -651,7 +650,6 @@ function getTimeBucket(timestamp: string, granularity: ChartGranularity): string
       const hours = Math.floor(date.getHours() / 6) * 6;
       return `${date.toISOString().slice(0, 11)}${hours.toString().padStart(2, '0')}:00:00Z`;
     }
-    case '3.5day':
     case '1day':
     default:
       return `${date.toISOString().slice(0, 10)}T00:00:00Z`;

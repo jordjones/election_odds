@@ -121,7 +121,7 @@ export async function GET(
           targetDataPoints = 28; // 7d * 24h / 6h
           break;
         case '30d':
-          granularity = '3.5day';
+          granularity = '1day';
           targetDataPoints = 9; // ~2 per week for 30 days
           break;
         case 'all':
@@ -180,10 +180,15 @@ export async function GET(
           .slice(0, 10)
           .map(([name]) => name);
 
-        // Filter to target number of data points
+        // Downsample to target number of data points (evenly spaced)
         let filteredData = allChartData;
         if (targetDataPoints > 0 && allChartData.length > targetDataPoints) {
-          filteredData = allChartData.slice(-targetDataPoints);
+          const sampled: typeof allChartData = [];
+          for (let i = 0; i < targetDataPoints; i++) {
+            const idx = Math.round(i * (allChartData.length - 1) / (targetDataPoints - 1));
+            sampled.push(allChartData[idx]);
+          }
+          filteredData = sampled;
         }
 
         // Filter series to only include top contracts
