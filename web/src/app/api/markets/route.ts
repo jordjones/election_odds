@@ -38,13 +38,14 @@ export async function GET(request: Request) {
     return NextResponse.json(markets);
   } catch (error) {
     console.error('[API /markets] Error fetching markets:', error);
-    const envKeys = Object.keys(process.env).filter(k => k.includes('DATA') || k.includes('NETLIFY') || k.includes('DATABASE') || k.includes('NODE'));
+    const dbUrl = (process.env as Record<string, string | undefined>)['DATABASE_URL'];
     return NextResponse.json({
       error: 'Failed to fetch markets',
       details: String(error),
       usePostgresResult: usePostgres(),
-      envKeys,
-      hasNetlify: !!process.env['NETLIFY'],
+      dbUrlType: typeof dbUrl,
+      dbUrlLength: dbUrl?.length ?? -1,
+      dbUrlPrefix: dbUrl?.slice(0, 20) || 'empty/undefined',
     }, { status: 500 });
   }
 }
