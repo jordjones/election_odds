@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getChartData, isDatabaseAvailable, getMarket, type DataGranularity } from '@/lib/db';
+import { getChartDataAsync, getMarketAsync, isPostgresAvailable } from '@/lib/db-pg';
 import { mockMarkets, generateMockChartData } from '@/lib/api/mock-data';
 import type { TimeFilter } from '@/lib/types';
 
@@ -75,9 +76,11 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const period = (searchParams.get('period') as TimeFilter) || 'all';
 
-  // Try to use real database data first
-  if (isDatabaseAvailable()) {
-    const dbMarket = getMarket(id);
+  // Try PostgreSQL first (production), then SQLite (local)
+  const usePostgres = isPostgresAvailable();
+
+  if (usePostgres || isDatabaseAvailable()) {
+    const dbMarket = usePostgres ? await getMarketAsync(id) : getMarket(id);
 
     if (dbMarket) {
       try {
@@ -119,7 +122,9 @@ export async function GET(
           });
         }
 
-        const allChartData = getChartData(chartMarketId, undefined, undefined, undefined, granularity);
+        const allChartData = usePostgres
+          ? await getChartDataAsync(chartMarketId)
+          : getChartData(chartMarketId, undefined, undefined, undefined, granularity);
 
         if (allChartData.length > 0) {
           // Get party filter for primary markets

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getMarket } from '@/lib/db';
+import { getMarketAsync, isPostgresAvailable } from '@/lib/db-pg';
 import type { TimeFilter } from '@/lib/types';
 
 export async function GET(
@@ -11,7 +12,13 @@ export async function GET(
   const changePeriod = (searchParams.get('changePeriod') as TimeFilter) || '1d';
 
   try {
-    const market = getMarket(id, changePeriod);
+    let market;
+
+    if (isPostgresAvailable()) {
+      market = await getMarketAsync(id, changePeriod);
+    } else {
+      market = getMarket(id, changePeriod);
+    }
 
     if (!market) {
       return NextResponse.json(

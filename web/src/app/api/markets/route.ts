@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getMarkets } from '@/lib/db';
+import { getMarketsAsync, isPostgresAvailable } from '@/lib/db-pg';
 import type { MarketCategory, TimeFilter } from '@/lib/types';
 
 export async function GET(request: Request) {
@@ -11,12 +12,24 @@ export async function GET(request: Request) {
   const changePeriod = searchParams.get('changePeriod') as TimeFilter | null;
 
   try {
-    const markets = getMarkets({
-      category: category || undefined,
-      status: status || undefined,
-      limit,
-      changePeriod: changePeriod || '1d',
-    });
+    let markets;
+
+    // Use PostgreSQL in production, SQLite locally
+    if (isPostgresAvailable()) {
+      markets = await getMarketsAsync({
+        category: category || undefined,
+        status: status || undefined,
+        limit,
+        changePeriod: changePeriod || '1d',
+      });
+    } else {
+      markets = getMarkets({
+        category: category || undefined,
+        status: status || undefined,
+        limit,
+        changePeriod: changePeriod || '1d',
+      });
+    }
 
     return NextResponse.json(markets);
   } catch (error) {

@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getFeaturedMarkets } from '@/lib/db';
+import { getFeaturedMarketsAsync, isPostgresAvailable } from '@/lib/db-pg';
 
 export async function GET() {
   try {
-    const featured = getFeaturedMarkets();
+    let featured;
+
+    if (isPostgresAvailable()) {
+      featured = await getFeaturedMarketsAsync();
+    } else {
+      featured = getFeaturedMarkets();
+    }
+
     return NextResponse.json(featured);
   } catch (error) {
     console.error('Error fetching featured markets:', error);
