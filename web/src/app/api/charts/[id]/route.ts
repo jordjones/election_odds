@@ -122,7 +122,7 @@ export async function GET(
           break;
         case '30d':
           granularity = '1day';
-          targetDataPoints = 9; // ~2 per week for 30 days
+          targetDataPoints = 0; // 1 per day, no downsampling
           break;
         case 'all':
         default:
