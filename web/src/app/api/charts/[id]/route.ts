@@ -202,8 +202,8 @@ export async function GET(
         }));
 
         // Cache based on period: 1d changes faster, longer periods are more stable
-        const cacheMaxAge = period === '1d' ? 60 : 300;
-        const cacheStale = period === '1d' ? 120 : 600;
+        const cdnMaxAge = period === '1d' ? 60 : 300;
+        const cdnStale = period === '1d' ? 120 : 600;
 
         return NextResponse.json({
           marketId: id,
@@ -212,7 +212,9 @@ export async function GET(
           contracts: topContracts,
         }, {
           headers: {
-            'Cache-Control': `public, s-maxage=${cacheMaxAge}, stale-while-revalidate=${cacheStale}`,
+            'Cache-Control': `public, max-age=${Math.min(cdnMaxAge, 60)}`,
+            'CDN-Cache-Control': `public, max-age=${cdnMaxAge}, stale-while-revalidate=${cdnStale}`,
+            'Netlify-Vary': 'query',
           },
         });
       }

@@ -37,7 +37,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json(markets, {
       headers: {
-        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+        'Cache-Control': 'public, max-age=60',
+        'CDN-Cache-Control': 'public, max-age=120, stale-while-revalidate=300',
+        'Netlify-Vary': 'query',
       },
     });
   } catch (error) {
