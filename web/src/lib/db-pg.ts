@@ -302,6 +302,9 @@ function getCandidateImageUrl(name: string): string | undefined {
     'garlin gilchrist': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/8R4A9159_%2853359280492%29_%28Garlin_Gilchrist%29.jpg/400px-8R4A9159_%2853359280492%29_%28Garlin_Gilchrist%29.jpg',
     'peggy flanagan': 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/2023PeggyFlanaganLtGovMN.jpg/400px-2023PeggyFlanaganLtGovMN.jpg',
     'juliana stratton': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Juliana_Stratton_2023_%28cropped%29.jpg/400px-Juliana_Stratton_2023_%28cropped%29.jpg',
+    // Party logos
+    'democratic party': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/DemocraticLogo.svg/400px-DemocraticLogo.svg.png',
+    'republican party': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Republicanlogo.svg/400px-Republicanlogo.svg.png',
   };
   return candidateImages[normalizeCandidateName(name)];
 }
