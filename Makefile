@@ -71,7 +71,13 @@ cleanup:
 
 ## Trigger Netlify production deploy (remote build)
 deploy:
-	cd web && netlify deploy --prod --build
+	netlify api createSiteBuild --data '{"site_id": "3f2e8481-f34f-4ec2-896b-aaf3b611ec7f"}'
+	@echo "Deploy triggered. Watch status with: make deploy-status"
+
+## Check latest Netlify deploy status
+deploy-status:
+	@netlify api listSiteDeploys --data '{"site_id": "3f2e8481-f34f-4ec2-896b-aaf3b611ec7f"}' 2>&1 \
+		| python3 -c "import sys,json; d=json.load(sys.stdin)[0]; print(f'{d[\"state\"]}  {d[\"created_at\"][:19]}')"
 
 ## Trigger GitHub Actions sync workflow
 trigger-sync:
@@ -105,7 +111,8 @@ help:
 	@echo "  cleanup              Execute non-site snapshot thinning"
 	@echo ""
 	@echo "Deploy:"
-	@echo "  deploy               Netlify production deploy"
+	@echo "  deploy               Trigger Netlify remote build"
+	@echo "  deploy-status        Check latest deploy status"
 	@echo "  trigger-sync         Trigger featured sync workflow"
 	@echo "  trigger-sync-all     Trigger twice-daily sync workflow"
 	@echo ""
@@ -113,5 +120,5 @@ help:
 	@echo "  dev                  Start local dev server"
 
 .PHONY: set-db-url db-sql db-query db-stats sync-featured sync-all \
-	populate-site-markets cleanup-dry-run cleanup deploy \
+	populate-site-markets cleanup-dry-run cleanup deploy deploy-status \
 	trigger-sync trigger-sync-all dev help
