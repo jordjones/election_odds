@@ -195,7 +195,24 @@ export function OddsChart({
     }
   }, []);
 
-  // Handle mouse wheel for vertical zoom
+  // Drag state for panning
+  const isDragging = useRef(false);
+  const dragStart = useRef<{ y: number; domain: [number, number] } | null>(null);
+
+  // Chart dimensions for coordinate calculations
+  const chartTop = 20;
+  const chartBottom = 90;
+  const chartContainerHeight = 400;
+  const chartHeight = chartContainerHeight - chartTop - chartBottom;
+
+  // Convert mouse Y position to data value
+  const mouseYToValue = useCallback((mouseY: number, containerRect: DOMRect) => {
+    const relativeY = mouseY - containerRect.top - chartTop;
+    const fraction = 1 - (relativeY / chartHeight); // Invert because Y increases downward
+    return yDomain[0] + fraction * (yDomain[1] - yDomain[0]);
+  }, [yDomain, chartTop, chartHeight]);
+
+  // Handle mouse wheel for vertical zoom - zoom toward mouse position
   const handleWheel = useCallback((e: WheelEvent) => {
     // Only zoom when scrolling over the main chart area, not the brush
     const target = e.target as HTMLElement;
@@ -204,21 +221,29 @@ export function OddsChart({
     }
     e.preventDefault();
 
+    const container = chartContainerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const mouseValue = mouseYToValue(e.clientY, rect);
+
     const zoomFactor = 0.1;
     const direction = e.deltaY > 0 ? 1 : -1; // Scroll down = zoom out, up = zoom in
 
     setYDomain(([currentMin, currentMax]) => {
       const range = currentMax - currentMin;
-      const center = (currentMin + currentMax) / 2;
 
       // Calculate new range
       const newRange = direction > 0
         ? Math.min(1, range * (1 + zoomFactor))  // Zoom out
-        : Math.max(0.05, range * (1 - zoomFactor)); // Zoom in (min 5% range)
+        : Math.max(0.02, range * (1 - zoomFactor)); // Zoom in (min 2% range)
 
-      // Calculate new bounds centered
-      let newMin = center - newRange / 2;
-      let newMax = center + newRange / 2;
+      // Calculate position of mouse within current range (0-1)
+      const mouseRatio = (mouseValue - currentMin) / range;
+
+      // Calculate new bounds keeping mouse position fixed
+      let newMin = mouseValue - mouseRatio * newRange;
+      let newMax = mouseValue + (1 - mouseRatio) * newRange;
 
       // Clamp to valid range
       if (newMin < 0) {
@@ -232,6 +257,49 @@ export function OddsChart({
 
       return [newMin, newMax];
     });
+  }, [mouseYToValue]);
+
+  // Handle mouse down for drag start
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Only start drag on main chart area
+    const target = e.target as HTMLElement;
+    if (target.closest('.recharts-brush')) return;
+
+    isDragging.current = true;
+    dragStart.current = { y: e.clientY, domain: [...yDomain] as [number, number] };
+    e.preventDefault();
+  }, [yDomain]);
+
+  // Handle mouse move for dragging
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging.current || !dragStart.current) return;
+
+    const deltaY = e.clientY - dragStart.current.y;
+    const range = dragStart.current.domain[1] - dragStart.current.domain[0];
+
+    // Convert pixel movement to value movement
+    const valueDelta = (deltaY / chartHeight) * range;
+
+    let newMin = dragStart.current.domain[0] + valueDelta;
+    let newMax = dragStart.current.domain[1] + valueDelta;
+
+    // Clamp to valid range
+    if (newMin < 0) {
+      newMin = 0;
+      newMax = range;
+    }
+    if (newMax > 1) {
+      newMax = 1;
+      newMin = 1 - range;
+    }
+
+    setYDomain([newMin, newMax]);
+  }, [chartHeight]);
+
+  // Handle mouse up to end drag
+  const handleMouseUp = useCallback(() => {
+    isDragging.current = false;
+    dragStart.current = null;
   }, []);
 
   // Attach wheel event listener
@@ -242,6 +310,16 @@ export function OddsChart({
     container.addEventListener('wheel', handleWheel, { passive: false });
     return () => container.removeEventListener('wheel', handleWheel);
   }, [handleWheel]);
+
+  // Attach global mouse up listener to handle drag end outside container
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      isDragging.current = false;
+      dragStart.current = null;
+    };
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, []);
 
   // Show full 0-100% range
   const showFullRange = useCallback(() => {
@@ -325,8 +403,12 @@ export function OddsChart({
       <CardContent>
         <div
           ref={chartContainerRef}
-          className="h-[400px] cursor-ns-resize relative"
-          title="Scroll to zoom vertically"
+          className="h-[400px] cursor-grab active:cursor-grabbing relative select-none"
+          title="Scroll to zoom, drag to pan"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
         >
           {/* Timestamp label positioned above cursor line */}
           {tooltipData && (
