@@ -79,13 +79,13 @@ async function getDbMarket(id: string) {
   }
 }
 
-async function getDbChartData(chartMarketId: string, granularity: string) {
+async function getDbChartData(chartMarketId: string, granularity: string, startDate?: string, endDate?: string) {
   if (usePostgres()) {
     const { getChartDataAsync } = await import('@/lib/db-pg');
-    return getChartDataAsync(chartMarketId);
+    return getChartDataAsync(chartMarketId, startDate, endDate);
   } else {
     const { getChartData } = await import('@/lib/db');
-    return getChartData(chartMarketId, undefined, undefined, undefined, granularity as any);
+    return getChartData(chartMarketId, startDate, endDate, undefined, granularity as any);
   }
 }
 
@@ -145,7 +145,25 @@ export async function GET(
         });
       }
 
-      const allChartData = await getDbChartData(chartMarketId, granularity);
+      // Compute start date based on period
+      let startDate: string | undefined;
+      if (period !== 'all') {
+        const now = new Date();
+        switch (period) {
+          case '1d':
+            now.setDate(now.getDate() - 1);
+            break;
+          case '1w':
+            now.setDate(now.getDate() - 7);
+            break;
+          case '30d':
+            now.setDate(now.getDate() - 30);
+            break;
+        }
+        startDate = now.toISOString();
+      }
+
+      const allChartData = await getDbChartData(chartMarketId, granularity, startDate);
 
       if (allChartData.length > 0) {
         // Get party filter for primary markets
