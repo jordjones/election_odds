@@ -17,7 +17,6 @@ import type { ChartData, TimeFilter } from '@/lib/types';
 import { TimeFilterDropdown } from './TimeFilterDropdown';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
 
 // Tooltip data for custom rendering
 interface TooltipData {
@@ -87,10 +86,8 @@ function formatTimestamp(timestamp: string, timeFilter: TimeFilter): string {
 
   switch (timeFilter) {
     case '1d':
-      // Show time with hour: "Jan 23 2:00 PM"
+      // Show just time: "2:00 PM"
       return date.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
         hour: 'numeric',
         minute: '2-digit',
         hour12: true,
@@ -138,9 +135,11 @@ export function OddsChart({
   timeFilter,
   onTimeFilterChange,
 }: OddsChartProps) {
-  // Y-axis zoom state: [min, max] in 0-1 range
+  // Y-axis domain state: [min, max] in 0-1 range (fit to data)
   const [yDomain, setYDomain] = useState<[number, number]>([0, 1]);
-  const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  // Track which contracts are hidden (toggled off)
+  const [hiddenContracts, setHiddenContracts] = useState<Set<string>>(new Set());
 
   // Brush indices ref to persist across re-renders without causing them
   const brushIndicesRef = useRef<{ startIndex: number; endIndex: number } | null>(null);
@@ -149,19 +148,36 @@ export function OddsChart({
   // Tooltip data for custom rendering
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
 
+  // Toggle contract visibility
+  const toggleContract = useCallback((contract: string) => {
+    setHiddenContracts(prev => {
+      const next = new Set(prev);
+      if (next.has(contract)) {
+        next.delete(contract);
+      } else {
+        next.add(contract);
+      }
+      return next;
+    });
+  }, []);
+
   const handleTooltipData = useCallback((data: TooltipData | null) => {
     setTooltipData(data);
   }, []);
 
-  // Calculate data range for smart zooming
+  // Calculate data range for smart zooming - only consider visible contracts
   const dataRange = useMemo(() => {
     if (!data || data.series.length === 0) return { min: 0, max: 1 };
+
+    // Get visible contracts (not hidden)
+    const visibleContracts = data.contracts.filter(c => !hiddenContracts.has(c));
+    if (visibleContracts.length === 0) return { min: 0, max: 1 };
 
     let min = 1;
     let max = 0;
     for (const point of data.series) {
-      for (const value of Object.values(point.values)) {
-        if (typeof value === 'number') {
+      for (const [key, value] of Object.entries(point.values)) {
+        if (typeof value === 'number' && visibleContracts.includes(key)) {
           min = Math.min(min, value);
           max = Math.max(max, value);
         }
@@ -173,13 +189,18 @@ export function OddsChart({
       min: Math.max(0, min - padding),
       max: Math.min(1, max + padding),
     };
-  }, [data]);
+  }, [data, hiddenContracts]);
 
-  // Reset zoom and brush when data or time filter changes - default to fit data
+  // Update Y domain when data range changes (including when contracts are hidden/shown)
   useEffect(() => {
     setYDomain([dataRange.min, dataRange.max]);
+  }, [dataRange]);
+
+  // Reset brush and hidden contracts only when data changes
+  useEffect(() => {
     brushIndicesRef.current = null;
-  }, [data, timeFilter, dataRange]);
+    setHiddenContracts(new Set());
+  }, [data]);
 
   // Handle brush change - store in ref to avoid re-render loops
   const handleBrushChange = useCallback((params: { startIndex?: number; endIndex?: number }) => {
@@ -188,145 +209,6 @@ export function OddsChart({
     }
   }, []);
 
-  // Drag state for panning
-  const isDragging = useRef(false);
-  const dragStart = useRef<{ y: number; domain: [number, number] } | null>(null);
-
-  // Chart dimensions for coordinate calculations
-  const chartTop = 20;
-  const chartBottom = 90;
-  const chartContainerHeight = 400;
-  const chartHeight = chartContainerHeight - chartTop - chartBottom;
-
-  // Convert mouse Y position to data value
-  const mouseYToValue = useCallback((mouseY: number, containerRect: DOMRect) => {
-    const relativeY = mouseY - containerRect.top - chartTop;
-    const fraction = 1 - (relativeY / chartHeight); // Invert because Y increases downward
-    return yDomain[0] + fraction * (yDomain[1] - yDomain[0]);
-  }, [yDomain, chartTop, chartHeight]);
-
-  // Handle mouse wheel for vertical zoom - zoom toward mouse position
-  const handleWheel = useCallback((e: WheelEvent) => {
-    // Only zoom when scrolling over the main chart area, not the brush
-    const target = e.target as HTMLElement;
-    if (target.closest('.recharts-brush')) {
-      return; // Don't intercept brush events
-    }
-    e.preventDefault();
-
-    const container = chartContainerRef.current;
-    if (!container) return;
-
-    const rect = container.getBoundingClientRect();
-    const mouseValue = mouseYToValue(e.clientY, rect);
-
-    const zoomFactor = 0.1;
-    const direction = e.deltaY > 0 ? 1 : -1; // Scroll down = zoom out, up = zoom in
-
-    setYDomain(([currentMin, currentMax]) => {
-      const range = currentMax - currentMin;
-
-      // Calculate new range
-      const newRange = direction > 0
-        ? Math.min(1, range * (1 + zoomFactor))  // Zoom out
-        : Math.max(0.02, range * (1 - zoomFactor)); // Zoom in (min 2% range)
-
-      // Calculate position of mouse within current range (0-1)
-      const mouseRatio = (mouseValue - currentMin) / range;
-
-      // Calculate new bounds keeping mouse position fixed
-      let newMin = mouseValue - mouseRatio * newRange;
-      let newMax = mouseValue + (1 - mouseRatio) * newRange;
-
-      // Clamp to valid range
-      if (newMin < 0) {
-        newMin = 0;
-        newMax = Math.min(1, newRange);
-      }
-      if (newMax > 1) {
-        newMax = 1;
-        newMin = Math.max(0, 1 - newRange);
-      }
-
-      return [newMin, newMax];
-    });
-  }, [mouseYToValue]);
-
-  // Handle mouse down for drag start
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    // Only start drag on main chart area
-    const target = e.target as HTMLElement;
-    if (target.closest('.recharts-brush')) return;
-
-    isDragging.current = true;
-    dragStart.current = { y: e.clientY, domain: [...yDomain] as [number, number] };
-    e.preventDefault();
-  }, [yDomain]);
-
-  // Handle mouse move for dragging
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging.current || !dragStart.current) return;
-
-    const deltaY = e.clientY - dragStart.current.y;
-    const range = dragStart.current.domain[1] - dragStart.current.domain[0];
-
-    // Convert pixel movement to value movement
-    const valueDelta = (deltaY / chartHeight) * range;
-
-    let newMin = dragStart.current.domain[0] + valueDelta;
-    let newMax = dragStart.current.domain[1] + valueDelta;
-
-    // Clamp to valid range
-    if (newMin < 0) {
-      newMin = 0;
-      newMax = range;
-    }
-    if (newMax > 1) {
-      newMax = 1;
-      newMin = 1 - range;
-    }
-
-    setYDomain([newMin, newMax]);
-  }, [chartHeight]);
-
-  // Handle mouse up to end drag
-  const handleMouseUp = useCallback(() => {
-    isDragging.current = false;
-    dragStart.current = null;
-  }, []);
-
-  // Attach wheel event listener
-  useEffect(() => {
-    const container = chartContainerRef.current;
-    if (!container) return;
-
-    container.addEventListener('wheel', handleWheel, { passive: false });
-    return () => container.removeEventListener('wheel', handleWheel);
-  }, [handleWheel]);
-
-  // Attach global mouse up listener to handle drag end outside container
-  useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      isDragging.current = false;
-      dragStart.current = null;
-    };
-    window.addEventListener('mouseup', handleGlobalMouseUp);
-    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, []);
-
-  // Show full 0-100% range
-  const showFullRange = useCallback(() => {
-    setYDomain([0, 1]);
-  }, []);
-
-  // Fit zoom to data range
-  const fitToData = useCallback(() => {
-    setYDomain([dataRange.min, dataRange.max]);
-  }, [dataRange]);
-
-  // Check if currently showing full range or fit-to-data
-  const isFullRange = yDomain[0] === 0 && yDomain[1] === 1;
-  const isFitToData = Math.abs(yDomain[0] - dataRange.min) < 0.001 && Math.abs(yDomain[1] - dataRange.max) < 0.001;
 
   if (isLoading) {
     return (
@@ -370,39 +252,19 @@ export function OddsChart({
   // Calculate X-axis tick interval to avoid label crowding
   const getXAxisInterval = (): number | 'preserveStartEnd' => {
     const dataLength = chartData.length;
-    // Aim for roughly 8-12 labels on the X-axis
-    if (dataLength <= 12) return 0; // Show all labels
-    return Math.floor(dataLength / 10);
+    // Aim for roughly 8 labels on the X-axis
+    if (dataLength <= 8) return 0; // Show all labels
+    return Math.floor(dataLength / 8);
   };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Price History</CardTitle>
-        <div className="flex items-center gap-2">
-          {!isFullRange && (
-            <Button variant="outline" size="sm" onClick={showFullRange}>
-              Full Range
-            </Button>
-          )}
-          {!isFitToData && (
-            <Button variant="outline" size="sm" onClick={fitToData}>
-              Fit to Data
-            </Button>
-          )}
-          <TimeFilterDropdown value={timeFilter} onChange={onTimeFilterChange} />
-        </div>
+        <TimeFilterDropdown value={timeFilter} onChange={onTimeFilterChange} />
       </CardHeader>
       <CardContent>
-        <div
-          ref={chartContainerRef}
-          className="h-[400px] cursor-grab active:cursor-grabbing relative select-none"
-          title="Scroll to zoom, drag to pan"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        >
+        <div className="h-[400px] relative">
           {/* Timestamp label positioned above cursor line */}
           {tooltipData && (
             <div
@@ -426,48 +288,99 @@ export function OddsChart({
           )}
           {/* Value labels positioned next to data points */}
           {tooltipData && (() => {
-            // Chart area constants - tuned for Recharts layout
-            const chartTop = 5;
-            const chartBottom = 90; // X-axis + brush + legend
-            const chartHeight = 400 - chartTop - chartBottom;
-            const labelHeight = 16;
-            const minGap = 2;
+            // Chart plot area (where data points are drawn)
+            const plotTop = 5;
+            const plotBottom = 90; // X-axis + brush area
+            const plotHeight = 400 - plotTop - plotBottom;
 
-            // Calculate Y positions for each label
-            const labels = tooltipData.values.map(({ name, value, color }) => {
-              const yPercent = (value - yDomain[0]) / (yDomain[1] - yDomain[0]);
-              const rawY = chartTop + (1 - yPercent) * chartHeight;
-              return { name, value, color, rawY, adjustedY: rawY };
-            });
+            // Label bounds (can extend into x-axis area)
+            const labelMinY = plotTop + 8;
+            const labelMaxY = plotTop + plotHeight + 35; // Allow overlap with x-axis
 
-            // Sort by Y position (top to bottom) for overlap prevention
-            labels.sort((a, b) => a.rawY - b.rawY);
+            const baseLabelHeight = 16;
+            const baseMinSpacing = 18;
+            const minScale = 0.6; // Can shrink labels up to 40%
 
-            // Spread overlapping labels apart from their center point
-            // This keeps labels closer to their actual positions
-            for (let i = 0; i < labels.length - 1; i++) {
-              const curr = labels[i];
-              const next = labels[i + 1];
-              const overlap = (curr.adjustedY + labelHeight / 2 + minGap) - (next.adjustedY - labelHeight / 2);
+            // Calculate Y positions for each label (all on right side)
+            const labels = tooltipData.values
+              .map(({ name, value, color }) => {
+                const yPercent = (value - yDomain[0]) / (yDomain[1] - yDomain[0]);
+                const rawY = plotTop + (1 - yPercent) * plotHeight;
+                return { name, value, color, rawY, adjustedY: rawY, scale: 1.0 };
+              })
+              .sort((a, b) => a.rawY - b.rawY); // Sort by Y position (top to bottom)
 
-              if (overlap > 0) {
-                // Split the overlap between both labels
-                const shift = overlap / 2;
-                curr.adjustedY -= shift;
-                next.adjustedY += shift;
-              }
+            // Calculate how much space we need vs have
+            const totalNeededSpace = (labels.length - 1) * baseMinSpacing;
+            const yRange = labels.length > 1
+              ? labels[labels.length - 1].rawY - labels[0].rawY
+              : totalNeededSpace;
+
+            // Determine scale factor based on crowding
+            let scale = 1.0;
+            if (yRange < totalNeededSpace) {
+              scale = Math.max(minScale, yRange / totalNeededSpace);
             }
 
-            return labels.map(({ name, value, color, adjustedY }) => (
+            const minSpacing = baseMinSpacing * scale;
+            labels.forEach(label => { label.scale = scale; });
+
+            // Resolve overlaps - only push labels that actually overlap
+            for (let pass = 0; pass < 15; pass++) {
+              let maxOverlap = 0;
+
+              for (let i = 0; i < labels.length - 1; i++) {
+                const curr = labels[i];
+                const next = labels[i + 1];
+                const overlap = (curr.adjustedY + minSpacing) - next.adjustedY;
+
+                if (overlap > 0) {
+                  maxOverlap = Math.max(maxOverlap, overlap);
+                  const adjustment = overlap / 2 + 0.5;
+                  curr.adjustedY -= adjustment;
+                  next.adjustedY += adjustment;
+                }
+              }
+
+              // Clamp to bounds
+              for (let i = 0; i < labels.length; i++) {
+                if (labels[i].adjustedY < labelMinY) {
+                  const diff = labelMinY - labels[i].adjustedY;
+                  labels[i].adjustedY = labelMinY;
+                  for (let j = i + 1; j < labels.length; j++) {
+                    labels[j].adjustedY += diff * 0.7;
+                  }
+                }
+              }
+              for (let i = labels.length - 1; i >= 0; i--) {
+                if (labels[i].adjustedY > labelMaxY) {
+                  const diff = labels[i].adjustedY - labelMaxY;
+                  labels[i].adjustedY = labelMaxY;
+                  for (let j = i - 1; j >= 0; j--) {
+                    labels[j].adjustedY -= diff * 0.7;
+                  }
+                }
+              }
+
+              if (maxOverlap < 1) break;
+            }
+
+            // Calculate font size in pixels (base is 12px for text-xs)
+            const fontSize = Math.round(12 * scale);
+
+            return labels.map(({ name, value, color, adjustedY, scale: labelScale }) => (
               <div
                 key={name}
-                className="absolute z-10 text-xs font-medium pointer-events-none whitespace-nowrap px-1 rounded"
+                className="absolute z-10 font-medium pointer-events-none whitespace-nowrap rounded"
                 style={{
                   left: tooltipData.cursorX + 8,
                   top: adjustedY,
                   transform: 'translateY(-50%)',
                   color,
-                  backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.69)',
+                  fontSize: `${fontSize}px`,
+                  padding: `${Math.round(2 * labelScale)}px ${Math.round(6 * labelScale)}px`,
+                  lineHeight: 1.2,
                 }}
               >
                 {(value * 100).toFixed(1)}% {name}
@@ -482,9 +395,6 @@ export function OddsChart({
                 tick={{ fontSize: 11 }}
                 interval={getXAxisInterval()}
                 className="text-muted-foreground"
-                angle={timeFilter === '1d' ? -45 : 0}
-                textAnchor={timeFilter === '1d' ? 'end' : 'middle'}
-                height={timeFilter === '1d' ? 60 : 30}
               />
               <YAxis
                 tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
@@ -498,7 +408,6 @@ export function OddsChart({
                 cursor={{ stroke: '#888', strokeWidth: 1 }}
                 content={<CustomTooltipContent onTooltipData={handleTooltipData} />}
               />
-              <Legend />
               {data.contracts.map((contract, index) => (
                 <Line
                   key={contract}
@@ -515,6 +424,7 @@ export function OddsChart({
                   }}
                   isAnimationActive={false}
                   connectNulls={true}
+                  hide={hiddenContracts.has(contract)}
                 />
               ))}
               {/* Range selector brush below chart */}
@@ -530,6 +440,28 @@ export function OddsChart({
               />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+        {/* Custom clickable legend */}
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-2">
+          {data.contracts.map((contract, index) => {
+            const isHidden = hiddenContracts.has(contract);
+            const color = CHART_COLORS[index % CHART_COLORS.length];
+            return (
+              <button
+                key={contract}
+                onClick={() => toggleContract(contract)}
+                className={`flex items-center gap-1.5 px-2 py-1 rounded text-sm transition-opacity hover:bg-muted ${
+                  isHidden ? 'opacity-40' : ''
+                }`}
+              >
+                <span
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: color }}
+                />
+                <span className={isHidden ? 'line-through' : ''}>{contract}</span>
+              </button>
+            );
+          })}
         </div>
       </CardContent>
     </Card>

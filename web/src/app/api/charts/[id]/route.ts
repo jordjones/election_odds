@@ -79,11 +79,11 @@ export async function GET(
         const allChartData = getChartData(chartMarketId, undefined, undefined, undefined, granularity);
 
         if (allChartData.length > 0) {
-          // Get top 6 contracts by latest value for display
+          // Get top 10 contracts by latest value for display
           const latestValues = allChartData[allChartData.length - 1]?.values || {};
           const topContracts = Object.entries(latestValues)
             .sort(([, a], [, b]) => b - a)
-            .slice(0, 6)
+            .slice(0, 10)
             .map(([name]) => name);
 
           // Filter to target number of data points
