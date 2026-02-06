@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { getChartData, isDatabaseAvailable, getMarket, type DataGranularity } from '@/lib/db';
-import { getChartDataAsync, getMarketAsync, isPostgresAvailable } from '@/lib/db-pg';
 import { mockMarkets, generateMockChartData } from '@/lib/api/mock-data';
 import type { TimeFilter } from '@/lib/types';
 
@@ -68,6 +66,34 @@ function filterByParty(candidates: string[], party: 'dem' | 'gop' | null): strin
   return candidates.filter(c => partySet.has(c));
 }
 
+// Dynamic imports to avoid loading better-sqlite3 on Netlify
+async function getDbMarket(id: string) {
+  if (process.env.DATABASE_URL) {
+    const { getMarketAsync } = await import('@/lib/db-pg');
+    return getMarketAsync(id);
+  } else {
+    const { getMarket, isDatabaseAvailable } = await import('@/lib/db');
+    if (!isDatabaseAvailable()) return null;
+    return getMarket(id);
+  }
+}
+
+async function getDbChartData(chartMarketId: string, granularity: string) {
+  if (process.env.DATABASE_URL) {
+    const { getChartDataAsync } = await import('@/lib/db-pg');
+    return getChartDataAsync(chartMarketId);
+  } else {
+    const { getChartData } = await import('@/lib/db');
+    return getChartData(chartMarketId, undefined, undefined, undefined, granularity as any);
+  }
+}
+
+function isDbAvailable(): boolean {
+  if (process.env.DATABASE_URL) return true;
+  // For SQLite, we can't check without importing - assume true and catch errors
+  return true;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -76,98 +102,91 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const period = (searchParams.get('period') as TimeFilter) || 'all';
 
-  // Try PostgreSQL first (production), then SQLite (local)
-  const usePostgres = isPostgresAvailable();
-
-  if (usePostgres || isDatabaseAvailable()) {
-    const dbMarket = usePostgres ? await getMarketAsync(id) : getMarket(id);
+  try {
+    const dbMarket = await getDbMarket(id);
 
     if (dbMarket) {
-      try {
-        // Determine granularity and target data points based on period
-        let granularity: DataGranularity;
-        let targetDataPoints: number;
+      // Determine granularity and target data points based on period
+      let granularity: string;
+      let targetDataPoints: number;
 
-        switch (period) {
-          case '1d':
-            granularity = '15min';
-            targetDataPoints = 96;
-            break;
-          case '1w':
-            granularity = '1hour';
-            targetDataPoints = 168;
-            break;
-          case '30d':
-            granularity = '6hour';
-            targetDataPoints = 120;
-            break;
-          case 'all':
-          default:
-            granularity = '1day';
-            targetDataPoints = 0;
-            break;
+      switch (period) {
+        case '1d':
+          granularity = '15min';
+          targetDataPoints = 96;
+          break;
+        case '1w':
+          granularity = '1hour';
+          targetDataPoints = 168;
+          break;
+        case '30d':
+          granularity = '6hour';
+          targetDataPoints = 120;
+          break;
+        case 'all':
+        default:
+          granularity = '1day';
+          targetDataPoints = 0;
+          break;
+      }
+
+      // Get chart data using the mapped market ID for electionbettingodds data
+      const chartMarketId = getChartMarketId(id);
+
+      // If no historical data available for this market type, return empty
+      if (!chartMarketId) {
+        return NextResponse.json({
+          marketId: id,
+          marketName: dbMarket.name,
+          series: [],
+          contracts: [],
+          message: 'No historical chart data available for this market type',
+        });
+      }
+
+      const allChartData = await getDbChartData(chartMarketId, granularity);
+
+      if (allChartData.length > 0) {
+        // Get party filter for primary markets
+        const partyFilter = getPartyFilter(id);
+
+        // Get top 10 contracts by latest value for display (filtered by party if applicable)
+        const latestValues = allChartData[allChartData.length - 1]?.values || {};
+        const allCandidates = Object.keys(latestValues);
+        const partyCandidates = filterByParty(allCandidates, partyFilter);
+
+        const topContracts = Object.entries(latestValues)
+          .filter(([name]) => partyCandidates.includes(name))
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 10)
+          .map(([name]) => name);
+
+        // Filter to target number of data points
+        let filteredData = allChartData;
+        if (targetDataPoints > 0 && allChartData.length > targetDataPoints) {
+          filteredData = allChartData.slice(-targetDataPoints);
         }
 
-        // Get chart data using the mapped market ID for electionbettingodds data
-        const chartMarketId = getChartMarketId(id);
+        // Filter series to only include top contracts
+        const filteredSeries = filteredData.map(point => ({
+          timestamp: point.timestamp,
+          values: Object.fromEntries(
+            Object.entries(point.values)
+              .filter(([name]) => topContracts.includes(name))
+              .map(([name, value]) => [name, value / 100])
+          ),
+        }));
 
-        // If no historical data available for this market type, return empty
-        if (!chartMarketId) {
-          return NextResponse.json({
-            marketId: id,
-            marketName: dbMarket.name,
-            series: [],
-            contracts: [],
-            message: 'No historical chart data available for this market type',
-          });
-        }
-
-        const allChartData = usePostgres
-          ? await getChartDataAsync(chartMarketId)
-          : getChartData(chartMarketId, undefined, undefined, undefined, granularity);
-
-        if (allChartData.length > 0) {
-          // Get party filter for primary markets
-          const partyFilter = getPartyFilter(id);
-
-          // Get top 10 contracts by latest value for display (filtered by party if applicable)
-          const latestValues = allChartData[allChartData.length - 1]?.values || {};
-          const allCandidates = Object.keys(latestValues);
-          const partyCandidates = filterByParty(allCandidates, partyFilter);
-
-          const topContracts = Object.entries(latestValues)
-            .filter(([name]) => partyCandidates.includes(name))
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 10)
-            .map(([name]) => name);
-
-          // Filter to target number of data points
-          let filteredData = allChartData;
-          if (targetDataPoints > 0 && allChartData.length > targetDataPoints) {
-            filteredData = allChartData.slice(-targetDataPoints);
-          }
-
-          // Filter series to only include top contracts
-          const filteredSeries = filteredData.map(point => ({
-            timestamp: point.timestamp,
-            values: Object.fromEntries(
-              Object.entries(point.values)
-                .filter(([name]) => topContracts.includes(name))
-                .map(([name, value]) => [name, value / 100])
-            ),
-          }));
-
-          return NextResponse.json({
-            marketId: id,
-            marketName: dbMarket.name,
-            series: filteredSeries,
-            contracts: topContracts,
-          });
-        }
-      } catch (error) {
-        console.error('Database chart query failed:', error);
+        return NextResponse.json({
+          marketId: id,
+          marketName: dbMarket.name,
+          series: filteredSeries,
+          contracts: topContracts,
+        });
       }
     }
+  } catch (error) {
+    console.error('Database chart query failed:', error);
   }
 
   // Fallback to mock data
