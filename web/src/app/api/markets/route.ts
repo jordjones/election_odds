@@ -38,6 +38,13 @@ export async function GET(request: Request) {
     return NextResponse.json(markets);
   } catch (error) {
     console.error('[API /markets] Error fetching markets:', error);
-    return NextResponse.json({ error: 'Failed to fetch markets', details: String(error) }, { status: 500 });
+    const envKeys = Object.keys(process.env).filter(k => k.includes('DATA') || k.includes('NETLIFY') || k.includes('DATABASE') || k.includes('NODE'));
+    return NextResponse.json({
+      error: 'Failed to fetch markets',
+      details: String(error),
+      usePostgresResult: usePostgres(),
+      envKeys,
+      hasNetlify: !!process.env['NETLIFY'],
+    }, { status: 500 });
   }
 }
