@@ -50,12 +50,13 @@ class SupabaseStorage:
         url: Optional[str] = None,
         total_volume: Optional[float] = None,
         end_date: Optional[str] = None,
+        category_tag: Optional[str] = None,
     ) -> Tuple[int, bool]:
         """Insert or update a market record."""
         with self.conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO markets (source, market_id, market_name, category, status, url, total_volume, end_date, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                INSERT INTO markets (source, market_id, market_name, category, status, url, total_volume, end_date, category_tag, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
                 ON CONFLICT (source, market_id) DO UPDATE SET
                     market_name = EXCLUDED.market_name,
                     category = EXCLUDED.category,
@@ -63,9 +64,10 @@ class SupabaseStorage:
                     url = EXCLUDED.url,
                     total_volume = EXCLUDED.total_volume,
                     end_date = EXCLUDED.end_date,
+                    category_tag = EXCLUDED.category_tag,
                     updated_at = NOW()
                 RETURNING id, (xmax = 0) as inserted
-            """, (source, market_id, market_name, category, status, url, total_volume, end_date))
+            """, (source, market_id, market_name, category, status, url, total_volume, end_date, category_tag))
             row = cur.fetchone()
             return row[0], row[1]
 

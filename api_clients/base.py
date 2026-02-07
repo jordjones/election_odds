@@ -54,6 +54,7 @@ class MarketData:
     description: Optional[str] = None
     end_date: Optional[datetime] = None
     total_volume: Optional[float] = None
+    category_tag: Optional[str] = None  # Normalized tag (e.g., Trump, US Elections, Ukraine)
     last_updated: Optional[datetime] = None
     raw_data: Optional[Dict[str, Any]] = None  # Original API response
 
@@ -69,6 +70,7 @@ class MarketData:
             'description': self.description,
             'end_date': self.end_date.isoformat() if self.end_date else None,
             'total_volume': self.total_volume,
+            'category_tag': self.category_tag,
             'last_updated': self.last_updated.isoformat() if self.last_updated else None,
             'contracts': [c.to_dict() for c in self.contracts],
         }

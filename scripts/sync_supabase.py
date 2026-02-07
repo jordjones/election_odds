@@ -22,6 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.storage_supabase import SupabaseStorage
+from scripts.category_tagger import classify_category_tag
 from api_clients import PolymarketClient, KalshiClient, PredictItClient
 
 # Configure logging
@@ -60,7 +61,10 @@ def sync_polymarket(storage: SupabaseStorage, featured_only: bool = False) -> di
 
     for market in markets:
         try:
-            # Upsert market
+            tag = classify_category_tag(
+                market.market_name, market.description or '',
+                market.source, market.raw_data,
+            )
             storage.upsert_market(
                 source='Polymarket',
                 market_id=market.market_id,
@@ -69,10 +73,10 @@ def sync_polymarket(storage: SupabaseStorage, featured_only: bool = False) -> di
                 status=market.status.value if hasattr(market.status, 'value') else str(market.status),
                 url=market.url,
                 total_volume=market.total_volume,
+                category_tag=tag,
             )
             stats['markets'] += 1
 
-            # Upsert contracts and prices
             for contract in market.contracts:
                 storage.upsert_contract(
                     source='Polymarket',
@@ -119,6 +123,10 @@ def sync_kalshi(storage: SupabaseStorage, featured_only: bool = False) -> dict:
 
     for market in markets:
         try:
+            tag = classify_category_tag(
+                market.market_name, market.description or '',
+                market.source, market.raw_data,
+            )
             storage.upsert_market(
                 source='Kalshi',
                 market_id=market.market_id,
@@ -127,6 +135,7 @@ def sync_kalshi(storage: SupabaseStorage, featured_only: bool = False) -> dict:
                 status=market.status.value if hasattr(market.status, 'value') else str(market.status),
                 url=market.url,
                 total_volume=market.total_volume,
+                category_tag=tag,
             )
             stats['markets'] += 1
 
@@ -178,6 +187,10 @@ def sync_predictit(storage: SupabaseStorage, featured_only: bool = False) -> dic
 
     for market in markets:
         try:
+            tag = classify_category_tag(
+                market.market_name, market.description or '',
+                market.source, market.raw_data,
+            )
             storage.upsert_market(
                 source='PredictIt',
                 market_id=market.market_id,
@@ -186,6 +199,7 @@ def sync_predictit(storage: SupabaseStorage, featured_only: bool = False) -> dic
                 status=market.status.value if hasattr(market.status, 'value') else str(market.status),
                 url=market.url,
                 total_volume=market.total_volume,
+                category_tag=tag,
             )
             stats['markets'] += 1
 
