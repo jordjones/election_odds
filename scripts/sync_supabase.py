@@ -25,6 +25,9 @@ from scripts.storage_supabase import SupabaseStorage
 from scripts.category_tagger import classify_category_tag
 from api_clients import PolymarketClient, KalshiClient, PredictItClient
 
+# Categories to skip during sync (non-election, saves DB space)
+EXCLUDED_CATEGORY_TAGS = {'Sports', 'Culture', 'Tech', 'Crypto', 'Finance'}
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -65,6 +68,10 @@ def sync_polymarket(storage: SupabaseStorage, featured_only: bool = False) -> di
                 market.market_name, market.description or '',
                 market.source, market.raw_data,
             )
+            if tag in EXCLUDED_CATEGORY_TAGS:
+                stats['skipped'] += 1
+                continue
+
             storage.upsert_market(
                 source='Polymarket',
                 market_id=market.market_id,
@@ -127,6 +134,10 @@ def sync_kalshi(storage: SupabaseStorage, featured_only: bool = False) -> dict:
                 market.market_name, market.description or '',
                 market.source, market.raw_data,
             )
+            if tag in EXCLUDED_CATEGORY_TAGS:
+                stats['skipped'] += 1
+                continue
+
             storage.upsert_market(
                 source='Kalshi',
                 market_id=market.market_id,
@@ -191,6 +202,10 @@ def sync_predictit(storage: SupabaseStorage, featured_only: bool = False) -> dic
                 market.market_name, market.description or '',
                 market.source, market.raw_data,
             )
+            if tag in EXCLUDED_CATEGORY_TAGS:
+                stats['skipped'] += 1
+                continue
+
             storage.upsert_market(
                 source='PredictIt',
                 market_id=market.market_id,
