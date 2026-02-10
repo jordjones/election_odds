@@ -134,7 +134,7 @@ function extractCandidateName(contractName: string, contractId?: string): string
   const lowerClean = cleanName.toLowerCase();
   if (/^democrat(s|ic party)?$/i.test(cleanName.trim())) return 'Democratic Party';
   if (/^republican(s| party)?$/i.test(cleanName.trim())) return 'Republican Party';
-  if (lowerClean.includes('a trump family member')) return 'Trump Family Member';
+  if (lowerClean.includes('a trump family member')) return null;
   if (cleanName.toLowerCase().startsWith('who will win')) return null;
 
   return cleanName;
