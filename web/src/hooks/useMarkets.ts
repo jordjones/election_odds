@@ -80,3 +80,23 @@ export function useStats() {
     queryFn: () => apiClient.getStats(),
   });
 }
+
+/**
+ * Fetch state senate races
+ */
+export function useStateSenateRaces(changePeriod?: TimeFilter, state?: string) {
+  return useQuery<Market[]>({
+    queryKey: ['senate-races', changePeriod, state],
+    queryFn: () => apiClient.getStateSenateRaces(changePeriod, state),
+  });
+}
+
+/**
+ * Fetch senate primaries
+ */
+export function useSenatePrimaries(changePeriod?: TimeFilter) {
+  return useQuery<Market[]>({
+    queryKey: ['senate-primaries', changePeriod],
+    queryFn: () => apiClient.getSenatePrimaries(changePeriod),
+  });
+}

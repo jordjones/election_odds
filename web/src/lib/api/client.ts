@@ -110,6 +110,27 @@ class ApiClient {
   async getFeaturedMarkets(): Promise<Market[]> {
     return this.fetch<Market[]>('/markets/featured');
   }
+
+  /**
+   * Get state senate races
+   */
+  async getStateSenateRaces(changePeriod?: TimeFilter, state?: string): Promise<Market[]> {
+    const searchParams = new URLSearchParams();
+    if (changePeriod) searchParams.set('changePeriod', changePeriod);
+    if (state) searchParams.set('state', state);
+    const query = searchParams.toString();
+    return this.fetch<Market[]>(`/senate-races${query ? `?${query}` : ''}`);
+  }
+
+  /**
+   * Get senate primaries
+   */
+  async getSenatePrimaries(changePeriod?: TimeFilter): Promise<Market[]> {
+    const searchParams = new URLSearchParams();
+    if (changePeriod) searchParams.set('changePeriod', changePeriod);
+    const query = searchParams.toString();
+    return this.fetch<Market[]>(`/senate-primaries${query ? `?${query}` : ''}`);
+  }
 }
 
 // Singleton instance

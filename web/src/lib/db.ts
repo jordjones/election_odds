@@ -487,14 +487,18 @@ function extractCandidateName(contractName: string, contractId?: string): string
   // Handle "Will X win..." or "Will X be the nominee..." format (Polymarket/Kalshi)
   const willMatch = cleanName.match(/Will (.+?) (win|be the)/i);
   if (willMatch) {
-    const name = willMatch[1].trim();
+    let name = willMatch[1].trim();
+    // Strip leading "the" for party names (e.g. "the Republicans" → "Republicans")
+    name = name.replace(/^the\s+/i, '');
     // Skip placeholder names
-    if (/^Person [A-Z]{1,2}$/i.test(name)) {
+    if (/^Person [A-Z]{1,2}$/i.test(name) || /^Player [A-Z]{1,2}$/i.test(name)
+        || name.toLowerCase() === 'another person' || name.toLowerCase() === 'any other person'
+        || name.toLowerCase() === 'another candidate') {
       return null;
     }
-    if (name.toLowerCase() === 'another person') {
-      return null;
-    }
+    // Check for party names (handles Kalshi typo "Democratics")
+    if (/^democrat(s|ic|ics|ic party)?$/i.test(name.trim())) return 'Democratic Party';
+    if (/^republican(s| party)?$/i.test(name.trim())) return 'Republican Party';
     return name;
   }
 
@@ -1247,6 +1251,464 @@ export function getMarkets(options?: {
     return markets.slice(0, options.limit);
   }
 
+  return markets;
+}
+
+// Max age (ms) a source price can lag behind the freshest source before being excluded from averages
+const STALE_PRICE_THRESHOLD_MS = 48 * 60 * 60 * 1000; // 48 hours
+
+// Filter prices to only include those within STALE_PRICE_THRESHOLD of the freshest
+function getFreshPrices(prices: MarketPrice[]): MarketPrice[] {
+  if (prices.length <= 1) return prices;
+  const newest = Math.max(...prices.map(p => new Date(p.lastUpdated).getTime()));
+  const fresh = prices.filter(p => newest - new Date(p.lastUpdated).getTime() <= STALE_PRICE_THRESHOLD_MS);
+  return fresh.length > 0 ? fresh : prices; // fallback to all if everything is stale
+}
+
+// For a set of contracts (e.g. "Democratic Party" and "Republican Party"),
+// detect sources where all contracts have nearly the same yes_price — a sign
+// of an illiquid/broken market — and exclude them from aggregation.
+function excludeIlliquidSources(contractsList: { prices: MarketPrice[] }[]): void {
+  if (contractsList.length < 2) return;
+  // Collect all sources
+  const allSources = new Set<string>();
+  for (const c of contractsList) {
+    for (const p of c.prices) allSources.add(p.source);
+  }
+  for (const source of allSources) {
+    const sourcePrices = contractsList
+      .map(c => c.prices.find(p => p.source === source)?.yesPrice)
+      .filter((p): p is number => p !== undefined);
+    if (sourcePrices.length < 2) continue;
+    const spread = Math.max(...sourcePrices) - Math.min(...sourcePrices);
+    // If all contracts from this source are within 5% of each other, it's illiquid
+    if (spread < 0.05) {
+      // Only remove if other sources exist for these contracts
+      const hasOtherSources = contractsList.some(c => c.prices.some(p => p.source !== source));
+      if (hasOtherSources) {
+        for (const c of contractsList) {
+          c.prices = c.prices.filter(p => p.source !== source);
+        }
+      }
+    }
+  }
+}
+
+// All 2026 senate race states (Class II + OH special)
+const SENATE_STATES_2026: Record<string, string> = {
+  al: 'Alabama',
+  ak: 'Alaska',
+  ar: 'Arkansas',
+  co: 'Colorado',
+  de: 'Delaware',
+  fl: 'Florida',
+  ga: 'Georgia',
+  id: 'Idaho',
+  il: 'Illinois',
+  ia: 'Iowa',
+  ks: 'Kansas',
+  ky: 'Kentucky',
+  la: 'Louisiana',
+  me: 'Maine',
+  ma: 'Massachusetts',
+  mi: 'Michigan',
+  mn: 'Minnesota',
+  ms: 'Mississippi',
+  mt: 'Montana',
+  ne: 'Nebraska',
+  nh: 'New Hampshire',
+  nj: 'New Jersey',
+  nm: 'New Mexico',
+  nc: 'North Carolina',
+  oh: 'Ohio',
+  ok: 'Oklahoma',
+  or: 'Oregon',
+  ri: 'Rhode Island',
+  sc: 'South Carolina',
+  sd: 'South Dakota',
+  tn: 'Tennessee',
+  tx: 'Texas',
+  va: 'Virginia',
+  wv: 'West Virginia',
+  wy: 'Wyoming',
+};
+
+/**
+ * Get state senate race markets (SQLite version)
+ */
+export function getStateSenateRaces(options?: {
+  states?: string[];
+  changePeriod?: string;
+}): Market[] {
+  const db = getDb();
+  const changePeriod = options?.changePeriod || '1d';
+  const changeTimestamp = getChangePeriodTimestamp(changePeriod);
+
+  const stateAbbrevs = options?.states || Object.keys(SENATE_STATES_2026);
+  const markets: Market[] = [];
+
+  for (const abbrev of stateAbbrevs) {
+    const stateName = SENATE_STATES_2026[abbrev];
+    if (!stateName) continue;
+
+    const stateNameLower = stateName.toLowerCase();
+
+    // Find markets that mention this state + senate, excluding primaries/nominations
+    const marketsResult = db.prepare(`
+      SELECT DISTINCT
+        m.id, m.source, m.market_id, m.market_name, m.category,
+        m.status, m.url, m.total_volume, m.end_date
+      FROM markets m
+      WHERE LOWER(m.market_name) LIKE ?
+        AND LOWER(m.market_name) LIKE '%senate%'
+        AND LOWER(m.market_name) NOT LIKE '%primary%'
+        AND LOWER(m.market_name) NOT LIKE '%nomin%'
+        AND LOWER(m.market_name) NOT LIKE '%matchup%'
+        AND LOWER(m.market_name) NOT LIKE '%endorse%'
+        AND LOWER(m.market_name) NOT LIKE '%closer%'
+        AND LOWER(m.market_name) NOT LIKE '%district%'
+        AND LOWER(m.market_name) NOT LIKE '%state senate%'
+        AND m.source IN ('Polymarket', 'Kalshi', 'PredictIt', 'Smarkets')
+      ORDER BY m.total_volume DESC NULLS LAST
+    `).all(`%${stateNameLower}%`) as DbMarket[];
+
+    if (marketsResult.length === 0) continue;
+
+    const contractsByCandidate = new Map<string, Contract>();
+
+    // Build historical prices map
+    const historicalByCandidate = new Map<string, number[]>();
+
+    for (const dbMarket of marketsResult) {
+      // Get current prices
+      const contractsWithPrices = db.prepare(`
+        SELECT
+          c.id, c.source, c.market_id, c.contract_id, c.contract_name,
+          ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
+        FROM contracts c
+        INNER JOIN (
+          SELECT contract_id, market_id, source, yes_price, no_price, volume, snapshot_time,
+                 ROW_NUMBER() OVER (PARTITION BY source, market_id, contract_id ORDER BY snapshot_time DESC) as rn
+          FROM price_snapshots
+        ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
+        WHERE c.market_id = ? AND c.source = ?
+        AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
+      `).all(dbMarket.market_id, dbMarket.source) as (DbContract & { yes_price: number; no_price: number | null; volume: number | null; snapshot_time: string })[];
+
+      // Get historical prices for change calculation
+      const historicalPrices = db.prepare(`
+        SELECT
+          c.contract_id, c.contract_name, ps.yes_price
+        FROM contracts c
+        INNER JOIN (
+          SELECT contract_id, market_id, source, yes_price, snapshot_time,
+                 ROW_NUMBER() OVER (PARTITION BY source, market_id, contract_id ORDER BY snapshot_time DESC) as rn
+          FROM price_snapshots
+          WHERE snapshot_time <= ?
+        ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
+        WHERE c.market_id = ? AND c.source = ?
+        AND ps.yes_price IS NOT NULL
+      `).all(changeTimestamp, dbMarket.market_id, dbMarket.source) as { contract_id: string; contract_name: string; yes_price: number }[];
+
+      for (const row of historicalPrices) {
+        const candidateName = extractCandidateName(row.contract_name, row.contract_id);
+        if (!candidateName) continue;
+        const normalizedName = normalizeCandidateName(candidateName);
+        if (!historicalByCandidate.has(normalizedName)) {
+          historicalByCandidate.set(normalizedName, []);
+        }
+        historicalByCandidate.get(normalizedName)!.push(row.yes_price);
+      }
+
+      for (const contract of contractsWithPrices) {
+        const candidateName = extractCandidateName(contract.contract_name, contract.contract_id);
+        if (!candidateName) continue;
+
+        const displayName = normalizePartyName(candidateName);
+        const normalizedName = normalizeCandidateName(displayName);
+
+        const price: MarketPrice = {
+          source: contract.source as any,
+          region: contract.source === 'Polymarket' ? 'International' :
+                 contract.source === 'Smarkets' ? 'UK' : 'US',
+          yesPrice: contract.yes_price,
+          noPrice: contract.no_price || (1 - contract.yes_price),
+          yesBid: null,
+          yesAsk: null,
+          volume: contract.volume || 0,
+          lastUpdated: contract.snapshot_time,
+        };
+
+        if (contractsByCandidate.has(normalizedName)) {
+          const existing = contractsByCandidate.get(normalizedName)!;
+          if (!existing.prices.find(p => p.source === price.source)) {
+            existing.prices.push(price);
+            existing.totalVolume += price.volume || 0;
+          }
+        } else {
+          contractsByCandidate.set(normalizedName, {
+            id: `senate-${abbrev}-${normalizedName}`,
+            name: displayName,
+            shortName: displayName.split(' ')[0],
+            imageUrl: getCandidateImageUrl(displayName),
+            prices: [price],
+            aggregatedPrice: contract.yes_price,
+            priceChange: 0,
+            totalVolume: contract.volume || 0,
+          });
+        }
+      }
+    }
+
+    // If we have both party-level contracts and individual candidates, keep party entries for consistency
+    const PARTY_KEYS = ['republican party', 'democratic party', 'independent', 'libertarian', 'green party'];
+    const partyEntries = [...contractsByCandidate.keys()].filter(k => PARTY_KEYS.includes(k));
+    const candidateEntries = [...contractsByCandidate.keys()].filter(k => !PARTY_KEYS.includes(k));
+    if (partyEntries.length > 0 && candidateEntries.length > 0) {
+      for (const key of candidateEntries) {
+        contractsByCandidate.delete(key);
+      }
+    }
+
+    // Remove illiquid sources (e.g. Kalshi showing 47/47 for both sides)
+    excludeIlliquidSources(Array.from(contractsByCandidate.values()));
+
+    const contracts = Array.from(contractsByCandidate.values()).map(contract => {
+      const freshPrices = getFreshPrices(contract.prices);
+      const avgPrice = freshPrices.reduce((sum, p) => sum + p.yesPrice, 0) / freshPrices.length;
+      const normalizedName = normalizeCandidateName(contract.name);
+      const historicalPrices = historicalByCandidate.get(normalizedName);
+      const historicalAvg = historicalPrices && historicalPrices.length > 0
+        ? historicalPrices.reduce((a, b) => a + b, 0) / historicalPrices.length
+        : avgPrice;
+
+      return {
+        ...contract,
+        aggregatedPrice: avgPrice,
+        priceChange: avgPrice - historicalAvg,
+      };
+    });
+
+    contracts.sort((a, b) => b.aggregatedPrice - a.aggregatedPrice);
+
+    if (contracts.length === 0) continue;
+
+    const sourcesIncluded = [...new Set(contracts.flatMap(c => c.prices.map(p => p.source)))];
+
+    markets.push({
+      id: `senate-race-${abbrev}`,
+      slug: `senate-race-${abbrev}`,
+      name: `${stateName} Senate Race 2026`,
+      description: `Aggregated from ${sourcesIncluded.join(', ')}.`,
+      category: 'senate-race' as MarketCategory,
+      status: 'open',
+      contracts,
+      totalVolume: contracts.reduce((sum, c) => sum + c.totalVolume, 0),
+      lastUpdated: new Date().toISOString(),
+    });
+  }
+
+  // Sort by competitiveness (closest to 50/50)
+  markets.sort((a, b) => {
+    const topA = a.contracts[0]?.aggregatedPrice || 0;
+    const topB = b.contracts[0]?.aggregatedPrice || 0;
+    return Math.abs(topA - 0.5) - Math.abs(topB - 0.5);
+  });
+
+  return markets;
+}
+
+// Map of state names for primary market matching
+const STATE_NAMES_TO_ABBREV: Record<string, string> = Object.fromEntries(
+  Object.entries(SENATE_STATES_2026).map(([abbrev, name]) => [name.toLowerCase(), abbrev])
+);
+
+/**
+ * Get senate primary markets (SQLite version)
+ */
+export function getSenatePrimaries(options?: {
+  changePeriod?: string;
+}): Market[] {
+  const db = getDb();
+  const changePeriod = options?.changePeriod || '1d';
+  const changeTimestamp = getChangePeriodTimestamp(changePeriod);
+
+  // Find all senate primary/nomination markets
+  const marketsResult = db.prepare(`
+    SELECT DISTINCT
+      m.id, m.source, m.market_id, m.market_name, m.category,
+      m.status, m.url, m.total_volume, m.end_date
+    FROM markets m
+    WHERE LOWER(m.market_name) LIKE '%senate%'
+      AND (LOWER(m.market_name) LIKE '%primary%' OR LOWER(m.market_name) LIKE '%nomin%')
+      AND LOWER(m.market_name) NOT LIKE '%2028%'
+      AND LOWER(m.market_name) NOT LIKE '%endorse%'
+      AND LOWER(m.market_name) NOT LIKE '%closer%'
+      AND LOWER(m.market_name) NOT LIKE '%margin%'
+      AND LOWER(m.market_name) NOT LIKE '%2nd place%'
+      AND LOWER(m.market_name) NOT LIKE '%3rd place%'
+      AND m.source IN ('Polymarket', 'Kalshi', 'PredictIt', 'Smarkets')
+    ORDER BY m.total_volume DESC NULLS LAST
+  `).all() as DbMarket[];
+
+  if (marketsResult.length === 0) return [];
+
+  // Group markets by state + party
+  const primaryGroups = new Map<string, { state: string; stateAbbrev: string; party: string; dbMarkets: DbMarket[] }>();
+
+  for (const dbMarket of marketsResult) {
+    const marketNameLower = dbMarket.market_name.toLowerCase();
+
+    let party: string;
+    if (marketNameLower.includes('democrat')) {
+      party = 'Democratic';
+    } else if (marketNameLower.includes('republican')) {
+      party = 'Republican';
+    } else {
+      continue;
+    }
+
+    let foundState = '';
+    let foundAbbrev = '';
+    for (const [stateLower, abbrev] of Object.entries(STATE_NAMES_TO_ABBREV)) {
+      if (marketNameLower.includes(stateLower)) {
+        foundState = SENATE_STATES_2026[abbrev];
+        foundAbbrev = abbrev;
+        break;
+      }
+    }
+    if (!foundState) continue;
+
+    const groupKey = `${foundAbbrev}-${party.toLowerCase()}`;
+    if (!primaryGroups.has(groupKey)) {
+      primaryGroups.set(groupKey, { state: foundState, stateAbbrev: foundAbbrev, party, dbMarkets: [] });
+    }
+    primaryGroups.get(groupKey)!.dbMarkets.push(dbMarket);
+  }
+
+  const markets: Market[] = [];
+
+  for (const [groupKey, group] of primaryGroups) {
+    const contractsByCandidate = new Map<string, Contract>();
+    const historicalByCandidate = new Map<string, number[]>();
+
+    for (const dbMarket of group.dbMarkets) {
+      const contractsWithPrices = db.prepare(`
+        SELECT
+          c.id, c.source, c.market_id, c.contract_id, c.contract_name,
+          ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
+        FROM contracts c
+        INNER JOIN (
+          SELECT contract_id, market_id, source, yes_price, no_price, volume, snapshot_time,
+                 ROW_NUMBER() OVER (PARTITION BY source, market_id, contract_id ORDER BY snapshot_time DESC) as rn
+          FROM price_snapshots
+        ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
+        WHERE c.market_id = ? AND c.source = ?
+        AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
+      `).all(dbMarket.market_id, dbMarket.source) as (DbContract & { yes_price: number; no_price: number | null; volume: number | null; snapshot_time: string })[];
+
+      const historicalPrices = db.prepare(`
+        SELECT
+          c.contract_id, c.contract_name, ps.yes_price
+        FROM contracts c
+        INNER JOIN (
+          SELECT contract_id, market_id, source, yes_price, snapshot_time,
+                 ROW_NUMBER() OVER (PARTITION BY source, market_id, contract_id ORDER BY snapshot_time DESC) as rn
+          FROM price_snapshots
+          WHERE snapshot_time <= ?
+        ) ps ON ps.contract_id = c.contract_id AND ps.market_id = c.market_id AND ps.source = c.source AND ps.rn = 1
+        WHERE c.market_id = ? AND c.source = ?
+        AND ps.yes_price IS NOT NULL
+      `).all(changeTimestamp, dbMarket.market_id, dbMarket.source) as { contract_id: string; contract_name: string; yes_price: number }[];
+
+      for (const row of historicalPrices) {
+        const candidateName = extractCandidateName(row.contract_name, row.contract_id);
+        if (!candidateName) continue;
+        const normalizedName = normalizeCandidateName(candidateName);
+        if (!historicalByCandidate.has(normalizedName)) {
+          historicalByCandidate.set(normalizedName, []);
+        }
+        historicalByCandidate.get(normalizedName)!.push(row.yes_price);
+      }
+
+      for (const contract of contractsWithPrices) {
+        const candidateName = extractCandidateName(contract.contract_name, contract.contract_id);
+        if (!candidateName) continue;
+        if (/^(Democratic|Republican) Party$/i.test(candidateName)) continue;
+
+        const normalizedName = normalizeCandidateName(candidateName);
+        const price: MarketPrice = {
+          source: contract.source as any,
+          region: contract.source === 'Polymarket' ? 'International' :
+                 contract.source === 'Smarkets' ? 'UK' : 'US',
+          yesPrice: contract.yes_price,
+          noPrice: contract.no_price || (1 - contract.yes_price),
+          yesBid: null,
+          yesAsk: null,
+          volume: contract.volume || 0,
+          lastUpdated: contract.snapshot_time,
+        };
+
+        if (contractsByCandidate.has(normalizedName)) {
+          const existing = contractsByCandidate.get(normalizedName)!;
+          if (!existing.prices.find(p => p.source === price.source)) {
+            existing.prices.push(price);
+            existing.totalVolume += price.volume || 0;
+          }
+        } else {
+          contractsByCandidate.set(normalizedName, {
+            id: `senate-primary-${group.stateAbbrev}-${group.party.toLowerCase()}-${normalizedName.replace(/\s+/g, '-')}`,
+            name: candidateName,
+            shortName: candidateName.split(' ').pop() || candidateName,
+            imageUrl: getCandidateImageUrl(candidateName),
+            prices: [price],
+            aggregatedPrice: contract.yes_price,
+            priceChange: 0,
+            totalVolume: contract.volume || 0,
+          });
+        }
+      }
+    }
+
+    excludeIlliquidSources(Array.from(contractsByCandidate.values()));
+
+    const contracts = Array.from(contractsByCandidate.values()).map(contract => {
+      const freshPrices = getFreshPrices(contract.prices);
+      const avgPrice = freshPrices.reduce((sum, p) => sum + p.yesPrice, 0) / freshPrices.length;
+      const normalizedName = normalizeCandidateName(contract.name);
+      const historicalPrices = historicalByCandidate.get(normalizedName);
+      const historicalAvg = historicalPrices && historicalPrices.length > 0
+        ? historicalPrices.reduce((a, b) => a + b, 0) / historicalPrices.length
+        : avgPrice;
+
+      return {
+        ...contract,
+        aggregatedPrice: avgPrice,
+        priceChange: avgPrice - historicalAvg,
+      };
+    });
+
+    contracts.sort((a, b) => b.aggregatedPrice - a.aggregatedPrice);
+    if (contracts.length === 0) continue;
+
+    const sourcesIncluded = [...new Set(contracts.flatMap(c => c.prices.map(p => p.source)))];
+    const partyLower = group.party.toLowerCase();
+    const category = (partyLower === 'democratic' ? 'senate-primary-dem' : 'senate-primary-gop') as MarketCategory;
+
+    markets.push({
+      id: `senate-primary-${group.stateAbbrev}-${partyLower}`,
+      slug: `senate-primary-${group.stateAbbrev}-${partyLower}`,
+      name: `${group.state} ${group.party} Senate Primary`,
+      description: `Aggregated from ${sourcesIncluded.join(', ')}.`,
+      category,
+      status: 'open',
+      contracts,
+      totalVolume: contracts.reduce((sum, c) => sum + c.totalVolume, 0),
+      lastUpdated: new Date().toISOString(),
+    });
+  }
+
+  markets.sort((a, b) => a.name.localeCompare(b.name));
   return markets;
 }
 

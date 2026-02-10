@@ -10,6 +10,7 @@ interface CandidateRowProps {
   rank: number;
   sources: MarketSource[];
   changePeriod?: TimeFilter;
+  hideVolume?: boolean;
 }
 
 // Get initials from a name (e.g., "Joe Biden" -> "JB")
@@ -215,7 +216,7 @@ function getImageSettings(name: string): { scale: number; position: string } {
   return settings[name] || { scale: 1.5, position: '50% 20%' };
 }
 
-export function CandidateRow({ contract, rank, sources, changePeriod = '1d' }: CandidateRowProps) {
+export function CandidateRow({ contract, rank, sources, changePeriod = '1d', hideVolume = false }: CandidateRowProps) {
   // Get price for each source
   const getPriceForSource = (source: MarketSource) => {
     return contract.prices.find((p) => p.source === source);
@@ -294,9 +295,11 @@ export function CandidateRow({ contract, rank, sources, changePeriod = '1d' }: C
       ))}
 
       {/* Total Volume */}
-      <td className="px-3 py-2 text-center text-sm text-muted-foreground">
-        {formatVolume(contract.totalVolume)}
-      </td>
+      {!hideVolume && (
+        <td className="px-3 py-2 text-center text-sm text-muted-foreground">
+          {formatVolume(contract.totalVolume)}
+        </td>
+      )}
     </tr>
   );
 }

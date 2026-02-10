@@ -18,6 +18,7 @@ interface OddsTableProps {
   showAllSources?: boolean;
   changePeriod?: TimeFilter;
   onChangePeriodChange?: (period: TimeFilter) => void;
+  hideVolume?: boolean;
 }
 
 // Market sources in display order: Polymarket, PredictIt, Kalshi, Smarkets
@@ -30,7 +31,7 @@ const CHANGE_PERIOD_OPTIONS: { value: TimeFilter; label: string }[] = [
   { value: '30d', label: '30d' },
 ];
 
-export function OddsTable({ market, showAllSources = false, changePeriod = '1d', onChangePeriodChange }: OddsTableProps) {
+export function OddsTable({ market, showAllSources = false, changePeriod = '1d', onChangePeriodChange, hideVolume = false }: OddsTableProps) {
 
   // Determine which sources to show - use DEFAULT_SOURCES order
   const sources: MarketSource[] = showAllSources
@@ -81,7 +82,7 @@ export function OddsTable({ market, showAllSources = false, changePeriod = '1d',
                     </div>
                   </TableHead>
                 ))}
-                <TableHead className="text-center w-24">Volume</TableHead>
+                {!hideVolume && <TableHead className="text-center w-24">Volume</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -92,6 +93,7 @@ export function OddsTable({ market, showAllSources = false, changePeriod = '1d',
                   rank={index + 1}
                   sources={sources}
                   changePeriod={changePeriod}
+                  hideVolume={hideVolume}
                 />
               ))}
             </TableBody>

@@ -48,6 +48,9 @@ export type MarketCategory =
   | 'primary-dem'
   | 'primary-gop'
   | 'senate'
+  | 'senate-race'
+  | 'senate-primary-dem'
+  | 'senate-primary-gop'
   | 'house'
   | 'governor'
   | 'scotus'
@@ -132,6 +135,7 @@ export const MAIN_NAV: NavItem[] = [
     children: [
       { label: 'House Control', href: '/races/house-2026' },
       { label: 'Senate Control', href: '/races/senate-2026' },
+      { label: 'Senate Races', href: '/senate' },
     ],
   },
   {
