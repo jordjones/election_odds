@@ -33,6 +33,7 @@ Thumbs.db
 .env
 .env.local
 *.env
+.db_password
 
 # Next.js
 web/.next/
