@@ -4,6 +4,9 @@ node_modules/
 # Data files (too large for git)
 data/
 !data/curated-posts.csv
+!web/public/data/
+!web/public/data/maps/
+!web/public/data/maps/**
 output/
 
 # Python

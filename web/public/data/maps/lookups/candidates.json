@@ -1,0 +1,54 @@
+{
+  "1976": {
+    "dem": "Carter",
+    "rep": "Ford"
+  },
+  "1980": {
+    "dem": "Carter",
+    "rep": "Reagan"
+  },
+  "1984": {
+    "dem": "Mondale",
+    "rep": "Reagan"
+  },
+  "1988": {
+    "dem": "Dukakis",
+    "rep": "Bush"
+  },
+  "1992": {
+    "dem": "Clinton",
+    "rep": "Bush"
+  },
+  "1996": {
+    "dem": "Clinton",
+    "rep": "Dole"
+  },
+  "2000": {
+    "dem": "Gore",
+    "rep": "Bush"
+  },
+  "2004": {
+    "dem": "Kerry",
+    "rep": "Bush"
+  },
+  "2008": {
+    "dem": "Obama",
+    "rep": "McCain"
+  },
+  "2012": {
+    "dem": "Obama",
+    "rep": "Romney"
+  },
+  "2016": {
+    "dem": "Clinton",
+    "rep": "Trump"
+  },
+  "2020": {
+    "dem": "Biden",
+    "rep": "Trump"
+  },
+  "2024": {
+    "dem": "Harris",
+    "rep": "Trump"
+  }
+}

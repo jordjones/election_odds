@@ -1,0 +1,257 @@
+{
+  "01": {
+    "name": "Alabama",
+    "abbrev": "AL",
+    "slug": "alabama"
+  },
+  "02": {
+    "name": "Alaska",
+    "abbrev": "AK",
+    "slug": "alaska"
+  },
+  "04": {
+    "name": "Arizona",
+    "abbrev": "AZ",
+    "slug": "arizona"
+  },
+  "05": {
+    "name": "Arkansas",
+    "abbrev": "AR",
+    "slug": "arkansas"
+  },
+  "06": {
+    "name": "California",
+    "abbrev": "CA",
+    "slug": "california"
+  },
+  "08": {
+    "name": "Colorado",
+    "abbrev": "CO",
+    "slug": "colorado"
+  },
+  "09": {
+    "name": "Connecticut",
+    "abbrev": "CT",
+    "slug": "connecticut"
+  },
+  "10": {
+    "name": "Delaware",
+    "abbrev": "DE",
+    "slug": "delaware"
+  },
+  "11": {
+    "name": "District of Columbia",
+    "abbrev": "DC",
+    "slug": "district-of-columbia"
+  },
+  "12": {
+    "name": "Florida",
+    "abbrev": "FL",
+    "slug": "florida"
+  },
+  "13": {
+    "name": "Georgia",
+    "abbrev": "GA",
+    "slug": "georgia"
+  },
+  "15": {
+    "name": "Hawaii",
+    "abbrev": "HI",
+    "slug": "hawaii"
+  },
+  "16": {
+    "name": "Idaho",
+    "abbrev": "ID",
+    "slug": "idaho"
+  },
+  "17": {
+    "name": "Illinois",
+    "abbrev": "IL",
+    "slug": "illinois"
+  },
+  "18": {
+    "name": "Indiana",
+    "abbrev": "IN",
+    "slug": "indiana"
+  },
+  "19": {
+    "name": "Iowa",
+    "abbrev": "IA",
+    "slug": "iowa"
+  },
+  "20": {
+    "name": "Kansas",
+    "abbrev": "KS",
+    "slug": "kansas"
+  },
+  "21": {
+    "name": "Kentucky",
+    "abbrev": "KY",
+    "slug": "kentucky"
+  },
+  "22": {
+    "name": "Louisiana",
+    "abbrev": "LA",
+    "slug": "louisiana"
+  },
+  "23": {
+    "name": "Maine",
+    "abbrev": "ME",
+    "slug": "maine"
+  },
+  "24": {
+    "name": "Maryland",
+    "abbrev": "MD",
+    "slug": "maryland"
+  },
+  "25": {
+    "name": "Massachusetts",
+    "abbrev": "MA",
+    "slug": "massachusetts"
+  },
+  "26": {
+    "name": "Michigan",
+    "abbrev": "MI",
+    "slug": "michigan"
+  },
+  "27": {
+    "name": "Minnesota",
+    "abbrev": "MN",
+    "slug": "minnesota"
+  },
+  "28": {
+    "name": "Mississippi",
+    "abbrev": "MS",
+    "slug": "mississippi"
+  },
+  "29": {
+    "name": "Missouri",
+    "abbrev": "MO",
+    "slug": "missouri"
+  },
+  "30": {
+    "name": "Montana",
+    "abbrev": "MT",
+    "slug": "montana"
+  },
+  "31": {
+    "name": "Nebraska",
+    "abbrev": "NE",
+    "slug": "nebraska"
+  },
+  "32": {
+    "name": "Nevada",
+    "abbrev": "NV",
+    "slug": "nevada"
+  },
+  "33": {
+    "name": "New Hampshire",
+    "abbrev": "NH",
+    "slug": "new-hampshire"
+  },
+  "34": {
+    "name": "New Jersey",
+    "abbrev": "NJ",
+    "slug": "new-jersey"
+  },
+  "35": {
+    "name": "New Mexico",
+    "abbrev": "NM",
+    "slug": "new-mexico"
+  },
+  "36": {
+    "name": "New York",
+    "abbrev": "NY",
+    "slug": "new-york"
+  },
+  "37": {
+    "name": "North Carolina",
+    "abbrev": "NC",
+    "slug": "north-carolina"
+  },
+  "38": {
+    "name": "North Dakota",
+    "abbrev": "ND",
+    "slug": "north-dakota"
+  },
+  "39": {
+    "name": "Ohio",
+    "abbrev": "OH",
+    "slug": "ohio"
+  },
+  "40": {
+    "name": "Oklahoma",
+    "abbrev": "OK",
+    "slug": "oklahoma"
+  },
+  "41": {
+    "name": "Oregon",
+    "abbrev": "OR",
+    "slug": "oregon"
+  },
+  "42": {
+    "name": "Pennsylvania",
+    "abbrev": "PA",
+    "slug": "pennsylvania"
+  },
+  "44": {
+    "name": "Rhode Island",
+    "abbrev": "RI",
+    "slug": "rhode-island"
+  },
+  "45": {
+    "name": "South Carolina",
+    "abbrev": "SC",
+    "slug": "south-carolina"
+  },
+  "46": {
+    "name": "South Dakota",
+    "abbrev": "SD",
+    "slug": "south-dakota"
+  },
+  "47": {
+    "name": "Tennessee",
+    "abbrev": "TN",
+    "slug": "tennessee"
+  },
+  "48": {
+    "name": "Texas",
+    "abbrev": "TX",
+    "slug": "texas"
+  },
+  "49": {
+    "name": "Utah",
+    "abbrev": "UT",
+    "slug": "utah"
+  },
+  "50": {
+    "name": "Vermont",
+    "abbrev": "VT",
+    "slug": "vermont"
+  },
+  "51": {
+    "name": "Virginia",
+    "abbrev": "VA",
+    "slug": "virginia"
+  },
+  "53": {
+    "name": "Washington",
+    "abbrev": "WA",
+    "slug": "washington"
+  },
+  "54": {
+    "name": "West Virginia",
+    "abbrev": "WV",
+    "slug": "west-virginia"
+  },
+  "55": {
+    "name": "Wisconsin",
+    "abbrev": "WI",
+    "slug": "wisconsin"
+  },
+  "56": {
+    "name": "Wyoming",
+    "abbrev": "WY",
+    "slug": "wyoming"
+  }
+}
