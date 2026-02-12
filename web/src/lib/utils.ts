@@ -33,7 +33,7 @@ export function formatVolume(volume: number): string {
   if (volume >= 1_000) {
     return `$${(volume / 1_000).toFixed(1)}K`;
   }
-  return `$${volume}`;
+  return `$${Math.round(volume)}`;
 }
 
 /**
