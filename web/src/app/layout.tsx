@@ -16,9 +16,42 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Election Odds Aggregator",
-  description: "Real-time aggregated prediction market odds for US elections. Compare prices from PredictIt, Kalshi, Polymarket, and more.",
-  keywords: ["election", "prediction markets", "odds", "betting", "politics", "2028", "presidential"],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://electionodds.com"),
+  title: {
+    default: "Election Odds 2026 & 2028 — Real-Time Prediction Market Tracker | ElectionOdds",
+    template: "%s | ElectionOdds",
+  },
+  description:
+    "Compare real-time election odds from Polymarket, PredictIt, Kalshi, and Smarkets. Track 2026 midterm and 2028 presidential prediction markets in one place.",
+  keywords: [
+    "election odds",
+    "prediction markets",
+    "election betting",
+    "2028 presidential odds",
+    "2026 midterm odds",
+    "polymarket",
+    "predictit",
+    "kalshi",
+    "smarkets",
+    "election forecast",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "ElectionOdds",
+    title: "Election Odds 2026 & 2028 — Real-Time Prediction Market Tracker",
+    description:
+      "Compare real-time election odds from Polymarket, PredictIt, Kalshi, and Smarkets. Track 2026 midterm and 2028 presidential prediction markets in one place.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Election Odds 2026 & 2028 — Real-Time Prediction Market Tracker",
+    description:
+      "Compare real-time election odds from Polymarket, PredictIt, Kalshi, and Smarkets.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

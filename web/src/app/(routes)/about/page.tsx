@@ -1,5 +1,17 @@
+import type { Metadata } from 'next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MARKET_SOURCES } from '@/lib/types';
+
+export const metadata: Metadata = {
+  title: 'About ElectionOdds — How We Aggregate Prediction Market Data',
+  description:
+    'ElectionOdds aggregates real-time odds from PredictIt, Kalshi, Polymarket, and Smarkets. Learn about our methodology, data sources, and what makes us different.',
+  openGraph: {
+    title: 'About ElectionOdds — How We Aggregate Prediction Market Data',
+    description:
+      'ElectionOdds aggregates real-time odds from PredictIt, Kalshi, Polymarket, and Smarkets. Learn about our methodology, data sources, and what makes us different.',
+  },
+};
 
 export default function AboutPage() {
   return (

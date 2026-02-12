@@ -9,6 +9,7 @@ import { formatVolume } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import type { TimeFilter } from '@/lib/types';
+import { JsonLd, HOMEPAGE_JSONLD } from '@/components/seo/JsonLd';
 
 export default function HomePage() {
   const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
@@ -23,6 +24,7 @@ export default function HomePage() {
 
   return (
     <div className="container py-8">
+      <JsonLd data={HOMEPAGE_JSONLD} />
       {/* Hero Section */}
       <section className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
