@@ -484,9 +484,8 @@ export async function getMarketsAsync(options?: {
       }
 
       // Get price changes from Polymarket data (same source as charts)
-      const polymarketMarketId = canonicalType === 'presidential-winner-2028' ? '31552' :
-                                 canonicalType === 'gop-nominee-2028' ? '31875' :
-                                 canonicalType === 'dem-nominee-2028' ? '30829' : null;
+      const polymarketMarket = relatedMarkets.find(m => m.source === 'Polymarket');
+      const polymarketMarketId = polymarketMarket?.market_id || null;
 
       const chartPriceChanges = polymarketMarketId
         ? await getChartBasedPriceChangesAsync(client, polymarketMarketId, changePeriod)

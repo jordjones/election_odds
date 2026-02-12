@@ -1108,10 +1108,8 @@ export function getMarkets(options?: {
     }
 
     // Get chart-based price changes from electionbettingodds
-    // Map canonical type to electionbettingodds market ID
-    const eboMarketId = canonicalType === 'presidential-winner-2028' ? 'president_2028' :
-                        canonicalType === 'gop-nominee-2028' ? 'president_2028' :
-                        canonicalType === 'dem-nominee-2028' ? 'president_2028' : null;
+    const eboMarket = relatedMarkets.find(m => m.source === 'electionbettingodds');
+    const eboMarketId = eboMarket?.market_id || null;
 
     const chartPriceChanges = eboMarketId
       ? getChartBasedPriceChanges(eboMarketId, changePeriod)
