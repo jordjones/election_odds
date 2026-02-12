@@ -840,15 +840,16 @@ function getCanonicalMarketType(marketName: string): string | null {
   // Polymarket: "Which party wins 2028 US Presidential Election?"
   // PredictIt: "Which party will win the 2028 US presidential election?"
   // Kalshi: "Which party will win the 2028 Presidential Election?"
-  if (lower.includes('2028') && lower.includes('president') &&
-      (lower.includes('which party') || lower.includes('party win') || lower.includes('party wins'))) {
+  if (lower.includes('2028') &&
+      (lower.includes('which party') || lower.includes('party win') || lower.includes('party wins') || lower.includes('winning party')) &&
+      (lower.includes('president') || lower.includes('winning party'))) {
     return 'presidential-party-2028';
   }
 
   // House 2026 control
   // Polymarket: "Which party will win the House in 2026?"
   // PredictIt: "Which party will win the House in the 2026 election?"
-  if (lower.includes('2026') && lower.includes('house') &&
+  if ((lower.includes('2026') || lower.includes('midterm')) && lower.includes('house') &&
       (lower.includes('which party') || lower.includes('party win') || lower.includes('control'))) {
     return 'house-control-2026';
   }
@@ -856,9 +857,10 @@ function getCanonicalMarketType(marketName: string): string | null {
   // Senate 2026 control (party-based, not seat count)
   // Polymarket: "Which party will win the Senate in 2026?"
   // PredictIt: "Which party will control the Senate after the 2026 election?"
+  // Smarkets: "Which party will control the Senate after the midterm elections?"
   // Exclude: "How many Senate seats..." (seat count markets)
-  if (lower.includes('2026') && lower.includes('senate') &&
-      (lower.includes('which party') || lower.includes('party win') || lower.includes('party control')) &&
+  if ((lower.includes('2026') || lower.includes('midterm')) && lower.includes('senate') &&
+      (lower.includes('which party') || lower.includes('party win') || lower.includes('party control') || lower.includes('control')) &&
       !lower.includes('how many') && !lower.includes('seats')) {
     return 'senate-control-2026';
   }

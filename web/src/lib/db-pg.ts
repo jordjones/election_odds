@@ -71,18 +71,19 @@ function getCanonicalMarketType(marketName: string): string | null {
     return 'presidential-winner-2028';
   }
 
-  if (lower.includes('2028') && lower.includes('president') &&
-      (lower.includes('which party') || lower.includes('party win') || lower.includes('party wins'))) {
+  if (lower.includes('2028') &&
+      (lower.includes('which party') || lower.includes('party win') || lower.includes('party wins') || lower.includes('winning party')) &&
+      (lower.includes('president') || lower.includes('winning party'))) {
     return 'presidential-party-2028';
   }
 
-  if (lower.includes('2026') && lower.includes('house') &&
+  if ((lower.includes('2026') || lower.includes('midterm')) && lower.includes('house') &&
       (lower.includes('which party') || lower.includes('party win') || lower.includes('control'))) {
     return 'house-control-2026';
   }
 
-  if (lower.includes('2026') && lower.includes('senate') &&
-      (lower.includes('which party') || lower.includes('party win') || lower.includes('party control')) &&
+  if ((lower.includes('2026') || lower.includes('midterm')) && lower.includes('senate') &&
+      (lower.includes('which party') || lower.includes('party win') || lower.includes('party control') || lower.includes('control')) &&
       !lower.includes('how many') && !lower.includes('seats')) {
     return 'senate-control-2026';
   }

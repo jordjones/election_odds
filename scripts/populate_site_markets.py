@@ -83,18 +83,19 @@ def get_canonical_market_type(market_name: str) -> str | None:
         return 'presidential-winner-2028'
 
     # Presidential party 2028
-    if ('2028' in lower and 'president' in lower and
-            ('which party' in lower or 'party win' in lower or 'party wins' in lower)):
+    if ('2028' in lower and
+            ('which party' in lower or 'party win' in lower or 'party wins' in lower or 'winning party' in lower) and
+            ('president' in lower or 'winning party' in lower)):
         return 'presidential-party-2028'
 
     # House control 2026
-    if ('2026' in lower and 'house' in lower and
+    if (('2026' in lower or 'midterm' in lower) and 'house' in lower and
             ('which party' in lower or 'party win' in lower or 'control' in lower)):
         return 'house-control-2026'
 
     # Senate control 2026
-    if ('2026' in lower and 'senate' in lower and
-            ('which party' in lower or 'party win' in lower or 'party control' in lower) and
+    if (('2026' in lower or 'midterm' in lower) and 'senate' in lower and
+            ('which party' in lower or 'party win' in lower or 'party control' in lower or 'control' in lower) and
             'how many' not in lower and 'seats' not in lower):
         return 'senate-control-2026'
 

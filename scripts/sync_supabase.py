@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.storage_supabase import SupabaseStorage
 from scripts.category_tagger import classify_category_tag
-from api_clients import PolymarketClient, KalshiClient, PredictItClient
+from api_clients import PolymarketClient, KalshiClient, PredictItClient, SmarketsClient
 
 # Categories to skip during sync (non-election, saves DB space)
 EXCLUDED_CATEGORY_TAGS = {'Sports', 'Culture', 'Tech', 'Crypto', 'Finance'}
@@ -246,9 +246,77 @@ def sync_predictit(storage: SupabaseStorage, featured_only: bool = False) -> dic
     return stats
 
 
+def sync_smarkets(storage: SupabaseStorage, featured_only: bool = False) -> dict:
+    """Sync data from Smarkets."""
+    client = SmarketsClient()
+    stats = {'markets': 0, 'contracts': 0, 'snapshots': 0, 'skipped': 0}
+
+    logger.info("Fetching Smarkets political markets...")
+    markets = client.get_political_markets()
+    logger.info(f"Found {len(markets)} political markets")
+
+    if featured_only:
+        site_ids = get_featured_market_ids(storage, 'Smarkets')
+        original_count = len(markets)
+        markets = [m for m in markets if m.market_id in site_ids]
+        stats['skipped'] = original_count - len(markets)
+        logger.info(f"Filtering to {len(markets)} featured markets (skipped {stats['skipped']})")
+
+    snapshot_time = datetime.now(timezone.utc).isoformat()
+
+    for market in markets:
+        try:
+            tag = classify_category_tag(
+                market.market_name, market.description or '',
+                market.source, market.raw_data,
+            )
+            if tag in EXCLUDED_CATEGORY_TAGS:
+                stats['skipped'] += 1
+                continue
+
+            storage.upsert_market(
+                source='Smarkets',
+                market_id=market.market_id,
+                market_name=market.market_name,
+                category=market.category,
+                status=market.status.value if hasattr(market.status, 'value') else str(market.status),
+                url=market.url,
+                total_volume=market.total_volume,
+                category_tag=tag,
+            )
+            stats['markets'] += 1
+
+            for contract in market.contracts:
+                storage.upsert_contract(
+                    source='Smarkets',
+                    market_id=market.market_id,
+                    contract_id=contract.contract_id,
+                    contract_name=contract.contract_name,
+                )
+                stats['contracts'] += 1
+
+                storage.upsert_price_snapshot(
+                    source='Smarkets',
+                    market_id=market.market_id,
+                    contract_id=contract.contract_id,
+                    snapshot_time=snapshot_time,
+                    yes_price=contract.yes_price,
+                    no_price=contract.no_price,
+                    yes_bid=contract.yes_bid,
+                    yes_ask=contract.yes_ask,
+                    volume=contract.volume,
+                )
+                stats['snapshots'] += 1
+
+        except Exception as e:
+            logger.error(f"Error processing market {market.market_id}: {e}")
+
+    return stats
+
+
 def main():
     parser = argparse.ArgumentParser(description='Sync election odds to Supabase')
-    parser.add_argument('--source', choices=['polymarket', 'kalshi', 'predictit', 'all'],
+    parser.add_argument('--source', choices=['polymarket', 'kalshi', 'predictit', 'smarkets', 'all'],
                         default='all', help='Data source to sync')
     parser.add_argument('--featured-only', action='store_true',
                         help='Only sync featured markets (presidential, primaries, congress)')
@@ -275,6 +343,12 @@ def main():
         if args.source in ['predictit', 'all']:
             stats = sync_predictit(storage, args.featured_only)
             logger.info(f"PredictIt: {stats}")
+            for k, v in stats.items():
+                total_stats[k] += v
+
+        if args.source in ['smarkets', 'all']:
+            stats = sync_smarkets(storage, args.featured_only)
+            logger.info(f"Smarkets: {stats}")
             for k, v in stats.items():
                 total_stats[k] += v
 
