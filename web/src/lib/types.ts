@@ -148,6 +148,7 @@ export const MAIN_NAV: NavItem[] = [
       { label: 'By Candidate', href: '/presidential/candidates' },
     ],
   },
+  { label: 'Pulse', href: '/pulse' },
   { label: 'About', href: '/about' },
 ];
 

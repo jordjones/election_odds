@@ -136,7 +136,7 @@ export default function HomePage() {
       {/* Quick Links */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-6">Explore Markets</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <Link href="/presidential/candidates">
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
               <CardContent className="p-4 text-center">
@@ -182,6 +182,14 @@ export default function HomePage() {
               <CardContent className="p-4 text-center">
                 <div className="text-2xl mb-2">📈</div>
                 <div className="font-medium">Charts</div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/pulse">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📣</div>
+                <div className="font-medium">Pulse</div>
               </CardContent>
             </Card>
           </Link>
