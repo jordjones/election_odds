@@ -3,6 +3,7 @@ node_modules/
 
 # Data files (too large for git)
 data/
+!data/curated-posts.csv
 output/
 
 # Python

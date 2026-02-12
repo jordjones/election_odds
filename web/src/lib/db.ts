@@ -3,7 +3,9 @@
  */
 
 import Database from 'better-sqlite3';
+import { readFileSync } from 'fs';
 import path from 'path';
+import type { CuratedPostRow, PulseTopic } from './pulse-types';
 
 // Path to the SQLite database
 // Use absolute path to avoid issues with Next.js cwd
@@ -1786,5 +1788,153 @@ export function getStats() {
       Polymarket: 0,
       Smarkets: 0,
     },
+  };
+}
+
+// ── Curated Posts (CSV-based, for local dev without Supabase) ──────────
+
+const CSV_PATH = path.join(process.cwd(), '..', 'data', 'curated-posts.csv');
+let _cachedPosts: CuratedPostRow[] | null = null;
+
+/** Parse RFC 4180 CSV (handles double-quoted fields with escaped quotes) */
+function parseCsvLine(line: string): string[] {
+  const fields: string[] = [];
+  let i = 0;
+  while (i <= line.length) {
+    if (i === line.length) { fields.push(''); break; }
+    if (line[i] === '"') {
+      // Quoted field
+      let val = '';
+      i++; // skip opening quote
+      while (i < line.length) {
+        if (line[i] === '"') {
+          if (i + 1 < line.length && line[i + 1] === '"') {
+            val += '"';
+            i += 2;
+          } else {
+            i++; // skip closing quote
+            break;
+          }
+        } else {
+          val += line[i++];
+        }
+      }
+      fields.push(val);
+      i++; // skip comma
+    } else {
+      // Unquoted field
+      const next = line.indexOf(',', i);
+      if (next === -1) {
+        fields.push(line.slice(i));
+        break;
+      }
+      fields.push(line.slice(i, next));
+      i = next + 1;
+    }
+  }
+  return fields;
+}
+
+function loadCuratedPosts(): CuratedPostRow[] {
+  if (_cachedPosts) return _cachedPosts;
+
+  let content: string;
+  try {
+    content = readFileSync(CSV_PATH, 'utf-8');
+  } catch {
+    // Fallback: try from web directory (e.g., during build)
+    try {
+      content = readFileSync(path.join(process.cwd(), 'data', 'curated-posts.csv'), 'utf-8');
+    } catch {
+      console.warn('[db.ts] Could not read curated-posts.csv');
+      _cachedPosts = [];
+      return _cachedPosts;
+    }
+  }
+
+  const lines = content.trim().split('\n');
+  const rows: CuratedPostRow[] = [];
+
+  // Skip header row
+  for (let i = 1; i < lines.length; i++) {
+    const fields = parseCsvLine(lines[i]);
+    if (fields.length < 4) continue;
+    rows.push({
+      tweet_id: fields[0],
+      candidate_name: fields[1],
+      topic: fields[2] as PulseTopic,
+      posted_at: fields[3],
+      editor_note: fields[4] || null,
+      // Enriched fields are null in CSV (only available from Supabase)
+      tweet_text: null,
+      likes: null,
+      retweets: null,
+      replies: null,
+      views: null,
+      enriched_at: null,
+    });
+  }
+
+  _cachedPosts = rows;
+  return rows;
+}
+
+/**
+ * Get curated posts (SQLite/CSV version for local dev)
+ */
+export function getCuratedPosts(options?: {
+  candidate?: string;
+  topic?: string;
+  limit?: number;
+}): CuratedPostRow[] {
+  let posts = loadCuratedPosts();
+
+  if (options?.candidate) {
+    posts = posts.filter(p => p.candidate_name === options.candidate);
+  }
+  if (options?.topic) {
+    posts = posts.filter(p => p.topic === options.topic);
+  }
+
+  // Sort by posted_at descending
+  posts = [...posts].sort((a, b) => b.posted_at.localeCompare(a.posted_at));
+
+  if (options?.limit) {
+    posts = posts.slice(0, options.limit);
+  }
+
+  return posts;
+}
+
+/**
+ * Get curated post stats (SQLite/CSV version for local dev)
+ */
+export function getCuratedPostStats(): {
+  candidateCounts: { candidate_name: string; count: number; latest_at: string }[];
+  topicCounts: { topic: PulseTopic; count: number }[];
+} {
+  const posts = loadCuratedPosts();
+
+  const candidateMap = new Map<string, { count: number; latest_at: string }>();
+  const topicMap = new Map<PulseTopic, number>();
+
+  for (const p of posts) {
+    const existing = candidateMap.get(p.candidate_name);
+    if (existing) {
+      existing.count++;
+      if (p.posted_at > existing.latest_at) existing.latest_at = p.posted_at;
+    } else {
+      candidateMap.set(p.candidate_name, { count: 1, latest_at: p.posted_at });
+    }
+    topicMap.set(p.topic, (topicMap.get(p.topic) || 0) + 1);
+  }
+
+  return {
+    candidateCounts: Array.from(candidateMap.entries())
+      .map(([candidate_name, data]) => ({ candidate_name, ...data }))
+      .sort((a, b) => b.count - a.count),
+    topicCounts: Array.from(topicMap.entries())
+      .map(([topic, count]) => ({ topic, count }))
+      .sort((a, b) => b.count - a.count),
   };
 }

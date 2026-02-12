@@ -1,0 +1,53 @@
+name: Sync Curated Posts
+
+on:
+  schedule:
+    # Daily at 8 AM UTC
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      enrich_mode:
+        description: 'Tweet enrichment mode'
+        required: true
+        default: 'stale'
+        type: choice
+        options:
+          - stale
+          - force
+          - skip
+
+jobs:
+  sync-and-enrich:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install psycopg2-binary requests
+
+      - name: Sync CSV to Supabase
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python scripts/sync_curated_posts.py
+
+      - name: Enrich tweets via X API
+        if: github.event_name == 'schedule' || github.event.inputs.enrich_mode != 'skip'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          ENRICH_MODE: ${{ github.event.inputs.enrich_mode }}
+        run: |
+          if [ "$ENRICH_MODE" = "force" ]; then
+            python scripts/enrich_tweets.py --force
+          else
+            python scripts/enrich_tweets.py --stale-hours 24
+          fi

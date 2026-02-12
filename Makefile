@@ -38,6 +38,7 @@ db-stats:
 		UNION ALL SELECT 'contracts', COUNT(*) FROM contracts \
 		UNION ALL SELECT 'price_snapshots', COUNT(*) FROM price_snapshots \
 		UNION ALL SELECT 'site_markets', COUNT(*) FROM site_markets \
+		UNION ALL SELECT 'curated_posts', COUNT(*) FROM curated_posts \
 		ORDER BY 1"
 
 # ─── Sync ────────────────────────────────────────────────────
@@ -66,6 +67,27 @@ cleanup-dry-run:
 cleanup:
 	@test -n "$$DATABASE_URL" || (echo "DATABASE_URL not set" && exit 1)
 	python scripts/cleanup_supabase.py --execute
+
+## Sync curated posts CSV to Supabase
+sync-posts:
+	@test -n "$$DATABASE_URL" || (echo "DATABASE_URL not set" && exit 1)
+	python scripts/sync_curated_posts.py
+
+## Sync curated posts CSV (dry run)
+sync-posts-dry-run:
+	python scripts/sync_curated_posts.py --dry-run
+
+## Enrich tweets with X API data (un-enriched only)
+enrich-tweets:
+	@test -n "$$DATABASE_URL" || (echo "DATABASE_URL not set" && exit 1)
+	@test -n "$$X_BEARER_TOKEN" || (echo "X_BEARER_TOKEN not set" && exit 1)
+	python scripts/enrich_tweets.py
+
+## Enrich all tweets (force re-enrich)
+enrich-tweets-force:
+	@test -n "$$DATABASE_URL" || (echo "DATABASE_URL not set" && exit 1)
+	@test -n "$$X_BEARER_TOKEN" || (echo "X_BEARER_TOKEN not set" && exit 1)
+	python scripts/enrich_tweets.py --force
 
 # ─── Deploy ──────────────────────────────────────────────────
 
@@ -109,6 +131,10 @@ help:
 	@echo "  populate-site-markets Populate site_markets table"
 	@echo "  cleanup-dry-run      Preview non-site snapshot thinning"
 	@echo "  cleanup              Execute non-site snapshot thinning"
+	@echo "  sync-posts           Sync curated posts CSV to Supabase"
+	@echo "  sync-posts-dry-run   Preview curated posts sync"
+	@echo "  enrich-tweets        Enrich un-enriched tweets via X API"
+	@echo "  enrich-tweets-force  Force re-enrich all tweets"
 	@echo ""
 	@echo "Deploy:"
 	@echo "  deploy               Trigger Netlify remote build"
@@ -120,5 +146,6 @@ help:
 	@echo "  dev                  Start local dev server"
 
 .PHONY: set-db-url db-sql db-query db-stats sync-featured sync-all \
-	populate-site-markets cleanup-dry-run cleanup deploy deploy-status \
-	trigger-sync trigger-sync-all dev help
+	populate-site-markets cleanup-dry-run cleanup \
+	sync-posts sync-posts-dry-run enrich-tweets enrich-tweets-force \
+	deploy deploy-status trigger-sync trigger-sync-all dev help

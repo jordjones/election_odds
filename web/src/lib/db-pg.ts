@@ -5,6 +5,7 @@
 
 import { Pool, PoolClient } from 'pg';
 import type { Market, Contract, MarketPrice, MarketCategory } from './types';
+import type { CuratedPostRow, PulseTopic } from './pulse-types';
 
 // PostgreSQL pool (lazy initialized)
 let pool: Pool | null = null;
@@ -1445,6 +1446,86 @@ export async function getStatsAsync() {
         Polymarket: 0,
         Smarkets: 0,
       },
+    };
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Get curated posts from Supabase (PostgreSQL version)
+ */
+export async function getCuratedPostsAsync(options?: {
+  candidate?: string;
+  topic?: string;
+  limit?: number;
+}): Promise<CuratedPostRow[]> {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    const conditions: string[] = [];
+    const params: (string | number)[] = [];
+    let paramIdx = 1;
+
+    if (options?.candidate) {
+      conditions.push(`candidate_name = $${paramIdx++}`);
+      params.push(options.candidate);
+    }
+    if (options?.topic) {
+      conditions.push(`topic = $${paramIdx++}`);
+      params.push(options.topic);
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const limitClause = options?.limit ? `LIMIT $${paramIdx++}` : '';
+    if (options?.limit) params.push(options.limit);
+
+    const result = await client.query(`
+      SELECT tweet_id, candidate_name, topic,
+             posted_at::text as posted_at, editor_note,
+             tweet_text, likes, retweets, replies, views,
+             enriched_at::text as enriched_at
+      FROM curated_posts
+      ${where}
+      ORDER BY posted_at DESC
+      ${limitClause}
+    `, params);
+
+    return result.rows as CuratedPostRow[];
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Get curated post stats grouped by candidate and topic (PostgreSQL version)
+ */
+export async function getCuratedPostStatsAsync(): Promise<{
+  candidateCounts: { candidate_name: string; count: number; latest_at: string }[];
+  topicCounts: { topic: PulseTopic; count: number }[];
+}> {
+  const pool = getPool();
+  const client = await pool.connect();
+
+  try {
+    const candidateResult = await client.query(`
+      SELECT candidate_name, COUNT(*)::int as count, MAX(posted_at)::text as latest_at
+      FROM curated_posts
+      GROUP BY candidate_name
+      ORDER BY count DESC
+    `);
+
+    const topicResult = await client.query(`
+      SELECT topic, COUNT(*)::int as count
+      FROM curated_posts
+      GROUP BY topic
+      ORDER BY count DESC
+    `);
+
+    return {
+      candidateCounts: candidateResult.rows,
+      topicCounts: topicResult.rows as { topic: PulseTopic; count: number }[],
     };
   } finally {
     client.release();
