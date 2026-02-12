@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useFeaturedMarkets, useStats, useMarketsByCategory } from '@/hooks/useMarkets';
+import { useFeaturedMarkets, useMarketsByCategory } from '@/hooks/useMarkets';
 import { MarketCard, OddsTable } from '@/components/odds';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatVolume } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import type { TimeFilter } from '@/lib/types';
@@ -14,7 +13,6 @@ import { JsonLd, HOMEPAGE_JSONLD } from '@/components/seo/JsonLd';
 export default function HomePage() {
   const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
   const { data: featuredMarkets, isLoading: marketsLoading } = useFeaturedMarkets();
-  const { data: stats, isLoading: statsLoading } = useStats();
   const { data: presidentialMarkets, isLoading: presidentialLoading } = useMarketsByCategory('presidential', changePeriod);
 
   // Get the main presidential candidate market (not party)
@@ -34,47 +32,6 @@ export default function HomePage() {
           Real-time aggregated prediction market odds for US elections.
           Compare prices from PredictIt, Kalshi, Polymarket, and more.
         </p>
-      </section>
-
-      {/* Stats Section */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-        {statsLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <Skeleton className="h-8 w-20 mb-2" />
-                <Skeleton className="h-4 w-24" />
-              </CardContent>
-            </Card>
-          ))
-        ) : stats ? (
-          <>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold">{stats.totalMarkets.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Markets</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold">{stats.totalContracts.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Contracts</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold">{formatVolume(stats.totalVolume)}</div>
-                <div className="text-sm text-muted-foreground">Total Volume</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold">5</div>
-                <div className="text-sm text-muted-foreground">Data Sources</div>
-              </CardContent>
-            </Card>
-          </>
-        ) : null}
       </section>
 
       {/* 2028 Presidential Odds */}
