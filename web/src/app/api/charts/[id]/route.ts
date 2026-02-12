@@ -42,9 +42,12 @@ function getChartMarketId(marketId: string): string | null {
   if (marketId === 'presidential-party-2028' || marketId.includes('party-2028')) {
     return 'presidential-party-2028';
   }
-  // House/Senate markets don't have Polymarket historical data yet
-  if (marketId.includes('house') || marketId.includes('senate')) {
-    return null;
+  // House/Senate control markets
+  if (marketId === 'house-control-2026' || marketId.includes('house-2026')) {
+    return 'house-control-2026';
+  }
+  if (marketId === 'senate-control-2026' || marketId.includes('senate-2026')) {
+    return 'senate-control-2026';
   }
   return marketId; // pass through for other markets
 }

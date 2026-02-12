@@ -487,7 +487,7 @@ function extractCandidateName(contractName: string, contractId?: string): string
   }
 
   // Handle "Will X win..." or "Will X be the nominee..." format (Polymarket/Kalshi)
-  const willMatch = cleanName.match(/Will (.+?) (win|be the)/i);
+  const willMatch = cleanName.match(/Will (.+?) (win|be the|control)/i);
   if (willMatch) {
     let name = willMatch[1].trim();
     // Strip leading "the" for party names (e.g. "the Republicans" → "Republicans")

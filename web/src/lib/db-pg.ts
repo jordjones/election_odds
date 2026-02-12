@@ -122,7 +122,7 @@ function extractCandidateName(contractName: string, contractId?: string): string
     return KALSHI_PERSON_MAP[suffix] || null;
   }
 
-  const willMatch = cleanName.match(/Will (.+?) (win|be the)/i);
+  const willMatch = cleanName.match(/Will (.+?) (win|be the|control)/i);
   if (willMatch) {
     let name = willMatch[1].trim();
     // Strip leading "the" for party names (e.g. "the Republicans" → "Republicans")
@@ -1245,6 +1245,14 @@ function extractChartCandidateName(contractName: string): string | null {
   // Remove " - Yes" suffix
   const cleanName = contractName.replace(/ - Yes$/, '');
 
+  // Handle party control contracts (house/senate)
+  const controlMatch = cleanName.match(/^Will the (.+?) (control|win)/i);
+  if (controlMatch) {
+    const partyName = controlMatch[1].trim();
+    if (/democrat/i.test(partyName)) return 'Democratic';
+    if (/republican/i.test(partyName)) return 'Republican';
+  }
+
   const willMatch = cleanName.match(/^Will (.+?) (win|be) the 2028/i);
   if (willMatch) {
     const fullName = willMatch[1].trim();
@@ -1268,6 +1276,11 @@ function extractChartCandidateName(contractName: string): string | null {
     const parts = fullName.split(' ');
     return parts[parts.length - 1];
   }
+
+  // Handle bare party names (PredictIt/Smarkets: "Democratic Party", "Republican Party")
+  if (/^democrat/i.test(cleanName)) return 'Democratic';
+  if (/^republican/i.test(cleanName)) return 'Republican';
+
   return null;
 }
 
@@ -1291,6 +1304,8 @@ export async function getChartDataAsync(
       'gop-nominee-2028': '31875',
       'dem-primary-2028': '30829',
       'dem-nominee-2028': '30829',
+      'house-control-2026': '32225',
+      'senate-control-2026': '32224',
     };
 
     const dbMarketId = polymarketMapping[marketId] || marketId;
