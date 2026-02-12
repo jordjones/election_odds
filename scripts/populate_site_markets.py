@@ -48,7 +48,8 @@ def get_canonical_market_type(market_name: str) -> str | None:
     """
     Classify a market name into a canonical type.
 
-    Mirrors getCanonicalMarketType() in web/src/lib/db-pg.ts.
+    Mirrors getCanonicalMarketType() in web/src/lib/db-pg.ts for national markets,
+    plus senate primaries and VP nominees.
     """
     lower = market_name.lower()
 
@@ -56,7 +57,20 @@ def get_canonical_market_type(market_name: str) -> str | None:
     if 'who will run' in lower or 'will run for' in lower:
         return None
 
-    # Exclude state-level and district markets
+    # Senate primaries — check BEFORE state exclusion since these contain state names
+    if ('senate' in lower and
+            ('nomination' in lower or 'primary winner' in lower) and
+            # Exclude derivative markets (margin, percentage, endorsement, place, closer)
+            'margin' not in lower and 'percentage' not in lower and
+            'endorse' not in lower and 'place' not in lower and
+            'closer' not in lower and 'order of finish' not in lower):
+        return 'senate-primary-2026'
+
+    # VP nominee 2028
+    if ('vp nominee' in lower or 'vice president' in lower) and '2028' in lower:
+        return 'vp-nominee-2028'
+
+    # Exclude state-level and district markets (for remaining national types)
     if 'district' in lower or STATE_PATTERN.search(lower):
         return None
 
