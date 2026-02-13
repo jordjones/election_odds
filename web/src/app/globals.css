@@ -122,6 +122,20 @@
   body {
     @apply bg-background text-foreground;
   }
+  .container {
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 768px) {
+    .container {
+      padding-inline: 1.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container {
+      padding-inline: 2rem;
+    }
+  }
 }
 
 /* Hide text labels in Recharts Brush component */
