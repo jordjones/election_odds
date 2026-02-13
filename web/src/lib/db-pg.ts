@@ -1304,6 +1304,7 @@ export async function getChartDataAsync(
       'dem-primary-2028': '30829',
       'dem-nominee-2028': '30829',
       'house-control-2026': '32225',
+      'presidential-party-2028': '33228',
       'senate-control-2026': '32224',
     };
 
