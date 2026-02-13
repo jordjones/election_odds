@@ -138,6 +138,38 @@
   }
 }
 
+/* Slim, theme-aware scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.7 0 0) transparent;
+}
+html.dark {
+  scrollbar-color: oklch(0.35 0 0) transparent;
+}
+
+/* Webkit (Chrome/Safari/Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0 0);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.55 0 0);
+}
+.dark::-webkit-scrollbar-thumb,
+.dark ::-webkit-scrollbar-thumb {
+  background: oklch(0.35 0 0);
+}
+.dark::-webkit-scrollbar-thumb:hover,
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.45 0 0);
+}
+
 /* Hide text labels in Recharts Brush component */
 .recharts-brush-texts {
   display: none;
