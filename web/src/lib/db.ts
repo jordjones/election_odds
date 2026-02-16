@@ -1201,11 +1201,13 @@ function getCanonicalMarketType(marketName: string): string | null {
   // Polymarket: "Which party will win the House in 2026?"
   // PredictIt: "Which party will win the House in the 2026 election?"
   if (
-    (lower.includes("2026") || lower.includes("midterm")) &&
-    lower.includes("house") &&
-    (lower.includes("which party") ||
-      lower.includes("party win") ||
-      lower.includes("control"))
+    ((lower.includes("2026") || lower.includes("midterm")) &&
+      lower.includes("house") &&
+      (lower.includes("which party") ||
+        lower.includes("party win") ||
+        lower.includes("control"))) ||
+    (lower.includes("house of representatives") &&
+      lower.includes("which party"))
   ) {
     return "house-control-2026";
   }
@@ -1216,12 +1218,13 @@ function getCanonicalMarketType(marketName: string): string | null {
   // Smarkets: "Which party will control the Senate after the midterm elections?"
   // Exclude: "How many Senate seats..." (seat count markets)
   if (
-    (lower.includes("2026") || lower.includes("midterm")) &&
-    lower.includes("senate") &&
-    (lower.includes("which party") ||
-      lower.includes("party win") ||
-      lower.includes("party control") ||
-      lower.includes("control")) &&
+    (((lower.includes("2026") || lower.includes("midterm")) &&
+      lower.includes("senate") &&
+      (lower.includes("which party") ||
+        lower.includes("party win") ||
+        lower.includes("party control") ||
+        lower.includes("control"))) ||
+      (lower.includes("u.s. senate") && lower.includes("which party"))) &&
     !lower.includes("how many") &&
     !lower.includes("seats")
   ) {

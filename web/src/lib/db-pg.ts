@@ -102,22 +102,25 @@ function getCanonicalMarketType(marketName: string): string | null {
   }
 
   if (
-    (lower.includes("2026") || lower.includes("midterm")) &&
-    lower.includes("house") &&
-    (lower.includes("which party") ||
-      lower.includes("party win") ||
-      lower.includes("control"))
+    ((lower.includes("2026") || lower.includes("midterm")) &&
+      lower.includes("house") &&
+      (lower.includes("which party") ||
+        lower.includes("party win") ||
+        lower.includes("control"))) ||
+    (lower.includes("house of representatives") &&
+      lower.includes("which party"))
   ) {
     return "house-control-2026";
   }
 
   if (
-    (lower.includes("2026") || lower.includes("midterm")) &&
-    lower.includes("senate") &&
-    (lower.includes("which party") ||
-      lower.includes("party win") ||
-      lower.includes("party control") ||
-      lower.includes("control")) &&
+    (((lower.includes("2026") || lower.includes("midterm")) &&
+      lower.includes("senate") &&
+      (lower.includes("which party") ||
+        lower.includes("party win") ||
+        lower.includes("party control") ||
+        lower.includes("control"))) ||
+      (lower.includes("u.s. senate") && lower.includes("which party"))) &&
     !lower.includes("how many") &&
     !lower.includes("seats")
   ) {
