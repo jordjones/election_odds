@@ -1502,13 +1502,6 @@ export function getMarkets(options?: {
     // Map: normalized candidate name -> Contract with prices from all sources
     const contractsByCandidate = new Map<string, Contract>();
 
-    // Event-level volume lookup (Polymarket reports volume at event level)
-    const marketVolumeByKey = new Map<string, number>();
-    for (const dbMarket of relatedMarkets) {
-      const key = `${dbMarket.source}:${dbMarket.market_id}`;
-      marketVolumeByKey.set(key, dbMarket.total_volume || 0);
-    }
-
     for (const dbMarket of relatedMarkets) {
       const contractsWithPrices = db
         .prepare(contractsWithPricesQuery)
@@ -1572,12 +1565,6 @@ export function getMarkets(options?: {
           volume: contract.volume || 0,
           lastUpdated: contract.snapshot_time,
         };
-
-        // Use event-level volume as fallback when per-contract is 0
-        if (price.volume === 0) {
-          const mktKey = `${contract.source}:${contract.market_id}`;
-          price.volume = marketVolumeByKey.get(mktKey) || 0;
-        }
 
         if (contractsByCandidate.has(normalizedName)) {
           // Add price to existing contract
@@ -1808,13 +1795,6 @@ export function getStateSenateRaces(options?: {
 
     const contractsByCandidate = new Map<string, Contract>();
 
-    // Event-level volume lookup (Polymarket reports volume at event level)
-    const marketVolumeByKey = new Map<string, number>();
-    for (const dbMarket of marketsResult) {
-      const key = `${dbMarket.source}:${dbMarket.market_id}`;
-      marketVolumeByKey.set(key, dbMarket.total_volume || 0);
-    }
-
     // Build historical prices map
     const historicalByCandidate = new Map<string, number[]>();
 
@@ -1904,12 +1884,6 @@ export function getStateSenateRaces(options?: {
           volume: contract.volume || 0,
           lastUpdated: contract.snapshot_time,
         };
-
-        // Use event-level volume as fallback when per-contract is 0
-        if (price.volume === 0) {
-          const mktKey = `${contract.source}:${contract.market_id}`;
-          price.volume = marketVolumeByKey.get(mktKey) || 0;
-        }
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;
@@ -2097,13 +2071,6 @@ export function getSenatePrimaries(options?: {
     const contractsByCandidate = new Map<string, Contract>();
     const historicalByCandidate = new Map<string, number[]>();
 
-    // Event-level volume lookup (Polymarket reports volume at event level)
-    const marketVolumeByKey = new Map<string, number>();
-    for (const dbMarket of group.dbMarkets) {
-      const key = `${dbMarket.source}:${dbMarket.market_id}`;
-      marketVolumeByKey.set(key, dbMarket.total_volume || 0);
-    }
-
     for (const dbMarket of group.dbMarkets) {
       const contractsWithPrices = db
         .prepare(
@@ -2187,12 +2154,6 @@ export function getSenatePrimaries(options?: {
           volume: contract.volume || 0,
           lastUpdated: contract.snapshot_time,
         };
-
-        // Use event-level volume as fallback when per-contract is 0
-        if (price.volume === 0) {
-          const mktKey = `${contract.source}:${contract.market_id}`;
-          price.volume = marketVolumeByKey.get(mktKey) || 0;
-        }
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;

@@ -899,14 +899,6 @@ export async function getMarketsAsync(options?: {
       // Aggregate contracts from all sources — batched into one query
       const contractsByCandidate = new Map<string, Contract>();
 
-      // Build a lookup of event-level volume from the markets table
-      // (Polymarket reports volume at the event level, not per-contract)
-      const marketVolumeByKey = new Map<string, number>();
-      for (const dbMarket of relatedMarkets) {
-        const key = `${dbMarket.source}:${dbMarket.market_id}`;
-        marketVolumeByKey.set(key, parseFloat(dbMarket.total_volume) || 0);
-      }
-
       // Build WHERE conditions for all (market_id, source) pairs in this canonical type
       const conditions: string[] = [];
       const queryParams: any[] = [];
@@ -963,13 +955,6 @@ export async function getMarketsAsync(options?: {
           volume: parseFloat(contract.volume) || 0,
           lastUpdated: contract.snapshot_time,
         };
-
-        // Use event-level volume from markets table when per-contract volume is 0
-        // (Polymarket reports volume at event level, not per contract)
-        if (price.volume === 0) {
-          const mktKey = `${contract.source}:${contract.market_id}`;
-          price.volume = marketVolumeByKey.get(mktKey) || 0;
-        }
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;
@@ -1185,13 +1170,6 @@ export async function getStateSenateRacesAsync(options?: {
       // Aggregate contracts from all matching markets for this state
       const contractsByCandidate = new Map<string, Contract>();
 
-      // Event-level volume lookup (Polymarket reports volume at event level)
-      const marketVolumeByKey = new Map<string, number>();
-      for (const dbMarket of marketsResult.rows) {
-        const key = `${dbMarket.source}:${dbMarket.market_id}`;
-        marketVolumeByKey.set(key, parseFloat(dbMarket.total_volume) || 0);
-      }
-
       const conditions: string[] = [];
       const queryParams: any[] = [];
       let paramIdx = 1;
@@ -1292,12 +1270,6 @@ export async function getStateSenateRacesAsync(options?: {
           volume: parseFloat(contract.volume) || 0,
           lastUpdated: contract.snapshot_time,
         };
-
-        // Use event-level volume as fallback when per-contract is 0
-        if (price.volume === 0) {
-          const mktKey = `${contract.source}:${contract.market_id}`;
-          price.volume = marketVolumeByKey.get(mktKey) || 0;
-        }
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;
@@ -1490,13 +1462,6 @@ export async function getSenatePrimariesAsync(options?: {
     for (const [groupKey, group] of primaryGroups) {
       const contractsByCandidate = new Map<string, Contract>();
 
-      // Event-level volume lookup (Polymarket reports volume at event level)
-      const marketVolumeByKey = new Map<string, number>();
-      for (const dbMarket of group.dbMarkets) {
-        const key = `${dbMarket.source}:${dbMarket.market_id}`;
-        marketVolumeByKey.set(key, parseFloat(dbMarket.total_volume) || 0);
-      }
-
       const conditions: string[] = [];
       const queryParams: any[] = [];
       let paramIdx = 1;
@@ -1598,12 +1563,6 @@ export async function getSenatePrimariesAsync(options?: {
           volume: contract.volume ? parseFloat(contract.volume) : 0,
           lastUpdated: contract.snapshot_time,
         };
-
-        // Use event-level volume as fallback when per-contract is 0
-        if (price.volume === 0) {
-          const mktKey = `${contract.source}:${contract.market_id}`;
-          price.volume = marketVolumeByKey.get(mktKey) || 0;
-        }
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;
