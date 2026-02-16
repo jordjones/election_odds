@@ -1640,6 +1640,7 @@ export function getMarkets(options?: {
     );
 
     // Sort by aggregated price
+    normalizePrices(contracts);
     contracts.sort((a, b) => b.aggregatedPrice - a.aggregatedPrice);
 
     if (contracts.length === 0) {
@@ -1717,6 +1718,40 @@ function excludeIlliquidSources(
         for (const c of contractsList) {
           c.prices = c.prices.filter((p) => p.source !== source);
         }
+      }
+    }
+  }
+}
+
+// Normalize aggregated prices so they sum to 100% within a market.
+// Also normalizes per-source yesPrice values so each source column sums to 100%.
+function normalizePrices(contracts: Contract[]): void {
+  if (contracts.length === 0) return;
+
+  // Normalize aggregatedPrice
+  const totalAgg = contracts.reduce((s, c) => s + c.aggregatedPrice, 0);
+  if (totalAgg > 0 && Math.abs(totalAgg - 1) > 0.001) {
+    const scale = 1 / totalAgg;
+    for (const c of contracts) {
+      c.aggregatedPrice *= scale;
+    }
+  }
+
+  // Normalize per-source yesPrice
+  const sources = new Set<string>();
+  for (const c of contracts) {
+    for (const p of c.prices) sources.add(p.source);
+  }
+  for (const source of sources) {
+    const sourcePrices = contracts
+      .map((c) => c.prices.find((p) => p.source === source))
+      .filter((p): p is MarketPrice => p !== undefined);
+    const total = sourcePrices.reduce((s, p) => s + p.yesPrice, 0);
+    if (total > 0 && Math.abs(total - 1) > 0.001) {
+      const scale = 1 / total;
+      for (const p of sourcePrices) {
+        p.yesPrice *= scale;
+        p.noPrice = 1 - p.yesPrice;
       }
     }
   }
@@ -1977,6 +2012,7 @@ export function getStateSenateRaces(options?: {
       },
     );
 
+    normalizePrices(contracts);
     contracts.sort((a, b) => b.aggregatedPrice - a.aggregatedPrice);
 
     if (contracts.length === 0) continue;
@@ -2239,6 +2275,7 @@ export function getSenatePrimaries(options?: {
       },
     );
 
+    normalizePrices(contracts);
     contracts.sort((a, b) => b.aggregatedPrice - a.aggregatedPrice);
     if (contracts.length === 0) continue;
 
