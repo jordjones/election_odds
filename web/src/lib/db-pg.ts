@@ -958,8 +958,18 @@ export async function getMarketsAsync(options?: {
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;
-          if (!existing.prices.find((p) => p.source === price.source)) {
+          const existingPrice = existing.prices.find(
+            (p) => p.source === price.source,
+          );
+          if (!existingPrice) {
             existing.prices.push(price);
+            existing.totalVolume += price.volume || 0;
+          } else if (
+            new Date(price.lastUpdated) > new Date(existingPrice.lastUpdated)
+          ) {
+            // Replace stale duplicate with fresher data from same source
+            existing.totalVolume -= existingPrice.volume || 0;
+            Object.assign(existingPrice, price);
             existing.totalVolume += price.volume || 0;
           }
         } else {
@@ -1322,8 +1332,18 @@ export async function getStateSenateRacesAsync(options?: {
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;
-          if (!existing.prices.find((p) => p.source === price.source)) {
+          const existingPrice = existing.prices.find(
+            (p) => p.source === price.source,
+          );
+          if (!existingPrice) {
             existing.prices.push(price);
+            existing.totalVolume += price.volume || 0;
+          } else if (
+            new Date(price.lastUpdated) > new Date(existingPrice.lastUpdated)
+          ) {
+            // Replace stale duplicate with fresher data from same source
+            existing.totalVolume -= existingPrice.volume || 0;
+            Object.assign(existingPrice, price);
             existing.totalVolume += price.volume || 0;
           }
         } else {
@@ -1644,8 +1664,18 @@ export async function getSenatePrimariesAsync(options?: {
 
         if (contractsByCandidate.has(normalizedName)) {
           const existing = contractsByCandidate.get(normalizedName)!;
-          if (!existing.prices.find((p) => p.source === price.source)) {
+          const existingPrice = existing.prices.find(
+            (p) => p.source === price.source,
+          );
+          if (!existingPrice) {
             existing.prices.push(price);
+            existing.totalVolume += price.volume || 0;
+          } else if (
+            new Date(price.lastUpdated) > new Date(existingPrice.lastUpdated)
+          ) {
+            // Replace stale duplicate with fresher data from same source
+            existing.totalVolume -= existingPrice.volume || 0;
+            Object.assign(existingPrice, price);
             existing.totalVolume += price.volume || 0;
           }
         } else {
