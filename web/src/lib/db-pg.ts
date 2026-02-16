@@ -1128,7 +1128,8 @@ const SENATE_STATES_2026: Record<string, string> = {
 
 /**
  * Get state senate race markets
- * Queries markets that match state + senate patterns, aggregates across sources
+ * Fetches ALL senate race markets in 3 batched queries (instead of 3 per state),
+ * then groups and aggregates in JS.
  */
 export async function getStateSenateRacesAsync(options?: {
   states?: string[];
@@ -1140,97 +1141,145 @@ export async function getStateSenateRacesAsync(options?: {
 
   try {
     const stateAbbrevs = options?.states || Object.keys(SENATE_STATES_2026);
+
+    // Query 1: Find ALL senate race markets across all states in one query
+    const marketsResult = await client.query(`
+      SELECT DISTINCT
+        m.id, m.source, m.market_id, m.market_name, m.category,
+        m.status, m.url, m.total_volume, m.end_date
+      FROM markets m
+      WHERE LOWER(m.market_name) LIKE '%senate%'
+        AND LOWER(m.market_name) NOT LIKE '%primary%'
+        AND LOWER(m.market_name) NOT LIKE '%nomin%'
+        AND m.source IN ('Polymarket', 'Kalshi', 'PredictIt', 'Smarkets')
+      ORDER BY m.total_volume DESC NULLS LAST
+    `);
+
+    if (marketsResult.rows.length === 0) return [];
+
+    // Match each market to a state by checking if market name contains the state name
+    const marketsByState = new Map<
+      string,
+      { abbrev: string; stateName: string; dbMarkets: any[] }
+    >();
+
+    for (const dbMarket of marketsResult.rows) {
+      const marketNameLower = dbMarket.market_name.toLowerCase();
+      for (const abbrev of stateAbbrevs) {
+        const stateName = SENATE_STATES_2026[abbrev];
+        if (!stateName) continue;
+        if (marketNameLower.includes(stateName.toLowerCase())) {
+          if (!marketsByState.has(abbrev)) {
+            marketsByState.set(abbrev, {
+              abbrev,
+              stateName,
+              dbMarkets: [],
+            });
+          }
+          marketsByState.get(abbrev)!.dbMarkets.push(dbMarket);
+          break; // Each market belongs to one state
+        }
+      }
+    }
+
+    if (marketsByState.size === 0) return [];
+
+    // Collect ALL market IDs across all states for batched contract queries
+    const allDbMarkets: any[] = [];
+    for (const group of marketsByState.values()) {
+      allDbMarkets.push(...group.dbMarkets);
+    }
+
+    // Query 2: Get ALL contracts with latest prices in one query
+    const conditions: string[] = [];
+    const queryParams: any[] = [];
+    let paramIdx = 1;
+    for (const dbMarket of allDbMarkets) {
+      conditions.push(
+        `(c.market_id = $${paramIdx} AND c.source = $${paramIdx + 1})`,
+      );
+      queryParams.push(dbMarket.market_id, dbMarket.source);
+      paramIdx += 2;
+    }
+
+    const contractsResult = await client.query(
+      `
+      SELECT
+        c.id, c.source, c.market_id, c.contract_id, c.contract_name,
+        ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
+      FROM contracts c
+      INNER JOIN LATERAL (
+        SELECT yes_price, no_price, volume, snapshot_time
+        FROM price_snapshots
+        WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
+        ORDER BY snapshot_time DESC
+        LIMIT 1
+      ) ps ON true
+      WHERE (${conditions.join(" OR ")})
+      AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
+    `,
+      queryParams,
+    );
+
+    // Query 3: Get ALL historical prices in one query
+    const changeTimestamp = getChangePeriodTimestamp(changePeriod);
+    const historicalConditions = conditions.map((cond) => {
+      return cond.replace(/\$(\d+)/g, (_, n: string) => `$${parseInt(n) + 1}`);
+    });
+
+    const historicalResult = await client.query(
+      `
+      SELECT DISTINCT ON (c.source, c.contract_id)
+        c.source, c.market_id, c.contract_id, c.contract_name,
+        ps.yes_price
+      FROM contracts c
+      INNER JOIN LATERAL (
+        SELECT yes_price, snapshot_time
+        FROM price_snapshots
+        WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
+          AND snapshot_time <= $1
+          AND yes_price IS NOT NULL
+        ORDER BY snapshot_time DESC
+        LIMIT 1
+      ) ps ON true
+      WHERE (${historicalConditions.join(" OR ")})
+    `,
+      [changeTimestamp, ...queryParams],
+    );
+
+    // Index contracts and historical by market_id+source for fast lookup
+    const contractsByMarketKey = new Map<string, any[]>();
+    for (const row of contractsResult.rows) {
+      const key = `${row.market_id}:${row.source}`;
+      if (!contractsByMarketKey.has(key)) contractsByMarketKey.set(key, []);
+      contractsByMarketKey.get(key)!.push(row);
+    }
+
+    const historicalByMarketKey = new Map<string, any[]>();
+    for (const row of historicalResult.rows) {
+      const key = `${row.market_id}:${row.source}`;
+      if (!historicalByMarketKey.has(key)) historicalByMarketKey.set(key, []);
+      historicalByMarketKey.get(key)!.push(row);
+    }
+
+    // Now aggregate per state (all in JS, no more DB queries)
     const markets: Market[] = [];
 
-    for (const abbrev of stateAbbrevs) {
-      const stateName = SENATE_STATES_2026[abbrev];
-      if (!stateName) continue;
-
-      const stateNameLower = stateName.toLowerCase();
-
-      // Find markets that mention this state + senate, excluding primaries/nominations
-      const marketsResult = await client.query(
-        `
-        SELECT DISTINCT
-          m.id, m.source, m.market_id, m.market_name, m.category,
-          m.status, m.url, m.total_volume, m.end_date
-        FROM markets m
-        WHERE LOWER(m.market_name) LIKE $1
-          AND LOWER(m.market_name) LIKE '%senate%'
-          AND LOWER(m.market_name) NOT LIKE '%primary%'
-          AND LOWER(m.market_name) NOT LIKE '%nomin%'
-          AND m.source IN ('Polymarket', 'Kalshi', 'PredictIt', 'Smarkets')
-        ORDER BY m.total_volume DESC NULLS LAST
-      `,
-        [`%${stateNameLower}%`],
-      );
-
-      if (marketsResult.rows.length === 0) continue;
-
-      // Aggregate contracts from all matching markets for this state
+    for (const [abbrev, group] of marketsByState) {
       const contractsByCandidate = new Map<string, Contract>();
 
-      const conditions: string[] = [];
-      const queryParams: any[] = [];
-      let paramIdx = 1;
-      for (const dbMarket of marketsResult.rows) {
-        conditions.push(
-          `(c.market_id = $${paramIdx} AND c.source = $${paramIdx + 1})`,
-        );
-        queryParams.push(dbMarket.market_id, dbMarket.source);
-        paramIdx += 2;
+      // Gather contracts for this state's markets
+      const stateContracts: any[] = [];
+      const stateHistorical: any[] = [];
+      for (const dbMarket of group.dbMarkets) {
+        const key = `${dbMarket.market_id}:${dbMarket.source}`;
+        stateContracts.push(...(contractsByMarketKey.get(key) || []));
+        stateHistorical.push(...(historicalByMarketKey.get(key) || []));
       }
 
-      const contractsResult = await client.query(
-        `
-        SELECT
-          c.id, c.source, c.market_id, c.contract_id, c.contract_name,
-          ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
-        FROM contracts c
-        INNER JOIN LATERAL (
-          SELECT yes_price, no_price, volume, snapshot_time
-          FROM price_snapshots
-          WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
-          ORDER BY snapshot_time DESC
-          LIMIT 1
-        ) ps ON true
-        WHERE (${conditions.join(" OR ")})
-        AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
-      `,
-        queryParams,
-      );
-
-      // Get historical prices for change calculation
-      const changeTimestamp = getChangePeriodTimestamp(changePeriod);
-      const historicalParams = [...queryParams];
-      const historicalConditions = conditions.map((cond, i) => {
-        // Shift param indices up by 1 to account for the timestamp param at $1
-        return cond.replace(/\$(\d+)/g, (_, n) => `$${parseInt(n) + 1}`);
-      });
-
-      const historicalResult = await client.query(
-        `
-        SELECT DISTINCT ON (c.source, c.contract_id)
-          c.source, c.contract_id, c.contract_name,
-          ps.yes_price
-        FROM contracts c
-        INNER JOIN LATERAL (
-          SELECT yes_price, snapshot_time
-          FROM price_snapshots
-          WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
-            AND snapshot_time <= $1
-            AND yes_price IS NOT NULL
-          ORDER BY snapshot_time DESC
-          LIMIT 1
-        ) ps ON true
-        WHERE (${historicalConditions.join(" OR ")})
-      `,
-        [changeTimestamp, ...queryParams],
-      );
-
-      // Build historical price map: normalized name → average historical price
+      // Build historical price map for this state
       const historicalByCandidate = new Map<string, number[]>();
-      for (const row of historicalResult.rows) {
+      for (const row of stateHistorical) {
         const candidateName = extractCandidateName(
           row.contract_name,
           row.contract_id,
@@ -1245,7 +1294,7 @@ export async function getStateSenateRacesAsync(options?: {
           .push(parseFloat(row.yes_price));
       }
 
-      for (const contract of contractsResult.rows) {
+      for (const contract of stateContracts) {
         const candidateName = extractCandidateName(
           contract.contract_name,
           contract.contract_id,
@@ -1291,8 +1340,8 @@ export async function getStateSenateRacesAsync(options?: {
         }
       }
 
-      // If we have both party-level contracts (Republican Party, Democratic Party)
-      // and individual candidate contracts, keep party entries for consistency
+      // If we have both party-level contracts and individual candidate contracts,
+      // keep party entries for consistency
       const PARTY_KEYS = [
         "republican party",
         "democratic party",
@@ -1312,10 +1361,8 @@ export async function getStateSenateRacesAsync(options?: {
         }
       }
 
-      // Remove illiquid sources (e.g. Kalshi showing 47/47 for both sides)
       excludeIlliquidSources(Array.from(contractsByCandidate.values()));
 
-      // Calculate aggregated prices and price changes
       const contracts = Array.from(contractsByCandidate.values()).map(
         (contract) => {
           const freshPrices = getFreshPrices(contract.prices);
@@ -1349,7 +1396,7 @@ export async function getStateSenateRacesAsync(options?: {
       markets.push({
         id: `senate-race-${abbrev}`,
         slug: `senate-race-${abbrev}`,
-        name: `${stateName} Senate Race 2026`,
+        name: `${group.stateName} Senate Race 2026`,
         description: `Aggregated from ${sourcesIncluded.join(", ")}.`,
         category: "senate-race" as MarketCategory,
         status: "open",
@@ -1457,70 +1504,101 @@ export async function getSenatePrimariesAsync(options?: {
       primaryGroups.get(groupKey)!.dbMarkets.push(dbMarket);
     }
 
+    // Collect ALL market IDs across all groups for batched queries
+    const allDbMarkets: any[] = [];
+    for (const group of primaryGroups.values()) {
+      allDbMarkets.push(...group.dbMarkets);
+    }
+
+    // Query 2: Get ALL contracts with latest prices in one query
+    const conditions: string[] = [];
+    const queryParams: any[] = [];
+    let paramIdx = 1;
+    for (const dbMarket of allDbMarkets) {
+      conditions.push(
+        `(c.market_id = $${paramIdx} AND c.source = $${paramIdx + 1})`,
+      );
+      queryParams.push(dbMarket.market_id, dbMarket.source);
+      paramIdx += 2;
+    }
+
+    const contractsResult = await client.query(
+      `
+      SELECT
+        c.id, c.source, c.market_id, c.contract_id, c.contract_name,
+        ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
+      FROM contracts c
+      INNER JOIN LATERAL (
+        SELECT yes_price, no_price, volume, snapshot_time
+        FROM price_snapshots
+        WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
+        ORDER BY snapshot_time DESC
+        LIMIT 1
+      ) ps ON true
+      WHERE (${conditions.join(" OR ")})
+      AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
+    `,
+      queryParams,
+    );
+
+    // Query 3: Get ALL historical prices in one query
+    const changeTimestamp = getChangePeriodTimestamp(changePeriod);
+    const historicalConditions = conditions.map((cond) => {
+      return cond.replace(/\$(\d+)/g, (_, n: string) => `$${parseInt(n) + 1}`);
+    });
+
+    const historicalResult = await client.query(
+      `
+      SELECT DISTINCT ON (c.source, c.contract_id)
+        c.source, c.market_id, c.contract_id, c.contract_name,
+        ps.yes_price
+      FROM contracts c
+      INNER JOIN LATERAL (
+        SELECT yes_price, snapshot_time
+        FROM price_snapshots
+        WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
+          AND snapshot_time <= $1
+          AND yes_price IS NOT NULL
+        ORDER BY snapshot_time DESC
+        LIMIT 1
+      ) ps ON true
+      WHERE (${historicalConditions.join(" OR ")})
+    `,
+      [changeTimestamp, ...queryParams],
+    );
+
+    // Index contracts and historical by market_id+source for fast lookup
+    const contractsByMarketKey = new Map<string, any[]>();
+    for (const row of contractsResult.rows) {
+      const key = `${row.market_id}:${row.source}`;
+      if (!contractsByMarketKey.has(key)) contractsByMarketKey.set(key, []);
+      contractsByMarketKey.get(key)!.push(row);
+    }
+
+    const historicalByMarketKey = new Map<string, any[]>();
+    for (const row of historicalResult.rows) {
+      const key = `${row.market_id}:${row.source}`;
+      if (!historicalByMarketKey.has(key)) historicalByMarketKey.set(key, []);
+      historicalByMarketKey.get(key)!.push(row);
+    }
+
+    // Now aggregate per group (all in JS, no more DB queries)
     const markets: Market[] = [];
 
     for (const [groupKey, group] of primaryGroups) {
       const contractsByCandidate = new Map<string, Contract>();
 
-      const conditions: string[] = [];
-      const queryParams: any[] = [];
-      let paramIdx = 1;
+      // Gather contracts for this group's markets from the index
+      const groupContracts: any[] = [];
+      const groupHistorical: any[] = [];
       for (const dbMarket of group.dbMarkets) {
-        conditions.push(
-          `(c.market_id = $${paramIdx} AND c.source = $${paramIdx + 1})`,
-        );
-        queryParams.push(dbMarket.market_id, dbMarket.source);
-        paramIdx += 2;
+        const key = `${dbMarket.market_id}:${dbMarket.source}`;
+        groupContracts.push(...(contractsByMarketKey.get(key) || []));
+        groupHistorical.push(...(historicalByMarketKey.get(key) || []));
       }
 
-      const contractsResult = await client.query(
-        `
-        SELECT
-          c.id, c.source, c.market_id, c.contract_id, c.contract_name,
-          ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
-        FROM contracts c
-        INNER JOIN LATERAL (
-          SELECT yes_price, no_price, volume, snapshot_time
-          FROM price_snapshots
-          WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
-          ORDER BY snapshot_time DESC
-          LIMIT 1
-        ) ps ON true
-        WHERE (${conditions.join(" OR ")})
-        AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
-      `,
-        queryParams,
-      );
-
-      // Historical prices for change calculation
-      const changeTimestamp = getChangePeriodTimestamp(changePeriod);
-      const historicalParams = [...queryParams];
-      const historicalConditions = conditions.map((cond) => {
-        return cond.replace(/\$(\d+)/g, (_, n) => `$${parseInt(n) + 1}`);
-      });
-
-      const historicalResult = await client.query(
-        `
-        SELECT DISTINCT ON (c.source, c.contract_id)
-          c.source, c.contract_id, c.contract_name,
-          ps.yes_price
-        FROM contracts c
-        INNER JOIN LATERAL (
-          SELECT yes_price, snapshot_time
-          FROM price_snapshots
-          WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
-            AND snapshot_time <= $1
-            AND yes_price IS NOT NULL
-          ORDER BY snapshot_time DESC
-          LIMIT 1
-        ) ps ON true
-        WHERE (${historicalConditions.join(" OR ")})
-      `,
-        [changeTimestamp, ...queryParams],
-      );
-
       const historicalByCandidate = new Map<string, number[]>();
-      for (const row of historicalResult.rows) {
+      for (const row of groupHistorical) {
         const candidateName = extractCandidateName(
           row.contract_name,
           row.contract_id,
@@ -1535,7 +1613,7 @@ export async function getSenatePrimariesAsync(options?: {
           .push(parseFloat(row.yes_price));
       }
 
-      for (const contract of contractsResult.rows) {
+      for (const contract of groupContracts) {
         const candidateName = extractCandidateName(
           contract.contract_name,
           contract.contract_id,
