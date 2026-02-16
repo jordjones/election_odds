@@ -1,17 +1,25 @@
-import { NextResponse } from 'next/server';
-import { PULSE_TOPICS } from '@/lib/pulse-types';
-import type { PulseTopic, CuratedPostRow } from '@/lib/pulse-types';
-import { MOCK_POSTS } from '@/data/pulse-mock';
-import { usePostgres } from '@/lib/use-postgres';
-import { getCuratedPostsAsync } from '@/lib/db-pg';
-import { getCuratedPosts } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { PULSE_TOPICS } from "@/lib/pulse-types";
+import type { PulseTopic, CuratedPostRow } from "@/lib/pulse-types";
+import { MOCK_POSTS } from "@/data/pulse-mock";
+import { usePostgres } from "@/lib/use-postgres";
+import { getCuratedPostsAsync } from "@/lib/db-pg";
+import { getCuratedPosts } from "@/lib/db";
+import { getCached } from "@/lib/cache";
+
+const PULSE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function GET() {
   try {
     // Fetch curated posts from DB or CSV
-    const curatedRows: CuratedPostRow[] = usePostgres()
-      ? await getCuratedPostsAsync()
-      : getCuratedPosts();
+    const curatedRows: CuratedPostRow[] = await getCached(
+      "pulse:curated",
+      PULSE_TTL,
+      () =>
+        usePostgres()
+          ? getCuratedPostsAsync()
+          : Promise.resolve(getCuratedPosts()),
+    );
 
     // Count posts per topic
     const topicCounts = new Map<PulseTopic, number>();
@@ -32,12 +40,15 @@ export async function GET() {
 
     return NextResponse.json(topics, {
       headers: {
-        'Cache-Control': 'public, max-age=300',
-        'CDN-Cache-Control': 'public, max-age=600',
+        "Cache-Control": "public, max-age=300",
+        "CDN-Cache-Control": "public, max-age=600",
       },
     });
   } catch (error) {
-    console.error('[API /pulse/topics] Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch pulse topics' }, { status: 500 });
+    console.error("[API /pulse/topics] Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch pulse topics" },
+      { status: 500 },
+    );
   }
 }

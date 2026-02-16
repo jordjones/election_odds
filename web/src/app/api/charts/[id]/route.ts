@@ -1,94 +1,197 @@
-import { NextResponse } from 'next/server';
-import { mockMarkets, generateMockChartData } from '@/lib/api/mock-data';
-import type { TimeFilter } from '@/lib/types';
-import { usePostgres } from '@/lib/use-postgres';
+import { NextResponse } from "next/server";
+import { mockMarkets, generateMockChartData } from "@/lib/api/mock-data";
+import type { TimeFilter } from "@/lib/types";
+import { usePostgres } from "@/lib/use-postgres";
+import { getCached, CHART_TTL } from "@/lib/cache";
 
 // Candidate party affiliations for filtering primary charts
 const DEMOCRAT_CANDIDATES = new Set([
-  'Newsom', 'Cortez', 'Shapiro', 'Buttigieg', 'Whitmer', 'Harris', 'Pritzker',
-  'Beshear', 'Moore', 'Ossoff', 'Kelly', 'Booker', 'Klobuchar', 'Sanders',
-  'Warren', 'M_Obama', 'Obama', 'H_Clinton', 'Fetterman', 'Warnock', 'Murphy',
-  'Khanna', 'Gallego', 'P_Murphy', 'Polis', 'Cooper', 'Cuomo', 'Yang',
-  'Slotkin', 'Crockett', 'Mamdani', 'Talarico', 'Emanuel', 'Raimondo',
-  'Jeffries', 'Abrams', 'Walz', 'C_Clinton',
+  "Newsom",
+  "Cortez",
+  "Shapiro",
+  "Buttigieg",
+  "Whitmer",
+  "Harris",
+  "Pritzker",
+  "Beshear",
+  "Moore",
+  "Ossoff",
+  "Kelly",
+  "Booker",
+  "Klobuchar",
+  "Sanders",
+  "Warren",
+  "M_Obama",
+  "Obama",
+  "H_Clinton",
+  "Fetterman",
+  "Warnock",
+  "Murphy",
+  "Khanna",
+  "Gallego",
+  "P_Murphy",
+  "Polis",
+  "Cooper",
+  "Cuomo",
+  "Yang",
+  "Slotkin",
+  "Crockett",
+  "Mamdani",
+  "Talarico",
+  "Emanuel",
+  "Raimondo",
+  "Jeffries",
+  "Abrams",
+  "Walz",
+  "C_Clinton",
 ]);
 
 const REPUBLICAN_CANDIDATES = new Set([
-  'Vance', 'Rubio', 'DeSantis', 'Haley', 'Ramaswamy', 'Trump', 'Trump_Jr',
-  'I_Trump', 'Youngkin', 'Gabbard', 'Carlson', 'Cruz', 'Hawley', 'S_Sanders',
-  'Kemp', 'Noem', 'Pence', 'R_Paul', 'Cotton', 'Kennedy', 'Musk', 'Abbott',
-  'Gaetz', 'M_Greene', 'Donalds', 'Stefanik', 'Thune', 'Britt', 'Massie',
-  'Bannon', 'T_Scott', 'R_Scott', 'Hagerty', 'Ernst', 'Crenshaw', 'Cheney',
-  'E_Trump', 'L_Trump', 'Hegseth', 'Patel', 'Burgum', 'Carson', 'McMahon',
+  "Vance",
+  "Rubio",
+  "DeSantis",
+  "Haley",
+  "Ramaswamy",
+  "Trump",
+  "Trump_Jr",
+  "I_Trump",
+  "Youngkin",
+  "Gabbard",
+  "Carlson",
+  "Cruz",
+  "Hawley",
+  "S_Sanders",
+  "Kemp",
+  "Noem",
+  "Pence",
+  "R_Paul",
+  "Cotton",
+  "Kennedy",
+  "Musk",
+  "Abbott",
+  "Gaetz",
+  "M_Greene",
+  "Donalds",
+  "Stefanik",
+  "Thune",
+  "Britt",
+  "Massie",
+  "Bannon",
+  "T_Scott",
+  "R_Scott",
+  "Hagerty",
+  "Ernst",
+  "Crenshaw",
+  "Cheney",
+  "E_Trump",
+  "L_Trump",
+  "Hegseth",
+  "Patel",
+  "Burgum",
+  "Carson",
+  "McMahon",
 ]);
 
 // Map frontend market IDs to chart data market IDs
 // Now uses Polymarket data which has separate markets for presidential, GOP, and DEM
 function getChartMarketId(marketId: string): string | null {
   // Presidential candidate markets
-  if (marketId === 'presidential-winner-2028' ||
-      marketId.includes('presidential-election-winner')) {
-    return 'presidential-winner-2028';
+  if (
+    marketId === "presidential-winner-2028" ||
+    marketId.includes("presidential-election-winner")
+  ) {
+    return "presidential-winner-2028";
   }
   // GOP primary market
-  if (marketId === 'gop-nominee-2028' || marketId.includes('gop-primary')) {
-    return 'gop-nominee-2028';
+  if (marketId === "gop-nominee-2028" || marketId.includes("gop-primary")) {
+    return "gop-nominee-2028";
   }
   // DEM primary market
-  if (marketId === 'dem-nominee-2028' || marketId.includes('dem-primary')) {
-    return 'dem-nominee-2028';
+  if (marketId === "dem-nominee-2028" || marketId.includes("dem-primary")) {
+    return "dem-nominee-2028";
   }
   // Party markets
-  if (marketId === 'presidential-party-2028' || marketId.includes('party-2028')) {
-    return 'presidential-party-2028';
+  if (
+    marketId === "presidential-party-2028" ||
+    marketId.includes("party-2028")
+  ) {
+    return "presidential-party-2028";
   }
   // House/Senate control markets
-  if (marketId === 'house-control-2026' || marketId.includes('house-2026')) {
-    return 'house-control-2026';
+  if (marketId === "house-control-2026" || marketId.includes("house-2026")) {
+    return "house-control-2026";
   }
-  if (marketId === 'senate-control-2026' || marketId.includes('senate-2026')) {
-    return 'senate-control-2026';
+  if (marketId === "senate-control-2026" || marketId.includes("senate-2026")) {
+    return "senate-control-2026";
   }
   return marketId; // pass through for other markets
 }
 
 // Get party filter for a market
-function getPartyFilter(marketId: string): 'dem' | 'gop' | null {
-  if (marketId === 'dem-nominee-2028' || marketId.includes('dem-primary') || marketId.includes('democratic')) {
-    return 'dem';
+function getPartyFilter(marketId: string): "dem" | "gop" | null {
+  if (
+    marketId === "dem-nominee-2028" ||
+    marketId.includes("dem-primary") ||
+    marketId.includes("democratic")
+  ) {
+    return "dem";
   }
-  if (marketId === 'gop-nominee-2028' || marketId.includes('gop-primary') || marketId.includes('republican')) {
-    return 'gop';
+  if (
+    marketId === "gop-nominee-2028" ||
+    marketId.includes("gop-primary") ||
+    marketId.includes("republican")
+  ) {
+    return "gop";
   }
   return null;
 }
 
 // Filter candidates by party
-function filterByParty(candidates: string[], party: 'dem' | 'gop' | null): string[] {
+function filterByParty(
+  candidates: string[],
+  party: "dem" | "gop" | null,
+): string[] {
   if (!party) return candidates;
-  const partySet = party === 'dem' ? DEMOCRAT_CANDIDATES : REPUBLICAN_CANDIDATES;
-  return candidates.filter(c => partySet.has(c));
+  const partySet =
+    party === "dem" ? DEMOCRAT_CANDIDATES : REPUBLICAN_CANDIDATES;
+  return candidates.filter((c) => partySet.has(c));
 }
 
 // Dynamic imports to avoid loading better-sqlite3 on Netlify
 async function getDbMarket(id: string) {
   if (usePostgres()) {
-    const { getMarketAsync } = await import('@/lib/db-pg');
+    const { getMarketAsync } = await import("@/lib/db-pg");
     return getMarketAsync(id);
   } else {
-    const { getMarket, isDatabaseAvailable } = await import('@/lib/db');
+    const { getMarket, isDatabaseAvailable } = await import("@/lib/db");
     if (!isDatabaseAvailable()) return null;
     return getMarket(id);
   }
 }
 
-async function getDbChartData(chartMarketId: string, granularity: string, startDate?: string, endDate?: string) {
+async function getDbChartData(
+  chartMarketId: string,
+  granularity: string,
+  startDate?: string,
+  endDate?: string,
+) {
   if (usePostgres()) {
-    const { getChartDataAsync } = await import('@/lib/db-pg');
-    return getChartDataAsync(chartMarketId, startDate, endDate, granularity as any);
+    const { getChartDataAsync } = await import("@/lib/db-pg");
+    return getChartDataAsync(
+      chartMarketId,
+      startDate,
+      endDate,
+      granularity as any,
+    );
   } else {
-    const { getChartData } = await import('@/lib/db');
-    return getChartData(chartMarketId, startDate, endDate, undefined, granularity as any);
+    const { getChartData } = await import("@/lib/db");
+    return getChartData(
+      chartMarketId,
+      startDate,
+      endDate,
+      undefined,
+      granularity as any,
+    );
   }
 }
 
@@ -100,14 +203,16 @@ function isDbAvailable(): boolean {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const { searchParams } = new URL(request.url);
-  const period = (searchParams.get('period') as TimeFilter) || 'all';
+  const period = (searchParams.get("period") as TimeFilter) || "all";
 
   try {
-    const dbMarket = await getDbMarket(id);
+    const dbMarket = await getCached(`chart-market:${id}`, CHART_TTL, () =>
+      getDbMarket(id),
+    );
 
     if (dbMarket) {
       // Determine granularity and target data points based on period
@@ -115,21 +220,21 @@ export async function GET(
       let targetDataPoints: number;
 
       switch (period) {
-        case '1d':
-          granularity = '5min';
+        case "1d":
+          granularity = "5min";
           targetDataPoints = 288; // 24h * 60min / 5min
           break;
-        case '1w':
-          granularity = '6hour';
+        case "1w":
+          granularity = "6hour";
           targetDataPoints = 28; // 7d * 24h / 6h
           break;
-        case '30d':
-          granularity = '1day';
+        case "30d":
+          granularity = "1day";
           targetDataPoints = 0; // 1 per day, no downsampling
           break;
-        case 'all':
+        case "all":
         default:
-          granularity = '1day';
+          granularity = "1day";
           targetDataPoints = 0;
           break;
       }
@@ -144,36 +249,40 @@ export async function GET(
           marketName: dbMarket.name,
           series: [],
           contracts: [],
-          message: 'No historical chart data available for this market type',
+          message: "No historical chart data available for this market type",
         });
       }
 
       // Compute start date based on period
       let startDate: string | undefined;
-      if (period !== 'all') {
+      if (period !== "all") {
         const now = new Date();
         switch (period) {
-          case '1d':
+          case "1d":
             now.setDate(now.getDate() - 1);
             break;
-          case '1w':
+          case "1w":
             now.setDate(now.getDate() - 7);
             break;
-          case '30d':
+          case "30d":
             now.setDate(now.getDate() - 30);
             break;
         }
         startDate = now.toISOString();
       }
 
-      const allChartData = await getDbChartData(chartMarketId, granularity, startDate);
+      const chartCacheKey = `chart-data:${chartMarketId}:${period}`;
+      const allChartData = await getCached(chartCacheKey, CHART_TTL, () =>
+        getDbChartData(chartMarketId, granularity, startDate),
+      );
 
       if (allChartData.length > 0) {
         // Get party filter for primary markets
         const partyFilter = getPartyFilter(id);
 
         // Get top 10 contracts by latest value for display (filtered by party if applicable)
-        const latestValues = allChartData[allChartData.length - 1]?.values || {};
+        const latestValues =
+          allChartData[allChartData.length - 1]?.values || {};
         const allCandidates = Object.keys(latestValues);
         const partyCandidates = filterByParty(allCandidates, partyFilter);
 
@@ -188,52 +297,54 @@ export async function GET(
         if (targetDataPoints > 0 && allChartData.length > targetDataPoints) {
           const sampled: typeof allChartData = [];
           for (let i = 0; i < targetDataPoints; i++) {
-            const idx = Math.round(i * (allChartData.length - 1) / (targetDataPoints - 1));
+            const idx = Math.round(
+              (i * (allChartData.length - 1)) / (targetDataPoints - 1),
+            );
             sampled.push(allChartData[idx]);
           }
           filteredData = sampled;
         }
 
         // Filter series to only include top contracts
-        const filteredSeries = filteredData.map(point => ({
+        const filteredSeries = filteredData.map((point) => ({
           timestamp: point.timestamp,
           values: Object.fromEntries(
             Object.entries(point.values)
               .filter(([name]) => topContracts.includes(name))
-              .map(([name, value]) => [name, value / 100])
+              .map(([name, value]) => [name, value / 100]),
           ),
         }));
 
         // Cache based on period: 1d changes faster, longer periods are more stable
-        const cdnMaxAge = period === '1d' ? 60 : 300;
-        const cdnStale = period === '1d' ? 120 : 600;
+        const cdnMaxAge = period === "1d" ? 60 : 300;
+        const cdnStale = period === "1d" ? 120 : 600;
 
-        return NextResponse.json({
-          marketId: id,
-          marketName: dbMarket.name,
-          series: filteredSeries,
-          contracts: topContracts,
-        }, {
-          headers: {
-            'Cache-Control': `public, max-age=${Math.min(cdnMaxAge, 60)}`,
-            'CDN-Cache-Control': `public, max-age=${cdnMaxAge}, stale-while-revalidate=${cdnStale}`,
-            'Netlify-Vary': 'query',
+        return NextResponse.json(
+          {
+            marketId: id,
+            marketName: dbMarket.name,
+            series: filteredSeries,
+            contracts: topContracts,
           },
-        });
+          {
+            headers: {
+              "Cache-Control": `public, max-age=${Math.min(cdnMaxAge, 60)}`,
+              "CDN-Cache-Control": `public, max-age=${cdnMaxAge}, stale-while-revalidate=${cdnStale}`,
+              "Netlify-Vary": "query",
+            },
+          },
+        );
       }
     }
   } catch (error) {
-    console.error('Database chart query failed:', error);
+    console.error("Database chart query failed:", error);
   }
 
   // Fallback to mock data
   const mockMarket = mockMarkets.find((m) => m.id === id || m.slug === id);
 
   if (!mockMarket) {
-    return NextResponse.json(
-      { error: 'Market not found' },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Market not found" }, { status: 404 });
   }
 
   const chartData = generateMockChartData(mockMarket);
@@ -242,13 +353,13 @@ export async function GET(
   let filteredSeries = chartData.series;
 
   switch (period) {
-    case '1d':
+    case "1d":
       filteredSeries = chartData.series.slice(-8);
       break;
-    case '1w':
+    case "1w":
       filteredSeries = chartData.series.slice(-7);
       break;
-    case 'all':
+    case "all":
     default:
       break;
   }

@@ -1643,6 +1643,32 @@ export async function getSenatePrimariesAsync(options?: {
   }
 }
 
+// DB-level cache for getMarketsAsync to avoid redundant queries
+// when getFeaturedMarketsAsync and getMarketAsync call it
+let marketsCache: {
+  data: Market[];
+  changePeriod: string;
+  expires: number;
+} | null = null;
+const MARKETS_CACHE_TTL = 60 * 1000; // 60 seconds
+
+async function getMarketsCached(changePeriod: string): Promise<Market[]> {
+  if (
+    marketsCache &&
+    marketsCache.changePeriod === changePeriod &&
+    Date.now() < marketsCache.expires
+  ) {
+    return marketsCache.data;
+  }
+  const data = await getMarketsAsync({ changePeriod });
+  marketsCache = {
+    data,
+    changePeriod,
+    expires: Date.now() + MARKETS_CACHE_TTL,
+  };
+  return data;
+}
+
 /**
  * Get a specific market by ID
  */
@@ -1650,7 +1676,7 @@ export async function getMarketAsync(
   idOrSlug: string,
   changePeriod?: string,
 ): Promise<Market | null> {
-  const markets = await getMarketsAsync({ changePeriod });
+  const markets = await getMarketsCached(changePeriod || "1d");
   return (
     markets.find(
       (m) =>
@@ -1663,7 +1689,7 @@ export async function getMarketAsync(
  * Get featured markets
  */
 export async function getFeaturedMarketsAsync(): Promise<Market[]> {
-  const allMarkets = await getMarketsAsync();
+  const allMarkets = await getMarketsCached("1d");
   const featured: Market[] = [];
 
   const presidential = allMarkets.find(

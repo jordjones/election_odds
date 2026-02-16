@@ -1,31 +1,48 @@
-import { NextResponse } from 'next/server';
-import type { PulseTopic, PulseRace, PulseSortMode, CuratedPostRow } from '@/lib/pulse-types';
-import { matchesRaceFilter } from '@/lib/pulse-types';
-import { MOCK_POSTS } from '@/data/pulse-mock';
-import { getTwitterHandle, candidateNameToSlug, getCandidateRaces } from '@/lib/candidates';
-import { usePostgres } from '@/lib/use-postgres';
-import { getCuratedPostsAsync } from '@/lib/db-pg';
-import { getCuratedPosts } from '@/lib/db';
+import { NextResponse } from "next/server";
+import type {
+  PulseTopic,
+  PulseRace,
+  PulseSortMode,
+  CuratedPostRow,
+} from "@/lib/pulse-types";
+import { matchesRaceFilter } from "@/lib/pulse-types";
+import { MOCK_POSTS } from "@/data/pulse-mock";
+import {
+  getTwitterHandle,
+  candidateNameToSlug,
+  getCandidateRaces,
+} from "@/lib/candidates";
+import { usePostgres } from "@/lib/use-postgres";
+import { getCuratedPostsAsync } from "@/lib/db-pg";
+import { getCuratedPosts } from "@/lib/db";
+import { getCached } from "@/lib/cache";
+
+const PULSE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const race = searchParams.get('race') as PulseRace | null;
-  const candidate = searchParams.get('candidate');
-  const topic = searchParams.get('topic') as PulseTopic | null;
-  const sort = (searchParams.get('sort') || 'recent') as PulseSortMode;
+  const race = searchParams.get("race") as PulseRace | null;
+  const candidate = searchParams.get("candidate");
+  const topic = searchParams.get("topic") as PulseTopic | null;
+  const sort = (searchParams.get("sort") || "recent") as PulseSortMode;
 
   try {
     // Fetch curated posts from DB (Supabase) or CSV (local dev)
-    const curatedRows: CuratedPostRow[] = usePostgres()
-      ? await getCuratedPostsAsync()
-      : getCuratedPosts();
+    const curatedRows: CuratedPostRow[] = await getCached(
+      "pulse:curated",
+      PULSE_TTL,
+      () =>
+        usePostgres()
+          ? getCuratedPostsAsync()
+          : Promise.resolve(getCuratedPosts()),
+    );
 
     // Merge curated + mock posts into a unified feed
     const allPosts = [
       ...curatedRows.map((p) => ({
         tweetId: p.tweet_id,
         candidateName: p.candidate_name,
-        twitterHandle: getTwitterHandle(p.candidate_name) || '',
+        twitterHandle: getTwitterHandle(p.candidate_name) || "",
         topic: p.topic,
         postedAt: p.posted_at,
         editorNote: p.editor_note,
@@ -58,15 +75,15 @@ export async function GET(request: Request) {
 
     // Filter by race
     if (race) {
-      filtered = filtered.filter(
-        (p) => matchesRaceFilter(getCandidateRaces(p.candidateName), race)
+      filtered = filtered.filter((p) =>
+        matchesRaceFilter(getCandidateRaces(p.candidateName), race),
       );
     }
 
     // Filter by candidate slug
     if (candidate) {
       filtered = filtered.filter(
-        (p) => candidateNameToSlug(p.candidateName) === candidate
+        (p) => candidateNameToSlug(p.candidateName) === candidate,
       );
     }
 
@@ -76,21 +93,27 @@ export async function GET(request: Request) {
     }
 
     // Sort
-    if (sort === 'recent') {
-      filtered.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
-    } else if (sort === 'popular') {
+    if (sort === "recent") {
+      filtered.sort(
+        (a, b) =>
+          new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime(),
+      );
+    } else if (sort === "popular") {
       filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
     }
 
     return NextResponse.json(filtered, {
       headers: {
-        'Cache-Control': 'public, max-age=300',
-        'CDN-Cache-Control': 'public, max-age=600, stale-while-revalidate=1200',
-        'Netlify-Vary': 'query',
+        "Cache-Control": "public, max-age=300",
+        "CDN-Cache-Control": "public, max-age=600, stale-while-revalidate=1200",
+        "Netlify-Vary": "query",
       },
     });
   } catch (error) {
-    console.error('[API /pulse/feed] Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch pulse feed' }, { status: 500 });
+    console.error("[API /pulse/feed] Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch pulse feed" },
+      { status: 500 },
+    );
   }
 }

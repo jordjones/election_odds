@@ -1,20 +1,36 @@
-import { NextResponse } from 'next/server';
-import type { PulseCandidate, PulseRace, CuratedPostRow } from '@/lib/pulse-types';
-import { matchesRaceFilter } from '@/lib/pulse-types';
-import { MOCK_POSTS } from '@/data/pulse-mock';
-import { getTwitterHandle, candidateNameToSlug, getCandidateRaces } from '@/lib/candidates';
-import { usePostgres } from '@/lib/use-postgres';
-import { getCuratedPostsAsync } from '@/lib/db-pg';
-import { getCuratedPosts } from '@/lib/db';
+import { NextResponse } from "next/server";
+import type {
+  PulseCandidate,
+  PulseRace,
+  CuratedPostRow,
+} from "@/lib/pulse-types";
+import { matchesRaceFilter } from "@/lib/pulse-types";
+import { MOCK_POSTS } from "@/data/pulse-mock";
+import {
+  getTwitterHandle,
+  candidateNameToSlug,
+  getCandidateRaces,
+} from "@/lib/candidates";
+import { usePostgres } from "@/lib/use-postgres";
+import { getCuratedPostsAsync } from "@/lib/db-pg";
+import { getCuratedPosts } from "@/lib/db";
+import { getCached } from "@/lib/cache";
+
+const PULSE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const race = searchParams.get('race') as PulseRace | null;
+  const race = searchParams.get("race") as PulseRace | null;
   try {
     // Fetch curated posts from DB or CSV
-    const curatedRows: CuratedPostRow[] = usePostgres()
-      ? await getCuratedPostsAsync()
-      : getCuratedPosts();
+    const curatedRows: CuratedPostRow[] = await getCached(
+      "pulse:curated",
+      PULSE_TTL,
+      () =>
+        usePostgres()
+          ? getCuratedPostsAsync()
+          : Promise.resolve(getCuratedPosts()),
+    );
 
     // Combine curated + mock posts, normalized to common shape
     const allPosts = [
@@ -29,10 +45,15 @@ export async function GET(request: Request) {
     ];
 
     const filteredPosts = race
-      ? allPosts.filter((p) => matchesRaceFilter(getCandidateRaces(p.candidateName), race))
+      ? allPosts.filter((p) =>
+          matchesRaceFilter(getCandidateRaces(p.candidateName), race),
+        )
       : allPosts;
 
-    const postsByCandidateMap = new Map<string, { count: number; latestAt: string }>();
+    const postsByCandidateMap = new Map<
+      string,
+      { count: number; latestAt: string }
+    >();
 
     for (const post of filteredPosts) {
       const existing = postsByCandidateMap.get(post.candidateName);
@@ -67,12 +88,15 @@ export async function GET(request: Request) {
 
     return NextResponse.json(candidates, {
       headers: {
-        'Cache-Control': 'public, max-age=300',
-        'CDN-Cache-Control': 'public, max-age=600',
+        "Cache-Control": "public, max-age=300",
+        "CDN-Cache-Control": "public, max-age=600",
       },
     });
   } catch (error) {
-    console.error('[API /pulse/candidates] Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch pulse candidates' }, { status: 500 });
+    console.error("[API /pulse/candidates] Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch pulse candidates" },
+      { status: 500 },
+    );
   }
 }
