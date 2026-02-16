@@ -1385,7 +1385,7 @@ export function getMarkets(options?: {
       m.total_volume,
       m.end_date
     FROM markets m
-    WHERE (m.market_name LIKE '%2028%' OR m.market_name LIKE '%2026%' OR m.market_name LIKE '%Next U.S. Presidential%' OR m.market_name LIKE '%midterm%')
+    WHERE (m.market_name LIKE '%2028%' OR m.market_name LIKE '%2026%' OR m.market_name LIKE '%Next U.S. Presidential%' OR m.market_name LIKE '%midterm%' OR m.market_name LIKE '%House of Representatives%' OR m.market_name LIKE '%U.S. Senate%')
       AND m.source IN ('Polymarket', 'Kalshi', 'PredictIt', 'Smarkets')
     ORDER BY m.total_volume DESC NULLS LAST
   `;
