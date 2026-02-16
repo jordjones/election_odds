@@ -34,3 +34,9 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           python scripts/sync_supabase.py --source all
+
+      - name: Clean up stale Polymarket contracts
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python scripts/cleanup_stale_contracts.py --execute
