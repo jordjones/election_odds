@@ -1,40 +1,43 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useParams, notFound } from 'next/navigation';
-import { useMarketsByCategory, useChartData } from '@/hooks/useMarkets';
-import { OddsTable, OddsChart, MarketHeader } from '@/components/odds';
-import { Skeleton } from '@/components/ui/skeleton';
-import type { TimeFilter, MarketCategory } from '@/lib/types';
+import { useState } from "react";
+import { useParams, notFound } from "next/navigation";
+import { useMarketsByCategory, useChartData } from "@/hooks/useMarkets";
+import { OddsTable, OddsChart, MarketHeader } from "@/components/odds";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { TimeFilter, MarketCategory } from "@/lib/types";
 
-const PARTY_CONFIG: Record<string, { category: MarketCategory; title: string; color: string }> = {
+const PARTY_CONFIG: Record<
+  string,
+  { category: MarketCategory; title: string; color: string }
+> = {
   dem: {
-    category: 'primary-dem',
-    title: '2028 Democratic Primary',
-    color: 'text-blue-600',
+    category: "primary-dem",
+    title: "2028 Democratic Primary",
+    color: "text-blue-600",
   },
   democratic: {
-    category: 'primary-dem',
-    title: '2028 Democratic Primary',
-    color: 'text-blue-600',
+    category: "primary-dem",
+    title: "2028 Democratic Primary",
+    color: "text-blue-600",
   },
   gop: {
-    category: 'primary-gop',
-    title: '2028 Republican Primary',
-    color: 'text-red-600',
+    category: "primary-gop",
+    title: "2028 Republican Primary",
+    color: "text-red-600",
   },
   republican: {
-    category: 'primary-gop',
-    title: '2028 Republican Primary',
-    color: 'text-red-600',
+    category: "primary-gop",
+    title: "2028 Republican Primary",
+    color: "text-red-600",
   },
 };
 
 export default function PrimaryPage() {
   const params = useParams();
   const party = params.party as string;
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
-  const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const [changePeriod, setChangePeriod] = useState<TimeFilter>("1d");
 
   const config = PARTY_CONFIG[party];
 
@@ -42,12 +45,15 @@ export default function PrimaryPage() {
     notFound();
   }
 
-  const { data: markets, isLoading: marketsLoading } = useMarketsByCategory(config.category, changePeriod);
+  const { data: markets, isLoading: marketsLoading } = useMarketsByCategory(
+    config.category,
+    changePeriod,
+  );
   const market = markets?.[0];
 
   const { data: chartData, isLoading: chartLoading } = useChartData(
-    market?.id || '',
-    timeFilter
+    market?.id || "",
+    timeFilter,
   );
 
   if (marketsLoading) {
@@ -75,9 +81,13 @@ export default function PrimaryPage() {
 
   return (
     <div className="container py-8">
-      <h1 className={`text-3xl font-bold mb-2 ${config.color}`}>{config.title}</h1>
+      <h1 className={`text-3xl font-bold mb-2 ${config.color}`}>
+        {config.title}
+      </h1>
       <p className="text-muted-foreground mb-8">
-        Who will win the {party === 'dem' ? 'Democratic' : 'Republican'} presidential nomination?
+        Who will win the{" "}
+        {config.category === "primary-dem" ? "Democratic" : "Republican"}{" "}
+        presidential nomination?
       </p>
 
       <div className="grid gap-8">
