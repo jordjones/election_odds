@@ -104,28 +104,41 @@ class SmarketsClient(BaseMarketClient):
             return {}
         return data
 
-    def get_volumes(self, market_id: str) -> Dict[str, int]:
-        """Fetch volumes for a market's contracts."""
+    def get_volumes(self, market_id: str) -> Dict[str, Any]:
+        """Fetch volumes for a market.
+
+        Returns dict with 'market_volume' (int) for the total market volume.
+        The Smarkets API returns volume at market level, not per-contract.
+        """
         data = self._make_request(f"markets/{market_id}/volumes/")
         if not data:
             return {}
-        return data
+        volumes_list = data.get('volumes', [])
+        market_volume = 0
+        for v in volumes_list:
+            if str(v.get('market_id', '')) == str(market_id):
+                market_volume = v.get('volume', 0)
+                break
+        return {'market_volume': market_volume}
 
     def _parse_price(self, price_bp: int) -> float:
         """Convert basis points (0-10000) to probability (0-1)."""
         return price_bp / 10000.0
 
-    def _parse_contracts(self, market_id: str) -> List[ContractData]:
-        """Parse contracts with prices for a market."""
+    def _parse_contracts(self, market_id: str) -> tuple[List[ContractData], int]:
+        """Parse contracts with prices for a market.
+
+        Returns (contracts, market_volume) since Smarkets reports volume at market level.
+        """
         contracts_data = self.get_contracts(market_id)
         quotes_data = self.get_quotes(market_id)
         volumes_data = self.get_volumes(market_id)
+        market_volume = volumes_data.get('market_volume', 0)
 
         contracts = []
         for contract in contracts_data:
             contract_id = contract.get('id', '')
             quote = quotes_data.get(contract_id, {})
-            volume = volumes_data.get(contract_id, 0)
 
             # Get best bid/offer
             bids = quote.get('bids', [])
@@ -153,18 +166,18 @@ class SmarketsClient(BaseMarketClient):
                 yes_ask=best_offer,
                 no_bid=1.0 - best_offer if best_offer else 0.0,
                 no_ask=1.0 - best_bid if best_bid else 0.0,
-                volume=volume / 100.0 if volume else None,  # Convert pence to pounds
+                volume=None,  # Smarkets only provides market-level volume
             ))
 
-        return contracts
+        return contracts, market_volume
 
     def _parse_market(self, event: Dict, market: Dict) -> MarketData:
         """Parse market data."""
         market_id = market.get('id', '')
-        contracts = self._parse_contracts(market_id)
+        contracts, market_volume = self._parse_contracts(market_id)
 
-        # Calculate total volume
-        total_volume = sum(c.volume or 0 for c in contracts)
+        # Use market-level volume from the API (in pence, convert to pounds)
+        total_volume = market_volume / 100.0 if market_volume else 0
 
         # Parse status
         state = market.get('state', 'unknown').lower()
@@ -185,7 +198,7 @@ class SmarketsClient(BaseMarketClient):
             contracts=contracts,
             url=f"https://smarkets.com{event.get('full_slug', '')}",
             description=market.get('description'),
-            total_volume=total_volume if total_volume > 0 else None,
+            total_volume=total_volume if total_volume > 0 else None,  # GBP
             last_updated=datetime.now(),
             raw_data={'event': event, 'market': market}
         )
