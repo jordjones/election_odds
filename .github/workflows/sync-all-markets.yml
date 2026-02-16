@@ -23,6 +23,12 @@ jobs:
         run: |
           pip install requests psycopg2-binary python-dotenv
 
+      - name: Refresh site_markets table
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          python scripts/populate_site_markets.py
+
       - name: Sync all markets from all sources
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
