@@ -109,7 +109,7 @@ export const GOVERNOR_COMPOSITION: Record<string, GovernorInfo> = {
   NE: { name: "Jim Pillen", party: "R", since: 2023, upIn2026: true },
   NV: { name: "Joe Lombardo", party: "R", since: 2023, upIn2026: true },
   NH: { name: "Kelly Ayotte", party: "R", since: 2025, upIn2026: true },
-  NJ: { name: "Phil Murphy", party: "D", since: 2018, upIn2026: false },
+  NJ: { name: "Mikie Sherrill", party: "D", since: 2026, upIn2026: false },
   NM: {
     name: "Michelle Lujan Grisham",
     party: "D",
