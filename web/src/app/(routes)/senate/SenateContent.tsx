@@ -1,22 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useStateSenateRaces, useSenatePrimaries } from '@/hooks/useMarkets';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatPercent, formatPriceChange, getPriceChangeColor, cn } from '@/lib/utils';
-import type { Market, TimeFilter } from '@/lib/types';
+import { useState } from "react";
+import Link from "next/link";
+import { useStateSenateRaces, useSenatePrimaries } from "@/hooks/useMarkets";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  formatPercent,
+  formatPriceChange,
+  getPriceChangeColor,
+  cn,
+} from "@/lib/utils";
+import type { Market, TimeFilter } from "@/lib/types";
 
 const CHANGE_PERIOD_OPTIONS: { value: TimeFilter; label: string }[] = [
-  { value: '1d', label: '24h' },
-  { value: '1w', label: '7d' },
-  { value: '30d', label: '30d' },
+  { value: "1d", label: "24h" },
+  { value: "1w", label: "7d" },
+  { value: "30d", label: "30d" },
 ];
 
 function RaceCard({ race }: { race: Market }) {
-  const stateAbbrev = race.id.replace('senate-race-', '');
-  const stateName = race.name.replace(' Senate Race 2026', '');
+  const stateAbbrev = race.id.replace("senate-race-", "");
+  const stateName = race.name.replace(" Senate Race 2026", "");
   const topContracts = [...race.contracts]
     .sort((a, b) => b.aggregatedPrice - a.aggregatedPrice)
     .slice(0, 3);
@@ -32,9 +37,9 @@ function RaceCard({ race }: { race: Market }) {
             </span>
           </div>
           <p className="text-xs text-muted-foreground">
-            {race.contracts.flatMap(c => c.prices).length > 0
-              ? `${[...new Set(race.contracts.flatMap(c => c.prices.map(p => p.source)))].length} sources`
-              : ''}
+            {race.contracts.flatMap((c) => c.prices).length > 0
+              ? `${[...new Set(race.contracts.flatMap((c) => c.prices.map((p) => p.source)))].length} sources`
+              : ""}
           </p>
         </CardHeader>
         <CardContent>
@@ -50,8 +55,8 @@ function RaceCard({ race }: { race: Market }) {
                 <div className="flex items-center gap-2 shrink-0">
                   <span
                     className={cn(
-                      'text-xs font-mono',
-                      getPriceChangeColor(contract.priceChange)
+                      "text-xs font-mono",
+                      getPriceChangeColor(contract.priceChange),
                     )}
                   >
                     {formatPriceChange(contract.priceChange)}
@@ -71,7 +76,7 @@ function RaceCard({ race }: { race: Market }) {
 
 function PrimaryCard({ primary }: { primary: Market }) {
   const slug = primary.id; // e.g. senate-primary-nc-democratic
-  const stateAbbrev = slug.replace('senate-primary-', '').split('-')[0];
+  const stateAbbrev = slug.replace("senate-primary-", "").split("-")[0];
   const topContracts = [...primary.contracts]
     .sort((a, b) => b.aggregatedPrice - a.aggregatedPrice)
     .slice(0, 3);
@@ -81,15 +86,17 @@ function PrimaryCard({ primary }: { primary: Market }) {
       <Card className="hover:shadow-md transition-shadow h-full">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base leading-tight">{primary.name}</CardTitle>
+            <CardTitle className="text-base leading-tight">
+              {primary.name}
+            </CardTitle>
             <span className="text-xs text-muted-foreground uppercase font-mono">
               {stateAbbrev}
             </span>
           </div>
           <p className="text-xs text-muted-foreground">
-            {primary.contracts.flatMap(c => c.prices).length > 0
-              ? `${[...new Set(primary.contracts.flatMap(c => c.prices.map(p => p.source)))].length} sources`
-              : ''}
+            {primary.contracts.flatMap((c) => c.prices).length > 0
+              ? `${[...new Set(primary.contracts.flatMap((c) => c.prices.map((p) => p.source)))].length} sources`
+              : ""}
           </p>
         </CardHeader>
         <CardContent>
@@ -105,8 +112,8 @@ function PrimaryCard({ primary }: { primary: Market }) {
                 <div className="flex items-center gap-2 shrink-0">
                   <span
                     className={cn(
-                      'text-xs font-mono',
-                      getPriceChangeColor(contract.priceChange)
+                      "text-xs font-mono",
+                      getPriceChangeColor(contract.priceChange),
                     )}
                   >
                     {formatPriceChange(contract.priceChange)}
@@ -125,20 +132,21 @@ function PrimaryCard({ primary }: { primary: Market }) {
 }
 
 export default function SenateContent() {
-  const [changePeriod, setChangePeriod] = useState<TimeFilter>('1d');
+  const [changePeriod, setChangePeriod] = useState<TimeFilter>("1d");
   const { data: races, isLoading } = useStateSenateRaces(changePeriod);
-  const { data: primaries, isLoading: primariesLoading } = useSenatePrimaries(changePeriod);
+  const { data: primaries, isLoading: primariesLoading } =
+    useSenatePrimaries(changePeriod);
 
-  // Split races: competitive = 2nd-highest of Dem/Rep/Ind >= 10%, safe = otherwise
+  // Split races: safe when max - min >= 75%, else competitive
   const isCompetitive = (r: Market) => {
-    const prices = ['democrat', 'republican', 'independent'].map(party =>
-      r.contracts.find(c => new RegExp(party, 'i').test(c.name))?.aggregatedPrice || 0
-    );
-    prices.sort((a, b) => b - a);
-    return (prices[1] || 0) >= 0.10;
+    const prices = r.contracts.map((c) => c.aggregatedPrice);
+    if (prices.length < 2) return false;
+    const max = Math.max(...prices);
+    const min = Math.min(...prices);
+    return max - min < 0.75;
   };
   const competitiveRaces = races?.filter(isCompetitive) || [];
-  const safeRaces = races?.filter(r => !isCompetitive(r)) || [];
+  const safeRaces = races?.filter((r) => !isCompetitive(r)) || [];
 
   if (isLoading) {
     return (
@@ -171,10 +179,10 @@ export default function SenateContent() {
             key={option.value}
             onClick={() => setChangePeriod(option.value)}
             className={cn(
-              'px-2 py-1 text-xs rounded transition-colors',
+              "px-2 py-1 text-xs rounded transition-colors",
               changePeriod === option.value
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted hover:bg-muted/80 text-muted-foreground",
             )}
           >
             {option.label}
@@ -182,11 +190,12 @@ export default function SenateContent() {
         ))}
       </div>
 
-      {(!races || races.length === 0) ? (
+      {!races || races.length === 0 ? (
         <div className="text-center py-12">
           <h2 className="text-xl font-bold mb-2">No Race Data</h2>
           <p className="text-muted-foreground">
-            No senate race data is currently available. Data requires a database connection.
+            No senate race data is currently available. Data requires a database
+            connection.
           </p>
         </div>
       ) : (
