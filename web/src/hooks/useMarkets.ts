@@ -1,19 +1,26 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api/client';
-import type { Market, MarketCategory, ChartData, TrackRecordEntry, AggregatedStats, TimeFilter } from '@/lib/types';
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api/client";
+import type {
+  Market,
+  MarketCategory,
+  ChartData,
+  TrackRecordEntry,
+  AggregatedStats,
+  TimeFilter,
+} from "@/lib/types";
 
 /**
  * Fetch all markets with optional filtering
  */
 export function useMarkets(params?: {
   category?: MarketCategory;
-  status?: 'open' | 'all';
+  status?: "open" | "all";
   limit?: number;
 }) {
   return useQuery<Market[]>({
-    queryKey: ['markets', params],
+    queryKey: ["markets", params],
     queryFn: () => apiClient.getMarkets(params),
   });
 }
@@ -23,7 +30,7 @@ export function useMarkets(params?: {
  */
 export function useMarket(idOrSlug: string, changePeriod?: TimeFilter) {
   return useQuery<Market>({
-    queryKey: ['market', idOrSlug, changePeriod],
+    queryKey: ["market", idOrSlug, changePeriod],
     queryFn: () => apiClient.getMarket(idOrSlug, changePeriod),
     enabled: !!idOrSlug,
   });
@@ -32,9 +39,12 @@ export function useMarket(idOrSlug: string, changePeriod?: TimeFilter) {
 /**
  * Fetch markets by category
  */
-export function useMarketsByCategory(category: MarketCategory, changePeriod?: TimeFilter) {
+export function useMarketsByCategory(
+  category: MarketCategory,
+  changePeriod?: TimeFilter,
+) {
   return useQuery<Market[]>({
-    queryKey: ['markets', 'category', category, changePeriod],
+    queryKey: ["markets", "category", category, changePeriod],
     queryFn: () => apiClient.getMarketsByCategory(category, changePeriod),
     enabled: !!category,
   });
@@ -43,9 +53,9 @@ export function useMarketsByCategory(category: MarketCategory, changePeriod?: Ti
 /**
  * Fetch chart data for a market
  */
-export function useChartData(marketId: string, timeFilter: TimeFilter = 'all') {
+export function useChartData(marketId: string, timeFilter: TimeFilter = "all") {
   return useQuery<ChartData>({
-    queryKey: ['chart', marketId, timeFilter],
+    queryKey: ["chart", marketId, timeFilter],
     queryFn: () => apiClient.getChartData(marketId, timeFilter),
     enabled: !!marketId,
   });
@@ -56,7 +66,7 @@ export function useChartData(marketId: string, timeFilter: TimeFilter = 'all') {
  */
 export function useFeaturedMarkets() {
   return useQuery<Market[]>({
-    queryKey: ['markets', 'featured'],
+    queryKey: ["markets", "featured"],
     queryFn: () => apiClient.getFeaturedMarkets(),
   });
 }
@@ -66,7 +76,7 @@ export function useFeaturedMarkets() {
  */
 export function useTrackRecord() {
   return useQuery<TrackRecordEntry[]>({
-    queryKey: ['track-record'],
+    queryKey: ["track-record"],
     queryFn: () => apiClient.getTrackRecord(),
   });
 }
@@ -76,7 +86,7 @@ export function useTrackRecord() {
  */
 export function useStats() {
   return useQuery<AggregatedStats>({
-    queryKey: ['stats'],
+    queryKey: ["stats"],
     queryFn: () => apiClient.getStats(),
   });
 }
@@ -86,8 +96,21 @@ export function useStats() {
  */
 export function useStateSenateRaces(changePeriod?: TimeFilter, state?: string) {
   return useQuery<Market[]>({
-    queryKey: ['senate-races', changePeriod, state],
+    queryKey: ["senate-races", changePeriod, state],
     queryFn: () => apiClient.getStateSenateRaces(changePeriod, state),
+  });
+}
+
+/**
+ * Fetch state governor races
+ */
+export function useStateGovernorRaces(
+  changePeriod?: TimeFilter,
+  state?: string,
+) {
+  return useQuery<Market[]>({
+    queryKey: ["governor-races", changePeriod, state],
+    queryFn: () => apiClient.getStateGovernorRaces(changePeriod, state),
   });
 }
 
@@ -96,7 +119,7 @@ export function useStateSenateRaces(changePeriod?: TimeFilter, state?: string) {
  */
 export function useSenatePrimaries(changePeriod?: TimeFilter) {
   return useQuery<Market[]>({
-    queryKey: ['senate-primaries', changePeriod],
+    queryKey: ["senate-primaries", changePeriod],
     queryFn: () => apiClient.getSenatePrimaries(changePeriod),
   });
 }

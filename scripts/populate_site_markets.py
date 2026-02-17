@@ -66,6 +66,17 @@ def get_canonical_market_type(market_name: str) -> str | None:
             'closer' not in lower and 'order of finish' not in lower):
         return 'senate-primary-2026'
 
+    # Governor races — check BEFORE state exclusion since these contain state names
+    if (('governor' in lower or 'gubernatorial' in lower or 'governorship' in lower) and
+            'lieutenant governor' not in lower and
+            'federal reserve' not in lower and
+            'primary' not in lower and
+            'nomination' not in lower and
+            'margin' not in lower and 'percentage' not in lower and
+            'endorse' not in lower and 'place' not in lower and
+            'closer' not in lower):
+        return 'governor-race-2026'
+
     # VP nominee 2028
     if ('vp nominee' in lower or 'vice president' in lower) and '2028' in lower:
         return 'vp-nominee-2028'

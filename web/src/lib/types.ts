@@ -2,11 +2,16 @@
  * Core types for the Election Odds Aggregator
  */
 
-export type MarketSource = 'PredictIt' | 'Kalshi' | 'Polymarket' | 'Smarkets';
+export type MarketSource = "PredictIt" | "Kalshi" | "Polymarket" | "Smarkets";
 
-export type MarketRegion = 'US' | 'UK' | 'International';
+export type MarketRegion = "US" | "UK" | "International";
 
-export type MarketStatus = 'open' | 'closed' | 'resolved' | 'suspended' | 'unknown';
+export type MarketStatus =
+  | "open"
+  | "closed"
+  | "resolved"
+  | "suspended"
+  | "unknown";
 
 export interface MarketPrice {
   source: MarketSource;
@@ -44,18 +49,19 @@ export interface Market {
 }
 
 export type MarketCategory =
-  | 'presidential'
-  | 'primary-dem'
-  | 'primary-gop'
-  | 'senate'
-  | 'senate-race'
-  | 'senate-primary-dem'
-  | 'senate-primary-gop'
-  | 'house'
-  | 'governor'
-  | 'scotus'
-  | 'policy'
-  | 'other';
+  | "presidential"
+  | "primary-dem"
+  | "primary-gop"
+  | "senate"
+  | "senate-race"
+  | "senate-primary-dem"
+  | "senate-primary-gop"
+  | "house"
+  | "governor"
+  | "governor-race"
+  | "scotus"
+  | "policy"
+  | "other";
 
 export interface TimeSeriesPoint {
   timestamp: string;
@@ -72,7 +78,7 @@ export interface ChartData {
 export interface TrackRecordEntry {
   id: string;
   year: number;
-  type: 'General' | 'Primary' | 'Referendum';
+  type: "General" | "Primary" | "Referendum";
   state?: string;
   candidate: string;
   predictedProbability: number;
@@ -104,7 +110,7 @@ export interface ApiError {
 }
 
 // Time filter options
-export type TimeFilter = '1d' | '1w' | '30d' | 'all';
+export type TimeFilter = "1d" | "1w" | "30d" | "all";
 
 export interface TimeFilterOption {
   value: TimeFilter;
@@ -112,10 +118,10 @@ export interface TimeFilterOption {
 }
 
 export const TIME_FILTER_OPTIONS: TimeFilterOption[] = [
-  { value: '1d', label: 'Last 24 hours' },
-  { value: '1w', label: 'Last week' },
-  { value: '30d', label: 'Last 30 days' },
-  { value: 'all', label: 'All time' },
+  { value: "1d", label: "Last 24 hours" },
+  { value: "1w", label: "Last week" },
+  { value: "30d", label: "Last 30 days" },
+  { value: "all", label: "All time" },
 ];
 
 // Navigation types
@@ -126,37 +132,61 @@ export interface NavItem {
 }
 
 export const MAIN_NAV: NavItem[] = [
-  { label: 'Home', href: '/' },
-  { label: 'Charts', href: '/charts' },
-  { label: 'Track Record', href: '/track-record' },
+  { label: "Home", href: "/" },
+  { label: "Charts", href: "/charts" },
+  { label: "Track Record", href: "/track-record" },
   {
-    label: '2026 Midterms',
-    href: '#',
+    label: "2026 Midterms",
+    href: "#",
     children: [
-      { label: 'House Control', href: '/races/house-2026' },
-      { label: 'Senate Control', href: '/races/senate-2026' },
-      { label: 'Senate Races', href: '/senate' },
+      { label: "House Control", href: "/races/house-2026" },
+      { label: "Senate Control", href: "/races/senate-2026" },
+      { label: "Senate Races", href: "/senate" },
+      { label: "Governor Races", href: "/governors" },
     ],
   },
   {
-    label: '2028 Election',
-    href: '#',
+    label: "2028 Election",
+    href: "#",
     children: [
-      { label: 'DEM Primary', href: '/primaries/dem' },
-      { label: 'GOP Primary', href: '/primaries/gop' },
-      { label: 'By Party', href: '/presidential/party' },
-      { label: 'By Candidate', href: '/presidential/candidates' },
+      { label: "DEM Primary", href: "/primaries/dem" },
+      { label: "GOP Primary", href: "/primaries/gop" },
+      { label: "By Party", href: "/presidential/party" },
+      { label: "By Candidate", href: "/presidential/candidates" },
     ],
   },
-  { label: 'Maps', href: '/maps' },
-  { label: 'Pulse', href: '/pulse' },
-  { label: 'About', href: '/about' },
+  { label: "Maps", href: "/maps" },
+  { label: "Pulse", href: "/pulse" },
+  { label: "About", href: "/about" },
 ];
 
 // Market source metadata
-export const MARKET_SOURCES: Record<MarketSource, { name: string; region: MarketRegion; flag: string; url: string }> = {
-  PredictIt: { name: 'PredictIt', region: 'US', flag: '🇺🇸', url: 'https://predictit.org' },
-  Kalshi: { name: 'Kalshi', region: 'US', flag: '🇺🇸', url: 'https://kalshi.com' },
-  Polymarket: { name: 'Polymarket', region: 'International', flag: '🌎', url: 'https://polymarket.com' },
-  Smarkets: { name: 'Smarkets', region: 'UK', flag: '🇬🇧', url: 'https://smarkets.com' },
+export const MARKET_SOURCES: Record<
+  MarketSource,
+  { name: string; region: MarketRegion; flag: string; url: string }
+> = {
+  PredictIt: {
+    name: "PredictIt",
+    region: "US",
+    flag: "🇺🇸",
+    url: "https://predictit.org",
+  },
+  Kalshi: {
+    name: "Kalshi",
+    region: "US",
+    flag: "🇺🇸",
+    url: "https://kalshi.com",
+  },
+  Polymarket: {
+    name: "Polymarket",
+    region: "International",
+    flag: "🌎",
+    url: "https://polymarket.com",
+  },
+  Smarkets: {
+    name: "Smarkets",
+    region: "UK",
+    flag: "🇬🇧",
+    url: "https://smarkets.com",
+  },
 };

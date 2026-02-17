@@ -44,6 +44,18 @@ export async function getSenateRacesServer(options?: {
   return getStateSenateRaces(options);
 }
 
+export async function getGovernorRacesServer(options?: {
+  states?: string[];
+  changePeriod?: string;
+}): Promise<Market[]> {
+  if (usePostgres()) {
+    const { getStateGovernorRacesAsync } = await import("./db-pg");
+    return getStateGovernorRacesAsync(options);
+  }
+  const { getStateGovernorRaces } = await import("./db");
+  return getStateGovernorRaces(options);
+}
+
 export async function getSenatePrimariesServer(options?: {
   changePeriod?: string;
 }): Promise<Market[]> {

@@ -15,9 +15,9 @@ import type {
   MarketCategory,
   TimeFilter,
   MarketSource,
-} from '../types';
+} from "../types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 class ApiClient {
   private baseUrl: string;
@@ -33,7 +33,7 @@ class ApiClient {
       const response = await fetch(url, {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...options?.headers,
         },
       });
@@ -54,39 +54,49 @@ class ApiClient {
    */
   async getMarkets(params?: {
     category?: MarketCategory;
-    status?: 'open' | 'all';
+    status?: "open" | "all";
     limit?: number;
     changePeriod?: TimeFilter;
   }): Promise<Market[]> {
     const searchParams = new URLSearchParams();
-    if (params?.category) searchParams.set('category', params.category);
-    if (params?.status) searchParams.set('status', params.status);
-    if (params?.limit) searchParams.set('limit', params.limit.toString());
-    if (params?.changePeriod) searchParams.set('changePeriod', params.changePeriod);
+    if (params?.category) searchParams.set("category", params.category);
+    if (params?.status) searchParams.set("status", params.status);
+    if (params?.limit) searchParams.set("limit", params.limit.toString());
+    if (params?.changePeriod)
+      searchParams.set("changePeriod", params.changePeriod);
 
     const query = searchParams.toString();
-    return this.fetch<Market[]>(`/markets${query ? `?${query}` : ''}`);
+    return this.fetch<Market[]>(`/markets${query ? `?${query}` : ""}`);
   }
 
   /**
    * Get a specific market by ID or slug
    */
-  async getMarket(idOrSlug: string, changePeriod?: TimeFilter): Promise<Market> {
-    const query = changePeriod ? `?changePeriod=${changePeriod}` : '';
+  async getMarket(
+    idOrSlug: string,
+    changePeriod?: TimeFilter,
+  ): Promise<Market> {
+    const query = changePeriod ? `?changePeriod=${changePeriod}` : "";
     return this.fetch<Market>(`/markets/${idOrSlug}${query}`);
   }
 
   /**
    * Get markets by category
    */
-  async getMarketsByCategory(category: MarketCategory, changePeriod?: TimeFilter): Promise<Market[]> {
-    return this.getMarkets({ category, status: 'open', changePeriod });
+  async getMarketsByCategory(
+    category: MarketCategory,
+    changePeriod?: TimeFilter,
+  ): Promise<Market[]> {
+    return this.getMarkets({ category, status: "open", changePeriod });
   }
 
   /**
    * Get chart data for a market
    */
-  async getChartData(marketId: string, timeFilter: TimeFilter = 'all'): Promise<ChartData> {
+  async getChartData(
+    marketId: string,
+    timeFilter: TimeFilter = "all",
+  ): Promise<ChartData> {
     return this.fetch<ChartData>(`/charts/${marketId}?period=${timeFilter}`);
   }
 
@@ -94,32 +104,49 @@ class ApiClient {
    * Get track record / historical accuracy data
    */
   async getTrackRecord(): Promise<TrackRecordEntry[]> {
-    return this.fetch<TrackRecordEntry[]>('/track-record');
+    return this.fetch<TrackRecordEntry[]>("/track-record");
   }
 
   /**
    * Get aggregated statistics
    */
   async getStats(): Promise<AggregatedStats> {
-    return this.fetch<AggregatedStats>('/stats');
+    return this.fetch<AggregatedStats>("/stats");
   }
 
   /**
    * Get featured/homepage markets
    */
   async getFeaturedMarkets(): Promise<Market[]> {
-    return this.fetch<Market[]>('/markets/featured');
+    return this.fetch<Market[]>("/markets/featured");
   }
 
   /**
    * Get state senate races
    */
-  async getStateSenateRaces(changePeriod?: TimeFilter, state?: string): Promise<Market[]> {
+  async getStateSenateRaces(
+    changePeriod?: TimeFilter,
+    state?: string,
+  ): Promise<Market[]> {
     const searchParams = new URLSearchParams();
-    if (changePeriod) searchParams.set('changePeriod', changePeriod);
-    if (state) searchParams.set('state', state);
+    if (changePeriod) searchParams.set("changePeriod", changePeriod);
+    if (state) searchParams.set("state", state);
     const query = searchParams.toString();
-    return this.fetch<Market[]>(`/senate-races${query ? `?${query}` : ''}`);
+    return this.fetch<Market[]>(`/senate-races${query ? `?${query}` : ""}`);
+  }
+
+  /**
+   * Get state governor races
+   */
+  async getStateGovernorRaces(
+    changePeriod?: TimeFilter,
+    state?: string,
+  ): Promise<Market[]> {
+    const searchParams = new URLSearchParams();
+    if (changePeriod) searchParams.set("changePeriod", changePeriod);
+    if (state) searchParams.set("state", state);
+    const query = searchParams.toString();
+    return this.fetch<Market[]>(`/governor-races${query ? `?${query}` : ""}`);
   }
 
   /**
@@ -127,9 +154,9 @@ class ApiClient {
    */
   async getSenatePrimaries(changePeriod?: TimeFilter): Promise<Market[]> {
     const searchParams = new URLSearchParams();
-    if (changePeriod) searchParams.set('changePeriod', changePeriod);
+    if (changePeriod) searchParams.set("changePeriod", changePeriod);
     const query = searchParams.toString();
-    return this.fetch<Market[]>(`/senate-primaries${query ? `?${query}` : ''}`);
+    return this.fetch<Market[]>(`/senate-primaries${query ? `?${query}` : ""}`);
   }
 }
 

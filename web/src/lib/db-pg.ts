@@ -60,6 +60,9 @@ function categorizeMarket(name: string): MarketCategory {
   if (lowerName.includes("senate")) {
     return "senate";
   }
+  if (lowerName.includes("governor") || lowerName.includes("gubernatorial")) {
+    return "governor";
+  }
   return "other";
 }
 
@@ -1419,6 +1422,352 @@ export async function getStateSenateRacesAsync(options?: {
         name: `${group.stateName} Senate Race 2026`,
         description: `Aggregated from ${sourcesIncluded.join(", ")}.`,
         category: "senate-race" as MarketCategory,
+        status: "open",
+        contracts,
+        totalVolume: contracts.reduce((sum, c) => sum + c.totalVolume, 0),
+        lastUpdated: new Date().toISOString(),
+      });
+    }
+
+    // Sort by competitiveness (closest to 50/50)
+    markets.sort((a, b) => {
+      const topA = a.contracts[0]?.aggregatedPrice || 0;
+      const topB = b.contracts[0]?.aggregatedPrice || 0;
+      return Math.abs(topA - 0.5) - Math.abs(topB - 0.5);
+    });
+
+    return markets;
+  } finally {
+    client.release();
+  }
+}
+
+// All 2026 governor race states (36 states)
+const GOVERNOR_STATES_2026: Record<string, string> = {
+  al: "Alabama",
+  ak: "Alaska",
+  az: "Arizona",
+  ar: "Arkansas",
+  ca: "California",
+  co: "Colorado",
+  ct: "Connecticut",
+  fl: "Florida",
+  ga: "Georgia",
+  hi: "Hawaii",
+  id: "Idaho",
+  il: "Illinois",
+  ia: "Iowa",
+  ks: "Kansas",
+  me: "Maine",
+  md: "Maryland",
+  ma: "Massachusetts",
+  mi: "Michigan",
+  mn: "Minnesota",
+  ne: "Nebraska",
+  nv: "Nevada",
+  nh: "New Hampshire",
+  nm: "New Mexico",
+  ny: "New York",
+  oh: "Ohio",
+  ok: "Oklahoma",
+  or: "Oregon",
+  pa: "Pennsylvania",
+  ri: "Rhode Island",
+  sc: "South Carolina",
+  sd: "South Dakota",
+  tn: "Tennessee",
+  tx: "Texas",
+  vt: "Vermont",
+  wi: "Wisconsin",
+  wy: "Wyoming",
+};
+
+/**
+ * Get state governor race markets
+ * Fetches ALL governor race markets in 3 batched queries,
+ * then groups and aggregates in JS.
+ */
+export async function getStateGovernorRacesAsync(options?: {
+  states?: string[];
+  changePeriod?: string;
+}): Promise<Market[]> {
+  const pool = getPool();
+  const client = await pool.connect();
+  const changePeriod = options?.changePeriod || "1d";
+
+  try {
+    const stateAbbrevs = options?.states || Object.keys(GOVERNOR_STATES_2026);
+
+    // Query 1: Find ALL governor race markets across all states in one query
+    const marketsResult = await client.query(`
+      SELECT DISTINCT
+        m.id, m.source, m.market_id, m.market_name, m.category,
+        m.status, m.url, m.total_volume, m.end_date
+      FROM markets m
+      WHERE (LOWER(m.market_name) LIKE '%governor%'
+        OR LOWER(m.market_name) LIKE '%gubernatorial%'
+        OR LOWER(m.market_name) LIKE '%governorship%')
+        AND LOWER(m.market_name) NOT LIKE '%lieutenant governor%'
+        AND LOWER(m.market_name) NOT LIKE '%federal reserve%'
+        AND LOWER(m.market_name) NOT LIKE '%primary%'
+        AND LOWER(m.market_name) NOT LIKE '%nomin%'
+        AND m.source IN ('Polymarket', 'Kalshi', 'PredictIt', 'Smarkets')
+      ORDER BY m.total_volume DESC NULLS LAST
+    `);
+
+    if (marketsResult.rows.length === 0) return [];
+
+    // Match each market to a state by checking if market name contains the state name
+    const marketsByState = new Map<
+      string,
+      { abbrev: string; stateName: string; dbMarkets: any[] }
+    >();
+
+    for (const dbMarket of marketsResult.rows) {
+      const marketNameLower = dbMarket.market_name.toLowerCase();
+      for (const abbrev of stateAbbrevs) {
+        const stateName = GOVERNOR_STATES_2026[abbrev];
+        if (!stateName) continue;
+        if (marketNameLower.includes(stateName.toLowerCase())) {
+          if (!marketsByState.has(abbrev)) {
+            marketsByState.set(abbrev, {
+              abbrev,
+              stateName,
+              dbMarkets: [],
+            });
+          }
+          marketsByState.get(abbrev)!.dbMarkets.push(dbMarket);
+          break; // Each market belongs to one state
+        }
+      }
+    }
+
+    if (marketsByState.size === 0) return [];
+
+    // Collect ALL market IDs across all states for batched contract queries
+    const allDbMarkets: any[] = [];
+    for (const group of marketsByState.values()) {
+      allDbMarkets.push(...group.dbMarkets);
+    }
+
+    // Query 2: Get ALL contracts with latest prices in one query
+    const conditions: string[] = [];
+    const queryParams: any[] = [];
+    let paramIdx = 1;
+    for (const dbMarket of allDbMarkets) {
+      conditions.push(
+        `(c.market_id = $${paramIdx} AND c.source = $${paramIdx + 1})`,
+      );
+      queryParams.push(dbMarket.market_id, dbMarket.source);
+      paramIdx += 2;
+    }
+
+    const contractsResult = await client.query(
+      `
+      SELECT
+        c.id, c.source, c.market_id, c.contract_id, c.contract_name,
+        ps.yes_price, ps.no_price, ps.volume, ps.snapshot_time
+      FROM contracts c
+      INNER JOIN LATERAL (
+        SELECT yes_price, no_price, volume, snapshot_time
+        FROM price_snapshots
+        WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
+        ORDER BY snapshot_time DESC
+        LIMIT 1
+      ) ps ON true
+      WHERE (${conditions.join(" OR ")})
+      AND ps.yes_price IS NOT NULL AND ps.yes_price >= 0.001
+    `,
+      queryParams,
+    );
+
+    // Query 3: Get ALL historical prices in one query
+    const changeTimestamp = getChangePeriodTimestamp(changePeriod);
+    const historicalConditions = conditions.map((cond) => {
+      return cond.replace(/\$(\d+)/g, (_, n: string) => `$${parseInt(n) + 1}`);
+    });
+
+    const historicalResult = await client.query(
+      `
+      SELECT DISTINCT ON (c.source, c.contract_id)
+        c.source, c.market_id, c.contract_id, c.contract_name,
+        ps.yes_price
+      FROM contracts c
+      INNER JOIN LATERAL (
+        SELECT yes_price, snapshot_time
+        FROM price_snapshots
+        WHERE source = c.source AND market_id = c.market_id AND contract_id = c.contract_id
+          AND snapshot_time <= $1
+          AND yes_price IS NOT NULL
+        ORDER BY snapshot_time DESC
+        LIMIT 1
+      ) ps ON true
+      WHERE (${historicalConditions.join(" OR ")})
+    `,
+      [changeTimestamp, ...queryParams],
+    );
+
+    // Index contracts and historical by market_id+source for fast lookup
+    const contractsByMarketKey = new Map<string, any[]>();
+    for (const row of contractsResult.rows) {
+      const key = `${row.market_id}:${row.source}`;
+      if (!contractsByMarketKey.has(key)) contractsByMarketKey.set(key, []);
+      contractsByMarketKey.get(key)!.push(row);
+    }
+
+    const historicalByMarketKey = new Map<string, any[]>();
+    for (const row of historicalResult.rows) {
+      const key = `${row.market_id}:${row.source}`;
+      if (!historicalByMarketKey.has(key)) historicalByMarketKey.set(key, []);
+      historicalByMarketKey.get(key)!.push(row);
+    }
+
+    // Now aggregate per state (all in JS, no more DB queries)
+    const markets: Market[] = [];
+
+    for (const [abbrev, group] of marketsByState) {
+      const contractsByCandidate = new Map<string, Contract>();
+
+      // Gather contracts for this state's markets
+      const stateContracts: any[] = [];
+      const stateHistorical: any[] = [];
+      for (const dbMarket of group.dbMarkets) {
+        const key = `${dbMarket.market_id}:${dbMarket.source}`;
+        stateContracts.push(...(contractsByMarketKey.get(key) || []));
+        stateHistorical.push(...(historicalByMarketKey.get(key) || []));
+      }
+
+      // Build historical price map for this state
+      const historicalByCandidate = new Map<string, number[]>();
+      for (const row of stateHistorical) {
+        const candidateName = extractCandidateName(
+          row.contract_name,
+          row.contract_id,
+        );
+        if (!candidateName) continue;
+        const normalizedName = normalizeCandidateName(candidateName);
+        if (!historicalByCandidate.has(normalizedName)) {
+          historicalByCandidate.set(normalizedName, []);
+        }
+        historicalByCandidate
+          .get(normalizedName)!
+          .push(parseFloat(row.yes_price));
+      }
+
+      for (const contract of stateContracts) {
+        const candidateName = extractCandidateName(
+          contract.contract_name,
+          contract.contract_id,
+        );
+        if (!candidateName) continue;
+
+        const normalizedName = normalizeCandidateName(candidateName);
+        const price: MarketPrice = {
+          source: contract.source as any,
+          region:
+            contract.source === "Polymarket"
+              ? "International"
+              : contract.source === "Smarkets"
+                ? "UK"
+                : "US",
+          yesPrice: parseFloat(contract.yes_price),
+          noPrice: contract.no_price
+            ? parseFloat(contract.no_price)
+            : 1 - parseFloat(contract.yes_price),
+          yesBid: null,
+          yesAsk: null,
+          volume: parseFloat(contract.volume) || 0,
+          lastUpdated: contract.snapshot_time,
+        };
+
+        if (contractsByCandidate.has(normalizedName)) {
+          const existing = contractsByCandidate.get(normalizedName)!;
+          const existingPrice = existing.prices.find(
+            (p) => p.source === price.source,
+          );
+          if (!existingPrice) {
+            existing.prices.push(price);
+            existing.totalVolume += price.volume || 0;
+          } else if (
+            new Date(price.lastUpdated) > new Date(existingPrice.lastUpdated)
+          ) {
+            existing.totalVolume -= existingPrice.volume || 0;
+            Object.assign(existingPrice, price);
+            existing.totalVolume += price.volume || 0;
+          }
+        } else {
+          contractsByCandidate.set(normalizedName, {
+            id: `governor-${abbrev}-${normalizedName}`,
+            name: candidateName,
+            shortName: candidateName.split(" ")[0],
+            imageUrl: getCandidateImageUrl(candidateName),
+            prices: [price],
+            aggregatedPrice: parseFloat(contract.yes_price),
+            priceChange: 0,
+            totalVolume: price.volume || 0,
+          });
+        }
+      }
+
+      // If we have both party-level contracts and individual candidate contracts,
+      // keep party entries for consistency
+      const PARTY_KEYS = [
+        "republican party",
+        "democratic party",
+        "independent",
+        "libertarian",
+        "green party",
+      ];
+      const partyEntries = [...contractsByCandidate.keys()].filter((k) =>
+        PARTY_KEYS.includes(k),
+      );
+      const candidateEntries = [...contractsByCandidate.keys()].filter(
+        (k) => !PARTY_KEYS.includes(k),
+      );
+      if (partyEntries.length > 0 && candidateEntries.length > 0) {
+        for (const key of candidateEntries) {
+          contractsByCandidate.delete(key);
+        }
+      }
+
+      excludeIlliquidSources(Array.from(contractsByCandidate.values()));
+
+      const contracts = Array.from(contractsByCandidate.values()).map(
+        (contract) => {
+          const freshPrices = getFreshPrices(contract.prices);
+          const avgPrice =
+            freshPrices.reduce((sum, p) => sum + p.yesPrice, 0) /
+            freshPrices.length;
+          const normalizedName = normalizeCandidateName(contract.name);
+          const historicalPrices = historicalByCandidate.get(normalizedName);
+          const historicalAvg =
+            historicalPrices && historicalPrices.length > 0
+              ? historicalPrices.reduce((a, b) => a + b, 0) /
+                historicalPrices.length
+              : avgPrice;
+
+          return {
+            ...contract,
+            aggregatedPrice: avgPrice,
+            priceChange: avgPrice - historicalAvg,
+          };
+        },
+      );
+
+      contracts.sort((a, b) => b.aggregatedPrice - a.aggregatedPrice);
+
+      if (contracts.length === 0) continue;
+
+      const sourcesIncluded = [
+        ...new Set(contracts.flatMap((c) => c.prices.map((p) => p.source))),
+      ];
+
+      markets.push({
+        id: `governor-race-${abbrev}`,
+        slug: `governor-race-${abbrev}`,
+        name: `${group.stateName} Governor Race 2026`,
+        description: `Aggregated from ${sourcesIncluded.join(", ")}.`,
+        category: "governor-race" as MarketCategory,
         status: "open",
         contracts,
         totalVolume: contracts.reduce((sum, c) => sum + c.totalVolume, 0),
