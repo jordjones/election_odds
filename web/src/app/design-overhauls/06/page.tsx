@@ -1387,14 +1387,28 @@ export default function TweetBattlePage() {
               </div>
             </div>
             <DualBar
-              leftValue={left.posts.reduce(
-                (s, p) => s + p.likes + p.retweets,
-                0,
-              )}
-              rightValue={right.posts.reduce(
-                (s, p) => s + p.likes + p.retweets,
-                0,
-              )}
+              leftValue={(() => {
+                const l = left.posts.reduce(
+                  (s, p) => s + p.likes + p.retweets,
+                  0,
+                );
+                const r = right.posts.reduce(
+                  (s, p) => s + p.likes + p.retweets,
+                  0,
+                );
+                return l / (l + r || 1);
+              })()}
+              rightValue={(() => {
+                const l = left.posts.reduce(
+                  (s, p) => s + p.likes + p.retweets,
+                  0,
+                );
+                const r = right.posts.reduce(
+                  (s, p) => s + p.likes + p.retweets,
+                  0,
+                );
+                return r / (l + r || 1);
+              })()}
               leftColor={leftColor}
               rightColor={rightColor}
               height="h-3"
