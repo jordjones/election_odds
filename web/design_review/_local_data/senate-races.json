@@ -1,0 +1,182 @@
+[
+  {
+    "id": "senate-pa",
+    "slug": "senate-pa",
+    "name": "Pennsylvania Senate Race 2026",
+    "category": "senate-race",
+    "status": "open",
+    "totalVolume": 2180000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:13:27.413Z",
+    "contracts": [
+      {
+        "id": "pa-fetterman",
+        "name": "John Fetterman",
+        "shortName": "Fetterman",
+        "prices": [],
+        "aggregatedPrice": 0.52,
+        "priceChange": 0.02,
+        "totalVolume": 1200000
+      },
+      {
+        "id": "pa-mccormick",
+        "name": "Dave McCormick",
+        "shortName": "McCormick",
+        "prices": [],
+        "aggregatedPrice": 0.48,
+        "priceChange": -0.02,
+        "totalVolume": 980000
+      }
+    ]
+  },
+  {
+    "id": "senate-ga",
+    "slug": "senate-ga",
+    "name": "Georgia Senate Race 2026",
+    "category": "senate-race",
+    "status": "open",
+    "totalVolume": 1450000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:13:27.414Z",
+    "contracts": [
+      {
+        "id": "ga-gop",
+        "name": "Republican",
+        "shortName": "GOP",
+        "prices": [],
+        "aggregatedPrice": 0.61,
+        "priceChange": 0.01,
+        "totalVolume": 800000
+      },
+      {
+        "id": "ga-dem",
+        "name": "Democrat",
+        "shortName": "DEM",
+        "prices": [],
+        "aggregatedPrice": 0.39,
+        "priceChange": -0.01,
+        "totalVolume": 650000
+      }
+    ]
+  },
+  {
+    "id": "senate-mi",
+    "slug": "senate-mi",
+    "name": "Michigan Senate Race 2026",
+    "category": "senate-race",
+    "status": "open",
+    "totalVolume": 1670000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:13:27.414Z",
+    "contracts": [
+      {
+        "id": "mi-slotkin",
+        "name": "Elissa Slotkin",
+        "shortName": "Slotkin",
+        "prices": [],
+        "aggregatedPrice": 0.55,
+        "priceChange": 0.03,
+        "totalVolume": 950000
+      },
+      {
+        "id": "mi-gop",
+        "name": "Republican",
+        "shortName": "GOP",
+        "prices": [],
+        "aggregatedPrice": 0.45,
+        "priceChange": -0.03,
+        "totalVolume": 720000
+      }
+    ]
+  },
+  {
+    "id": "senate-nc",
+    "slug": "senate-nc",
+    "name": "North Carolina Senate Race 2026",
+    "category": "senate-race",
+    "status": "open",
+    "totalVolume": 1080000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:13:27.414Z",
+    "contracts": [
+      {
+        "id": "nc-tillis",
+        "name": "Thom Tillis",
+        "shortName": "Tillis",
+        "prices": [],
+        "aggregatedPrice": 0.58,
+        "priceChange": -0.01,
+        "totalVolume": 600000
+      },
+      {
+        "id": "nc-dem",
+        "name": "Democrat",
+        "shortName": "DEM",
+        "prices": [],
+        "aggregatedPrice": 0.42,
+        "priceChange": 0.01,
+        "totalVolume": 480000
+      }
+    ]
+  },
+  {
+    "id": "senate-az",
+    "slug": "senate-az",
+    "name": "Arizona Senate Race 2026",
+    "category": "senate-race",
+    "status": "open",
+    "totalVolume": 1320000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:13:27.414Z",
+    "contracts": [
+      {
+        "id": "az-dem",
+        "name": "Democrat",
+        "shortName": "DEM",
+        "prices": [],
+        "aggregatedPrice": 0.47,
+        "priceChange": 0.02,
+        "totalVolume": 700000
+      },
+      {
+        "id": "az-gop",
+        "name": "Republican",
+        "shortName": "GOP",
+        "prices": [],
+        "aggregatedPrice": 0.53,
+        "priceChange": -0.02,
+        "totalVolume": 620000
+      }
+    ]
+  },
+  {
+    "id": "senate-tx",
+    "slug": "senate-tx",
+    "name": "Texas Senate Race 2026",
+    "category": "senate-race",
+    "status": "open",
+    "totalVolume": 890000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:13:27.414Z",
+    "contracts": [
+      {
+        "id": "tx-gop",
+        "name": "Republican",
+        "shortName": "GOP",
+        "prices": [],
+        "aggregatedPrice": 0.72,
+        "priceChange": 0.01,
+        "totalVolume": 520000
+      },
+      {
+        "id": "tx-dem",
+        "name": "Democrat",
+        "shortName": "DEM",
+        "prices": [],
+        "aggregatedPrice": 0.28,
+        "priceChange": -0.01,
+        "totalVolume": 370000
+      }
+    ]
+  }
+]

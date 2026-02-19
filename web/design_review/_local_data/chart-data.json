@@ -1,0 +1,323 @@
+{
+  "marketId": "presidential-2028",
+  "marketName": "Who will win the 2028 US Presidential Election?",
+  "series": [
+    {
+      "timestamp": "2026-01-19T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.21381229494577572,
+        "Gavin Newsom": 0.1941532509370072,
+        "Marco Rubio": 0.12206808207716006,
+        "Alexandria Ocasio-Cortez": 0.09349807980915734,
+        "Ron DeSantis": 0.05506175395670115
+      }
+    },
+    {
+      "timestamp": "2026-01-20T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2068980393791922,
+        "Gavin Newsom": 0.1761690817778182,
+        "Marco Rubio": 0.08627357833218299,
+        "Alexandria Ocasio-Cortez": 0.08758137743403195,
+        "Ron DeSantis": 0.030511094922799624
+      }
+    },
+    {
+      "timestamp": "2026-01-21T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2836291042484074,
+        "Gavin Newsom": 0.17632440201566144,
+        "Marco Rubio": 0.03440740799212507,
+        "Alexandria Ocasio-Cortez": 0.09130669824443242,
+        "Ron DeSantis": 0.08693623920729049
+      }
+    },
+    {
+      "timestamp": "2026-01-22T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2317358800837321,
+        "Gavin Newsom": 0.19429863194317443,
+        "Marco Rubio": 0.0978508868879466,
+        "Alexandria Ocasio-Cortez": 0.07107930983135663,
+        "Ron DeSantis": 0.08671882740622412
+      }
+    },
+    {
+      "timestamp": "2026-01-23T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2678641948423304,
+        "Gavin Newsom": 0.22011591533779187,
+        "Marco Rubio": 0.06865377542266021,
+        "Alexandria Ocasio-Cortez": 0.09929610782872103,
+        "Ron DeSantis": 0.08352325258905605
+      }
+    },
+    {
+      "timestamp": "2026-01-24T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.25658206368598924,
+        "Gavin Newsom": 0.1723564807234026,
+        "Marco Rubio": 0.05126121247233584,
+        "Alexandria Ocasio-Cortez": 0.05530327563123344,
+        "Ron DeSantis": 0.033055970237156965
+      }
+    },
+    {
+      "timestamp": "2026-01-25T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2643180897717732,
+        "Gavin Newsom": 0.20582783835090382,
+        "Marco Rubio": 0.08643386825480959,
+        "Alexandria Ocasio-Cortez": 0.03584851699059777,
+        "Ron DeSantis": 0.08585645037183705
+      }
+    },
+    {
+      "timestamp": "2026-01-26T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.21025521450162385,
+        "Gavin Newsom": 0.19415198394818894,
+        "Marco Rubio": 0.04463207228000592,
+        "Alexandria Ocasio-Cortez": 0.06657573922916946,
+        "Ron DeSantis": 0.05451590486757154
+      }
+    },
+    {
+      "timestamp": "2026-01-27T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.24135303619663323,
+        "Gavin Newsom": 0.15919451055928194,
+        "Marco Rubio": 0.05304196467596933,
+        "Alexandria Ocasio-Cortez": 0.04803502429736907,
+        "Ron DeSantis": 0.022793997163657775
+      }
+    },
+    {
+      "timestamp": "2026-01-28T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.273026046719609,
+        "Gavin Newsom": 0.14770147877832687,
+        "Marco Rubio": 0.11249943457962094,
+        "Alexandria Ocasio-Cortez": 0.02604913939952877,
+        "Ron DeSantis": 0.01768421520507721
+      }
+    },
+    {
+      "timestamp": "2026-01-29T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.24644313622120748,
+        "Gavin Newsom": 0.17893542105014557,
+        "Marco Rubio": 0.10725673587336149,
+        "Alexandria Ocasio-Cortez": 0.06235198420455087,
+        "Ron DeSantis": 0.022204974942511058
+      }
+    },
+    {
+      "timestamp": "2026-01-30T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.21949759159293522,
+        "Gavin Newsom": 0.14954587367732342,
+        "Marco Rubio": 0.04932887426384752,
+        "Alexandria Ocasio-Cortez": 0.0888782084526578,
+        "Ron DeSantis": 0.07474105617971143
+      }
+    },
+    {
+      "timestamp": "2026-01-31T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.22196996725230592,
+        "Gavin Newsom": 0.20023198261664107,
+        "Marco Rubio": 0.1092741886256729,
+        "Alexandria Ocasio-Cortez": 0.041146774438111614,
+        "Ron DeSantis": 0.024712389319674195
+      }
+    },
+    {
+      "timestamp": "2026-02-01T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.22169765869786026,
+        "Gavin Newsom": 0.1912904114705804,
+        "Marco Rubio": 0.06905260110619305,
+        "Alexandria Ocasio-Cortez": 0.0569509258042284,
+        "Ron DeSantis": 0.03664864120521575
+      }
+    },
+    {
+      "timestamp": "2026-02-02T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2597445358663234,
+        "Gavin Newsom": 0.20265394473657855,
+        "Marco Rubio": 0.06121622760291838,
+        "Alexandria Ocasio-Cortez": 0.04956400246708103,
+        "Ron DeSantis": 0.07484299100951002
+      }
+    },
+    {
+      "timestamp": "2026-02-03T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.24995062553232555,
+        "Gavin Newsom": 0.1753672648902328,
+        "Marco Rubio": 0.07396858550624784,
+        "Alexandria Ocasio-Cortez": 0.0374081350548988,
+        "Ron DeSantis": 0.040883465020313974
+      }
+    },
+    {
+      "timestamp": "2026-02-04T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2618565078901407,
+        "Gavin Newsom": 0.17708165820654265,
+        "Marco Rubio": 0.07177192939272553,
+        "Alexandria Ocasio-Cortez": 0.03699002875116049,
+        "Ron DeSantis": 0.04145829920875094
+      }
+    },
+    {
+      "timestamp": "2026-02-05T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2363441695509246,
+        "Gavin Newsom": 0.15900623302596953,
+        "Marco Rubio": 0.1009060983551981,
+        "Alexandria Ocasio-Cortez": 0.05974716061523216,
+        "Ron DeSantis": 0.03369253947493711
+      }
+    },
+    {
+      "timestamp": "2026-02-06T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.22747998921138857,
+        "Gavin Newsom": 0.1704667965051281,
+        "Marco Rubio": 0.07235218528993272,
+        "Alexandria Ocasio-Cortez": 0.06190984014014625,
+        "Ron DeSantis": 0.0606775857393628
+      }
+    },
+    {
+      "timestamp": "2026-02-07T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.25531536083133793,
+        "Gavin Newsom": 0.18831155651192852,
+        "Marco Rubio": 0.07658386592996971,
+        "Alexandria Ocasio-Cortez": 0.050596782827745906,
+        "Ron DeSantis": 0.0655398213832453
+      }
+    },
+    {
+      "timestamp": "2026-02-08T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2593473435827739,
+        "Gavin Newsom": 0.17217678807750658,
+        "Marco Rubio": 0.08950029053377004,
+        "Alexandria Ocasio-Cortez": 0.06742470898509366,
+        "Ron DeSantis": 0.0665427309615958
+      }
+    },
+    {
+      "timestamp": "2026-02-09T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.23229758501388068,
+        "Gavin Newsom": 0.18139135624211758,
+        "Marco Rubio": 0.08072579461472132,
+        "Alexandria Ocasio-Cortez": 0.05337464861276696,
+        "Ron DeSantis": 0.062388444518820696
+      }
+    },
+    {
+      "timestamp": "2026-02-10T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.23860311801657344,
+        "Gavin Newsom": 0.1716434685998117,
+        "Marco Rubio": 0.07600870834036833,
+        "Alexandria Ocasio-Cortez": 0.06119056380063658,
+        "Ron DeSantis": 0.05597143942577153
+      }
+    },
+    {
+      "timestamp": "2026-02-11T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2545251647557461,
+        "Gavin Newsom": 0.1783273238553182,
+        "Marco Rubio": 0.07190653659163047,
+        "Alexandria Ocasio-Cortez": 0.05354894406102801,
+        "Ron DeSantis": 0.04705033651827504
+      }
+    },
+    {
+      "timestamp": "2026-02-12T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.24143570472467776,
+        "Gavin Newsom": 0.17003707660109937,
+        "Marco Rubio": 0.07841725641528584,
+        "Alexandria Ocasio-Cortez": 0.06157505989008405,
+        "Ron DeSantis": 0.04974447372537773
+      }
+    },
+    {
+      "timestamp": "2026-02-13T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2492416516203115,
+        "Gavin Newsom": 0.1787909949147491,
+        "Marco Rubio": 0.07624558868910428,
+        "Alexandria Ocasio-Cortez": 0.05194076495129807,
+        "Ron DeSantis": 0.048854099059061545
+      }
+    },
+    {
+      "timestamp": "2026-02-14T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2514128074140141,
+        "Gavin Newsom": 0.17747147854547585,
+        "Marco Rubio": 0.0822557069802844,
+        "Alexandria Ocasio-Cortez": 0.06040095708988298,
+        "Ron DeSantis": 0.05369368698502924
+      }
+    },
+    {
+      "timestamp": "2026-02-15T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2407194558679995,
+        "Gavin Newsom": 0.18341243984111522,
+        "Marco Rubio": 0.0752066215895091,
+        "Alexandria Ocasio-Cortez": 0.06291487705223067,
+        "Ron DeSantis": 0.04753237910104371
+      }
+    },
+    {
+      "timestamp": "2026-02-16T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.24249504056300458,
+        "Gavin Newsom": 0.18156666269899122,
+        "Marco Rubio": 0.07728977418207404,
+        "Alexandria Ocasio-Cortez": 0.05930300935784652,
+        "Ron DeSantis": 0.05113709119918734
+      }
+    },
+    {
+      "timestamp": "2026-02-17T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.2441179020995278,
+        "Gavin Newsom": 0.17936500304815145,
+        "Marco Rubio": 0.08064934879951736,
+        "Alexandria Ocasio-Cortez": 0.05929781544482935,
+        "Ron DeSantis": 0.05021171467310102
+      }
+    },
+    {
+      "timestamp": "2026-02-18T06:03:43.800Z",
+      "values": {
+        "JD Vance": 0.245,
+        "Gavin Newsom": 0.18,
+        "Marco Rubio": 0.08,
+        "Alexandria Ocasio-Cortez": 0.06,
+        "Ron DeSantis": 0.05
+      }
+    }
+  ],
+  "contracts": [
+    "JD Vance",
+    "Gavin Newsom",
+    "Marco Rubio",
+    "Alexandria Ocasio-Cortez",
+    "Ron DeSantis"
+  ]
+}

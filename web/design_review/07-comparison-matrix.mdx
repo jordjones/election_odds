@@ -1,0 +1,55 @@
+# Design Overhaul Comparison Matrix
+
+## At a Glance
+
+| Dimension | 01 Command Center | 02 Election Briefing | 03 The Arena | 04 Forecast Dashboard | 05 Live Wire |
+|-----------|------------------|---------------------|-------------|----------------------|-------------|
+| **Persona** | Traders, operatives | Journalists, editors | Sports fans, bettors | Data analysts, wonks | Mobile users, casual |
+| **Metaphor** | Bloomberg terminal | Newspaper front page | ESPN matchup | FiveThirtyEight | Twitter feed |
+| **Data density** | Very high | Medium | Medium | High | Low |
+| **Mobile-ready** | Poor | Good | Good | Fair | Excellent |
+| **Learning curve** | Steep | Low | Low | Medium | Very low |
+| **Engagement hook** | Keyboard shortcuts, watchlist | Narrative headlines, wire | VS format, rankings | Statistical depth | Social actions, feed |
+| **Unique feature** | Keyboard nav | Auto-generated prose | ProgressRing VS | Source consensus | Card feed + filters |
+
+## Scoring (1-5)
+
+| Criteria | 01 | 02 | 03 | 04 | 05 |
+|----------|----|----|----|----|-----|
+| First impression | 3 | 4 | 5 | 3 | 4 |
+| Data accessibility | 5 | 3 | 3 | 5 | 2 |
+| Mobile experience | 1 | 3 | 3 | 2 | 5 |
+| Shareability | 1 | 4 | 4 | 3 | 5 |
+| Retention potential | 4 | 3 | 4 | 4 | 3 |
+| Brand differentiation | 3 | 4 | 5 | 4 | 3 |
+| **Total** | **17** | **21** | **24** | **21** | **22** |
+
+## Shared Components
+
+| Component | 01 | 02 | 03 | 04 | 05 |
+|-----------|----|----|----|----|-----|
+| ProgressRing | - | - | Yes | Yes | Yes |
+| HorizontalBar | - | Yes | - | Yes | Yes |
+| DualBar | - | - | Yes | Yes | - |
+| PartyColor | - | Yes | Yes | Yes | Yes |
+| BigNumber | - | - | - | - | - |
+| MiniChart | - | - | - | - | Inline |
+
+## Recommendation
+
+**For broad audience:** Combine elements from 03 (The Arena) and 05 (Live Wire). The VS format creates immediate engagement, while the card feed format works well on mobile.
+
+**For credibility:** Incorporate 04 (Forecast Dashboard) elements like source consensus and track record into whichever design is chosen.
+
+**For media/press:** 02 (Election Briefing) can serve as a dedicated press page or embed-friendly view.
+
+**For power users:** Keep 01 (Command Center) as an opt-in "pro mode" accessible via keyboard shortcut or settings toggle.
+
+## Production Path
+
+A hybrid approach could layer these concepts:
+1. Default homepage: Arena-style matchups (engaging, clear)
+2. Detail pages: Forecast Dashboard depth (source agreement, confidence)
+3. Mobile: Live Wire card format (feed, filters, social)
+4. Press page: Election Briefing (quotable, embeddable)
+5. Pro mode: Command Center (toggle-able for power users)

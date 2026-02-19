@@ -1,0 +1,63 @@
+# Concept 04: Forecast Dashboard
+
+**Route:** /design-overhauls/04
+**Target Persona:** Data analysts, poll watchers, FiveThirtyEight readers
+**Design Metaphor:** FiveThirtyEight / The Economist data journalism
+
+## Core Thesis
+
+Sophisticated users want statistical depth — not just "who's winning" but how confident we should be, how sources agree, and what the track record looks like. This design adds analytical layers: source consensus, confidence signals, Brier scores, and control forecasts.
+
+## Key Design Decisions
+
+### Layout
+- Full-width forecast panel (headline probability)
+- Sidebar with control forecasts + confidence meter
+- Two-column candidate tables
+- Bottom row: source agreement + track record
+
+### Statistical Depth
+- "X in 100" probability framing (FiveThirtyEight convention)
+- 50% reference line on trend charts
+- Source consensus matrix (deviation from mean)
+- Brier score track record with bar chart
+- Confidence signals panel with quality indicators
+
+### Information Architecture
+1. **Top:** Big question + big numbers (party probability)
+2. **Right sidebar:** Control forecasts (House/Senate/Presidency) + confidence
+3. **Middle:** Detailed candidate-level data with party badges
+4. **Bottom:** Source agreement and historical accuracy
+
+### Visual Language
+- Emerald accent for confidence/accuracy
+- Party-colored strips on candidate rows
+- Reference lines on charts for context
+- Info icon + methodology notes for transparency
+- Time range selector (7d, 30d, 90d)
+
+## Strengths
+- Deepest analytical content of all concepts
+- Source consensus view is unique and valuable
+- Track record builds credibility with data-savvy users
+- Confidence signals acknowledge uncertainty honestly
+- Control forecasts give quick overview of all races
+
+## Weaknesses
+- High complexity may overwhelm casual users
+- Brier scores require explanation for non-statisticians
+- Confidence signals are simulated (need real methodology)
+- Dense layout requires large screens for best experience
+
+## Shared Components Used
+- ProgressRing (confidence meter)
+- HorizontalBar (candidate probability bars)
+- DualBar (control forecast bars)
+- PartyColor (party identification + coloring)
+
+## Technical Notes
+- ~420 lines
+- Uses Recharts: AreaChart, BarChart, ReferenceLine, Cell
+- Track record data from mockTrackRecord
+- Brier score chart with color-coded correct/incorrect calls
+- Metrics bar with live-updating timestamp

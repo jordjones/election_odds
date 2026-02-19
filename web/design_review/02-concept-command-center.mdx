@@ -1,0 +1,53 @@
+# Concept 01: Command Center
+
+**Route:** /design-overhauls/01
+**Target Persona:** Power users, traders, political operatives
+**Design Metaphor:** Bloomberg terminal / trading desk
+
+## Core Thesis
+
+Treat election odds like a financial instrument. Dense data, keyboard shortcuts, watchlists, and split-panel layouts give power users maximum information per pixel.
+
+## Key Design Decisions
+
+### Layout
+- Split-panel: table (left 45%) + chart/watchlist (right 55%)
+- Fixed header with clock and keyboard hint
+- Scrolling ticker bar for market headlines
+- Tabbed market switcher (1-7 keyboard shortcuts)
+
+### Data Density
+- Compact table rows with rank, name, price, change, volume, spread
+- Monospace font for all numeric values (tabular-nums)
+- Price changes color-coded (emerald/red)
+- Spread shown in percentage points
+
+### Interaction Model
+- Keyboard-driven (?, 1-7, w, f, arrow keys)
+- Star/watchlist with localStorage persistence
+- Panel toggle between chart and watchlist
+- Hover states on table rows
+
+### Visual Language
+- Dark theme (zinc-950 background)
+- Blue accent (blue-400/500)
+- Amber for watchlist/favorites
+- Minimal borders, high contrast numbers
+
+## Strengths
+- Highest data density of all concepts
+- Keyboard shortcuts reward power users
+- Watchlist creates personalization/stickiness
+- Feels professional and authoritative
+
+## Weaknesses
+- Intimidating for casual users
+- No narrative or context
+- No mobile optimization (desktop-first)
+- Steep learning curve
+
+## Technical Notes
+- ~425 lines in single page.tsx
+- Uses: Recharts AreaChart, Lucide icons
+- localStorage for watchlist persistence
+- Inline CSS keyframes for ticker animation

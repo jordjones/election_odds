@@ -1,0 +1,12 @@
+{
+  "totalMarkets": 718,
+  "totalContracts": 6900,
+  "totalVolume": 285000000,
+  "lastUpdated": "2026-02-18T06:03:43.800Z",
+  "sourceBreakdown": {
+    "PredictIt": 234,
+    "Kalshi": 128,
+    "Polymarket": 346,
+    "Smarkets": 10
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "id": "party-2028",
+  "slug": "party-2028",
+  "name": "Which party will win the 2028 Presidential Election?",
+  "description": "Bets on which party will control the Presidency after the Nov 5, 2028 election.",
+  "category": "presidential",
+  "status": "open",
+  "contracts": [
+    {
+      "id": "party-dem",
+      "name": "Democratic Party",
+      "shortName": "Democratic",
+      "prices": [
+        {
+          "source": "PredictIt",
+          "region": "US",
+          "yesPrice": 0.548,
+          "noPrice": 0.45199999999999996,
+          "yesBid": 0.534140271577892,
+          "yesAsk": 0.5618597284221081,
+          "volume": 380270,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Kalshi",
+          "region": "US",
+          "yesPrice": 0.5320589157151561,
+          "noPrice": 0.44183559396248623,
+          "yesBid": 0.520280543155784,
+          "yesAsk": 0.5757194568442161,
+          "volume": 1948213,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Polymarket",
+          "region": "International",
+          "yesPrice": 0.5391819914547845,
+          "noPrice": 0.45308331674835794,
+          "yesBid": 0.534140271577892,
+          "yesAsk": 0.5618597284221081,
+          "volume": 4361441,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Smarkets",
+          "region": "UK",
+          "yesPrice": 0.5413448966265673,
+          "noPrice": 0.4663992562284084,
+          "yesBid": 0.506420814733676,
+          "yesAsk": 0.5895791852663241,
+          "volume": 112479,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        }
+      ],
+      "aggregatedPrice": 0.548,
+      "priceChange": 0.005,
+      "totalVolume": 6802403
+    },
+    {
+      "id": "party-gop",
+      "name": "Republican Party",
+      "shortName": "Republican",
+      "prices": [
+        {
+          "source": "PredictIt",
+          "region": "US",
+          "yesPrice": 0.442,
+          "noPrice": 0.558,
+          "yesBid": 0.43321282716467635,
+          "yesAsk": 0.45078717283532366,
+          "volume": 467668,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Kalshi",
+          "region": "US",
+          "yesPrice": 0.4304240651272297,
+          "noPrice": 0.5755856537784227,
+          "yesBid": 0.4244256543293527,
+          "yesAsk": 0.4595743456706473,
+          "volume": 1162011,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Polymarket",
+          "region": "International",
+          "yesPrice": 0.4349857974041719,
+          "noPrice": 0.5649951098107242,
+          "yesBid": 0.43321282716467635,
+          "yesAsk": 0.45078717283532366,
+          "volume": 2600143,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Smarkets",
+          "region": "UK",
+          "yesPrice": 0.45514245417051724,
+          "noPrice": 0.5389260053234604,
+          "yesBid": 0.41563848149402904,
+          "yesAsk": 0.46836151850597096,
+          "volume": 171047,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        }
+      ],
+      "aggregatedPrice": 0.442,
+      "priceChange": -0.005,
+      "totalVolume": 4400869
+    },
+    {
+      "id": "party-other",
+      "name": "Other",
+      "shortName": "Other",
+      "prices": [
+        {
+          "source": "PredictIt",
+          "region": "US",
+          "yesPrice": 0.01,
+          "noPrice": 0.99,
+          "yesBid": -0.0033414578159506377,
+          "yesAsk": 0.023341457815950636,
+          "volume": 292438,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Kalshi",
+          "region": "US",
+          "yesPrice": 0.01910465277608006,
+          "noPrice": 0.9791001223836833,
+          "yesBid": -0.016682915631901274,
+          "yesAsk": 0.03668291563190128,
+          "volume": 219581,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Polymarket",
+          "region": "International",
+          "yesPrice": 0.004384665264732468,
+          "noPrice": 0.9814779689550813,
+          "yesBid": -0.0033414578159506377,
+          "yesAsk": 0.023341457815950636,
+          "volume": 1042205,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        },
+        {
+          "source": "Smarkets",
+          "region": "UK",
+          "yesPrice": 0.012055295417076454,
+          "noPrice": 1.0129499423126633,
+          "yesBid": -0.03002437344785191,
+          "yesAsk": 0.05002437344785191,
+          "volume": 103315,
+          "lastUpdated": "2026-02-18T06:03:43.799Z"
+        }
+      ],
+      "aggregatedPrice": 0.01,
+      "priceChange": 0,
+      "totalVolume": 1657539
+    }
+  ],
+  "totalVolume": 380866,
+  "endDate": "2028-11-05",
+  "lastUpdated": "2026-02-18T06:03:43.799Z"
+}

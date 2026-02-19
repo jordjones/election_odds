@@ -1,0 +1,65 @@
+[
+  {
+    "tweetId": "1234567890",
+    "candidateName": "JD Vance",
+    "twitterHandle": "JDVance",
+    "topic": "campaign",
+    "postedAt": "2026-02-18T05:13:27.414Z",
+    "text": "Excited to announce our new policy platform for American workers. Manufacturing jobs are coming home.",
+    "likes": 45200,
+    "retweets": 8900,
+    "editorNote": "First major policy announcement of 2028 cycle"
+  },
+  {
+    "tweetId": "1234567891",
+    "candidateName": "Gavin Newsom",
+    "twitterHandle": "GavinNewsom",
+    "topic": "economy",
+    "postedAt": "2026-02-18T04:13:27.414Z",
+    "text": "California just posted the fastest GDP growth of any state. Our investments in clean energy and technology are paying off.",
+    "likes": 32100,
+    "retweets": 5600
+  },
+  {
+    "tweetId": "1234567892",
+    "candidateName": "Alexandria Ocasio-Cortez",
+    "twitterHandle": "AOC",
+    "topic": "healthcare",
+    "postedAt": "2026-02-18T03:13:27.414Z",
+    "text": "Medicare for All is not radical — it is common sense. Every other developed nation has figured this out.",
+    "likes": 89300,
+    "retweets": 18200,
+    "editorNote": "Reviving healthcare as campaign issue"
+  },
+  {
+    "tweetId": "1234567893",
+    "candidateName": "Ron DeSantis",
+    "twitterHandle": "RonDeSantis",
+    "topic": "immigration",
+    "postedAt": "2026-02-18T02:13:27.414Z",
+    "text": "Florida leads the nation in border security cooperation. We will not wait for Washington to act.",
+    "likes": 28400,
+    "retweets": 6100
+  },
+  {
+    "tweetId": "1234567894",
+    "candidateName": "Josh Shapiro",
+    "twitterHandle": "JoshShapiroPA",
+    "topic": "economy",
+    "postedAt": "2026-02-18T01:13:27.414Z",
+    "text": "Pennsylvania steel workers deserve a president who fights for them. That is exactly what I intend to do.",
+    "likes": 15600,
+    "retweets": 3200,
+    "editorNote": "Positioning as blue-collar champion"
+  },
+  {
+    "tweetId": "1234567895",
+    "candidateName": "Nikki Haley",
+    "twitterHandle": "NikkiHaley",
+    "topic": "foreign-policy",
+    "postedAt": "2026-02-18T00:13:27.414Z",
+    "text": "Strength abroad means security at home. We need leaders who understand both.",
+    "likes": 19800,
+    "retweets": 4100
+  }
+]

@@ -1,0 +1,59 @@
+# Concept 02: The Election Briefing
+
+**Route:** /design-overhauls/02
+**Target Persona:** Journalists, editors, newsroom professionals
+**Design Metaphor:** Newspaper front page / wire service
+
+## Core Thesis
+
+Frame prediction market data as editorial intelligence. Journalists need context, narrative, and quotable numbers. The design borrows newspaper conventions — mastheads, bylines, section tabs, columnar layouts — to make data feel like news.
+
+## Key Design Decisions
+
+### Layout
+- Newspaper grid: 2/3 main content + 1/3 sidebar
+- Masthead with serif typography (Georgia)
+- Section tabs (All Stories, Presidential, Midterms, Primaries)
+- Scrolling wire ticker for breaking updates
+
+### Content Strategy
+- Lead story with auto-generated narrative paragraph
+- Market briefs as compact card summaries
+- "By The Numbers" sidebar for quick-reference stats
+- Source breakdown visualization
+- Methodology note for credibility
+
+### Narrative Elements
+- Headline auto-generated from leader's name + percentage
+- Body text describes trend direction and volume
+- "Biggest Movers" sidebar flags notable changes
+- Time-ago timestamps create urgency
+
+### Visual Language
+- Dark background with serif typography for editorial feel
+- Amber accent for lead story badge and section tabs
+- Wire ticker with pulse animation
+- Horizontal probability bars for at-a-glance comparison
+- Card-based market briefs with party-colored bars
+
+## Strengths
+- Immediately quotable — headlines write themselves
+- Familiar newspaper conventions reduce cognitive load
+- Section filtering enables topic-specific briefings
+- Methodology note builds trust with editorial audience
+
+## Weaknesses
+- Auto-generated prose may feel formulaic
+- Serif typography on dark backgrounds requires careful sizing
+- Wire ticker may feel noisy for some users
+- Less data density than Command Center
+
+## Shared Components Used
+- HorizontalBar (probability visualization)
+- PartyColor (candidate/party color mapping)
+
+## Technical Notes
+- ~280 lines
+- Section state with useState for filtering
+- Uses Georgia serif font stack
+- Wire ticker with CSS scroll animation

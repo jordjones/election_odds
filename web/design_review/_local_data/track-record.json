@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1",
+    "year": 2024,
+    "type": "General",
+    "state": "USA",
+    "candidate": "Trump",
+    "predictedProbability": 0.52,
+    "actualOutcome": true,
+    "brierScore": 0.23
+  },
+  {
+    "id": "2",
+    "year": 2024,
+    "type": "General",
+    "state": "PA",
+    "candidate": "Trump",
+    "predictedProbability": 0.48,
+    "actualOutcome": true,
+    "brierScore": 0.27
+  },
+  {
+    "id": "3",
+    "year": 2024,
+    "type": "General",
+    "state": "GA",
+    "candidate": "Trump",
+    "predictedProbability": 0.55,
+    "actualOutcome": true,
+    "brierScore": 0.2
+  },
+  {
+    "id": "4",
+    "year": 2024,
+    "type": "General",
+    "state": "MI",
+    "candidate": "Harris",
+    "predictedProbability": 0.52,
+    "actualOutcome": false,
+    "brierScore": 0.27
+  },
+  {
+    "id": "5",
+    "year": 2022,
+    "type": "General",
+    "state": "PA",
+    "candidate": "Fetterman",
+    "predictedProbability": 0.72,
+    "actualOutcome": true,
+    "brierScore": 0.08
+  },
+  {
+    "id": "6",
+    "year": 2022,
+    "type": "General",
+    "state": "GA",
+    "candidate": "Warnock",
+    "predictedProbability": 0.65,
+    "actualOutcome": true,
+    "brierScore": 0.12
+  },
+  {
+    "id": "7",
+    "year": 2020,
+    "type": "General",
+    "state": "USA",
+    "candidate": "Biden",
+    "predictedProbability": 0.6,
+    "actualOutcome": true,
+    "brierScore": 0.16
+  },
+  {
+    "id": "8",
+    "year": 2016,
+    "type": "General",
+    "state": "USA",
+    "candidate": "Clinton",
+    "predictedProbability": 0.71,
+    "actualOutcome": false,
+    "brierScore": 0.5
+  },
+  {
+    "id": "9",
+    "year": 2016,
+    "type": "Referendum",
+    "state": "UK",
+    "candidate": "Remain",
+    "predictedProbability": 0.75,
+    "actualOutcome": false,
+    "brierScore": 0.56
+  }
+]

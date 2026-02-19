@@ -1,0 +1,68 @@
+# Concept 05: Live Wire
+
+**Route:** /design-overhauls/05
+**Target Persona:** Mobile users, social media natives, casual followers
+**Design Metaphor:** Twitter/X feed / news app / Instagram stories
+
+## Core Thesis
+
+Most people consume political content on their phones, in short bursts, through social feeds. Live Wire reimagines election odds as a card-based feed with social interactions (like, comment, share, bookmark), type-based filtering, and trending sidebar.
+
+## Key Design Decisions
+
+### Layout
+- Sticky header with live indicator
+- Filter chips (All, Alerts, Movers, Markets, Milestones)
+- Single-column card feed (mobile-first)
+- Sidebar with trending list + quick snapshot (desktop)
+- Scroll-to-top FAB button
+
+### Card Anatomy
+- Type badge (Alert, Mover, Market, Milestone, Compare)
+- Timestamp + bookmark action
+- Headline + detail text
+- Data strip: ProgressRing + sparkline + key metrics
+- Optional market mini-table (for market/comparison types)
+- Social actions: like, comment, share
+
+### Feed Card Types
+- **Alert:** Breaking or notable position (red badge)
+- **Mover:** Biggest price changes (green badge)
+- **Market:** Full market overview with mini-table (blue badge)
+- **Milestone:** Threshold crossings (amber badge)
+- **Compare:** Side-by-side market summary (purple badge)
+
+### Visual Language
+- Rounded corners throughout (rounded-2xl)
+- Social-media-style interaction buttons
+- Gradient header (orange-to-red)
+- Pulse animation on "Live" indicator
+- Filter chips with pill styling
+- Scroll-to-top button appears after 400px scroll
+
+## Strengths
+- Most mobile-friendly of all concepts
+- Card format is shareable and digestible
+- Type filtering lets users focus on what matters
+- Social actions create engagement and stickiness
+- Trending sidebar surfaces important movements
+
+## Weaknesses
+- Lower data density than other concepts
+- No detailed tables or comparison views
+- Social actions are decorative (no backend)
+- Feed order is time-based, not importance-based
+- Sparklines are compact but hard to read on small screens
+
+## Shared Components Used
+- ProgressRing (inline candidate gauge)
+- HorizontalBar (mini-table bars)
+- PartyColor (color coding throughout)
+- MiniChart pattern (sparklines)
+
+## Technical Notes
+- ~380 lines
+- Generates 8 feed items from mock data
+- Client-side filter state
+- Scroll event listener for FAB visibility
+- Each card has independent like/bookmark state

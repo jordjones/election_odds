@@ -1,0 +1,60 @@
+# Concept 03: The Arena
+
+**Route:** /design-overhauls/03
+**Target Persona:** Sports fans, casual bettors, competitive viewers
+**Design Metaphor:** ESPN matchup page / fight card
+
+## Core Thesis
+
+Election odds are inherently competitive — two sides, one winner. Lean into the versus format. Display every race as a head-to-head matchup with circular gauges, spread bars, and "who's winning" indicators. Make politics feel like game day.
+
+## Key Design Decisions
+
+### Layout
+- Featured matchup hero (full-width, detailed)
+- 3-column matchup card grid
+- Power rankings leaderboard (top 10 across all markets)
+- Quick stats bar with key metrics
+
+### Matchup Format
+- Circular ProgressRing gauges for each side
+- VS badge between fighters
+- DualBar spread visualization
+- "Leading" badge on the frontrunner
+- Trend chart showing head-to-head movement
+
+### Visual Language
+- Gradient header (red-to-blue) for bipartisan branding
+- Swords icon as primary motif
+- Trophy/flame icons for rankings and featured
+- Card-based layout with rounded corners (rounded-2xl)
+- Party colors (blue/red) drive all data visualization
+
+### Competitive Framing
+- "Spread" shown in percentage points
+- "Leading" badges highlight frontrunners
+- Power Rankings table ranks all candidates globally
+- Quick stats include "Leader" with name + odds
+
+## Strengths
+- Immediately engaging — VS format is universally understood
+- ProgressRing gauges are visually distinctive
+- DualBar shows relative position at a glance
+- Works for any two-sided race (party, candidate, control)
+
+## Weaknesses
+- Forced into 1v1 format — primaries with 8 candidates only show top 2
+- May trivialize complex policy differences
+- Competitive framing could alienate policy-focused users
+- Lots of visual chrome per matchup = lower data density
+
+## Shared Components Used
+- ProgressRing (circular probability gauge)
+- DualBar (side-by-side probability bar)
+- PartyColor (consistent party color mapping)
+
+## Technical Notes
+- ~340 lines
+- Builds matchup data from mock market contracts
+- 6 pre-built matchups covering all major races
+- Uses gradient backgrounds for featured hero section

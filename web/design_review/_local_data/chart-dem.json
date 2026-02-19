@@ -1,0 +1,323 @@
+{
+  "marketId": "dem-primary-2028",
+  "marketName": "Who will win the 2028 Democratic presidential nomination?",
+  "series": [
+    {
+      "timestamp": "2026-01-19T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.29657463108116805,
+        "Alexandria Ocasio-Cortez": 0.10916573862684156,
+        "Josh Shapiro": 0.06053032078069734,
+        "Kamala Harris": 0.1205906748665418,
+        "Andy Beshear": 0.07592405135807595
+      }
+    },
+    {
+      "timestamp": "2026-01-20T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3651565832297408,
+        "Alexandria Ocasio-Cortez": 0.1516882875404674,
+        "Josh Shapiro": 0.06511704252038103,
+        "Kamala Harris": 0.08062272703428577,
+        "Andy Beshear": 0.05662411445343759
+      }
+    },
+    {
+      "timestamp": "2026-01-21T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.34987354587771363,
+        "Alexandria Ocasio-Cortez": 0.1417352695939597,
+        "Josh Shapiro": 0.06498874110682896,
+        "Kamala Harris": 0.05014599607206695,
+        "Andy Beshear": 0.07497483276924763
+      }
+    },
+    {
+      "timestamp": "2026-01-22T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3269793158551778,
+        "Alexandria Ocasio-Cortez": 0.10749329550046866,
+        "Josh Shapiro": 0.11115284723543531,
+        "Kamala Harris": 0.07744096587804913,
+        "Andy Beshear": 0.05613020865242055
+      }
+    },
+    {
+      "timestamp": "2026-01-23T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.33702307317104785,
+        "Alexandria Ocasio-Cortez": 0.12352862403669718,
+        "Josh Shapiro": 0.12636223611615927,
+        "Kamala Harris": 0.08996675897350186,
+        "Andy Beshear": 0.06932490219337396
+      }
+    },
+    {
+      "timestamp": "2026-01-24T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.33902481349114405,
+        "Alexandria Ocasio-Cortez": 0.09283127691255903,
+        "Josh Shapiro": 0.076865148166721,
+        "Kamala Harris": 0.07422285434760616,
+        "Andy Beshear": 0.07898982884054624
+      }
+    },
+    {
+      "timestamp": "2026-01-25T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.32281342137109426,
+        "Alexandria Ocasio-Cortez": 0.09432577965009288,
+        "Josh Shapiro": 0.09764407383762352,
+        "Kamala Harris": 0.11888945258509713,
+        "Andy Beshear": 0.05012794272693474
+      }
+    },
+    {
+      "timestamp": "2026-01-26T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3309338914004449,
+        "Alexandria Ocasio-Cortez": 0.13357939358329896,
+        "Josh Shapiro": 0.07420594957751375,
+        "Kamala Harris": 0.05803962350062997,
+        "Andy Beshear": 0.09896475711603425
+      }
+    },
+    {
+      "timestamp": "2026-01-27T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3615140290351514,
+        "Alexandria Ocasio-Cortez": 0.11429727255368692,
+        "Josh Shapiro": 0.0740021285875226,
+        "Kamala Harris": 0.10847054427244372,
+        "Andy Beshear": 0.04002285240627625
+      }
+    },
+    {
+      "timestamp": "2026-01-28T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.35404671308804714,
+        "Alexandria Ocasio-Cortez": 0.10231112718229535,
+        "Josh Shapiro": 0.12547034438312527,
+        "Kamala Harris": 0.09341534648000244,
+        "Andy Beshear": 0.04734512779551133
+      }
+    },
+    {
+      "timestamp": "2026-01-29T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.31280259475917427,
+        "Alexandria Ocasio-Cortez": 0.12483155655262834,
+        "Josh Shapiro": 0.11279882684251745,
+        "Kamala Harris": 0.08949281836795214,
+        "Andy Beshear": 0.08238771522887806
+      }
+    },
+    {
+      "timestamp": "2026-01-30T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.32279904635546375,
+        "Alexandria Ocasio-Cortez": 0.12940721312155204,
+        "Josh Shapiro": 0.09583806544607838,
+        "Kamala Harris": 0.056252860746796834,
+        "Andy Beshear": 0.051639990854915926
+      }
+    },
+    {
+      "timestamp": "2026-01-31T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.33773873595920745,
+        "Alexandria Ocasio-Cortez": 0.1318189154926851,
+        "Josh Shapiro": 0.1168289863869855,
+        "Kamala Harris": 0.10096702581738769,
+        "Andy Beshear": 0.06789574203289077
+      }
+    },
+    {
+      "timestamp": "2026-02-01T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.35688590716480545,
+        "Alexandria Ocasio-Cortez": 0.12835280414796707,
+        "Josh Shapiro": 0.10240076073636356,
+        "Kamala Harris": 0.062362164685086756,
+        "Andy Beshear": 0.07974920332224125
+      }
+    },
+    {
+      "timestamp": "2026-02-02T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.32469708747707116,
+        "Alexandria Ocasio-Cortez": 0.11135338855281957,
+        "Josh Shapiro": 0.10242570706491651,
+        "Kamala Harris": 0.10490889972190978,
+        "Andy Beshear": 0.0519616529686026
+      }
+    },
+    {
+      "timestamp": "2026-02-03T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.31178622713938225,
+        "Alexandria Ocasio-Cortez": 0.13770548116058032,
+        "Josh Shapiro": 0.11237262057268713,
+        "Kamala Harris": 0.06872700416755767,
+        "Andy Beshear": 0.05809562758811152
+      }
+    },
+    {
+      "timestamp": "2026-02-04T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.330156715435227,
+        "Alexandria Ocasio-Cortez": 0.11782356343885908,
+        "Josh Shapiro": 0.09070275627455343,
+        "Kamala Harris": 0.10263376107422033,
+        "Andy Beshear": 0.0887662802978386
+      }
+    },
+    {
+      "timestamp": "2026-02-05T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.31963999965665274,
+        "Alexandria Ocasio-Cortez": 0.1146433631470887,
+        "Josh Shapiro": 0.08589553702799757,
+        "Kamala Harris": 0.07333546759004324,
+        "Andy Beshear": 0.06547935639914215
+      }
+    },
+    {
+      "timestamp": "2026-02-06T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3343451435518232,
+        "Alexandria Ocasio-Cortez": 0.10888274562290731,
+        "Josh Shapiro": 0.09815421982158311,
+        "Kamala Harris": 0.0879489183083222,
+        "Andy Beshear": 0.05544536538724594
+      }
+    },
+    {
+      "timestamp": "2026-02-07T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3198031990736457,
+        "Alexandria Ocasio-Cortez": 0.10996271671704004,
+        "Josh Shapiro": 0.09235699782579071,
+        "Kamala Harris": 0.07679468836520487,
+        "Andy Beshear": 0.06206678534533816
+      }
+    },
+    {
+      "timestamp": "2026-02-08T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.33891081450856503,
+        "Alexandria Ocasio-Cortez": 0.11473226013704278,
+        "Josh Shapiro": 0.10654958141441044,
+        "Kamala Harris": 0.08461895178301851,
+        "Andy Beshear": 0.059207880636113173
+      }
+    },
+    {
+      "timestamp": "2026-02-09T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.32833053230739073,
+        "Alexandria Ocasio-Cortez": 0.13115425413407952,
+        "Josh Shapiro": 0.09734018843118639,
+        "Kamala Harris": 0.08607622631447477,
+        "Andy Beshear": 0.07677278299868835
+      }
+    },
+    {
+      "timestamp": "2026-02-10T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3312754520547088,
+        "Alexandria Ocasio-Cortez": 0.11796018711753231,
+        "Josh Shapiro": 0.08667385061919926,
+        "Kamala Harris": 0.08004519437849403,
+        "Andy Beshear": 0.05772127641215644
+      }
+    },
+    {
+      "timestamp": "2026-02-11T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.33060796076119775,
+        "Alexandria Ocasio-Cortez": 0.12459530501330603,
+        "Josh Shapiro": 0.09397302130468708,
+        "Kamala Harris": 0.06948423884605887,
+        "Andy Beshear": 0.07866202494126466
+      }
+    },
+    {
+      "timestamp": "2026-02-12T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.32542887828157735,
+        "Alexandria Ocasio-Cortez": 0.12425967496775818,
+        "Josh Shapiro": 0.10678005968409209,
+        "Kamala Harris": 0.08191357366917741,
+        "Andy Beshear": 0.06163289631076743
+      }
+    },
+    {
+      "timestamp": "2026-02-13T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.33361734277174243,
+        "Alexandria Ocasio-Cortez": 0.11897176787386463,
+        "Josh Shapiro": 0.09281513658427226,
+        "Kamala Harris": 0.07926889952676454,
+        "Andy Beshear": 0.06799766742582074
+      }
+    },
+    {
+      "timestamp": "2026-02-14T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.32675425899732113,
+        "Alexandria Ocasio-Cortez": 0.11989892541506457,
+        "Josh Shapiro": 0.10273548053666776,
+        "Kamala Harris": 0.07958074528397747,
+        "Andy Beshear": 0.072036417948916
+      }
+    },
+    {
+      "timestamp": "2026-02-15T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3330962838216789,
+        "Alexandria Ocasio-Cortez": 0.12206248743732738,
+        "Josh Shapiro": 0.10419733353419143,
+        "Kamala Harris": 0.07558702268041328,
+        "Andy Beshear": 0.07123997149891788
+      }
+    },
+    {
+      "timestamp": "2026-02-16T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3270920805165095,
+        "Alexandria Ocasio-Cortez": 0.12066771196288888,
+        "Josh Shapiro": 0.10294796424847481,
+        "Kamala Harris": 0.07779704353452493,
+        "Andy Beshear": 0.06764942169159245
+      }
+    },
+    {
+      "timestamp": "2026-02-17T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.3311963998607279,
+        "Alexandria Ocasio-Cortez": 0.12019074576747232,
+        "Josh Shapiro": 0.10028223782919185,
+        "Kamala Harris": 0.08097106330344633,
+        "Andy Beshear": 0.07149481442749649
+      }
+    },
+    {
+      "timestamp": "2026-02-18T06:03:43.801Z",
+      "values": {
+        "Gavin Newsom": 0.33,
+        "Alexandria Ocasio-Cortez": 0.12,
+        "Josh Shapiro": 0.1,
+        "Kamala Harris": 0.08,
+        "Andy Beshear": 0.07
+      }
+    }
+  ],
+  "contracts": [
+    "Gavin Newsom",
+    "Alexandria Ocasio-Cortez",
+    "Josh Shapiro",
+    "Kamala Harris",
+    "Andy Beshear"
+  ]
+}

@@ -1,0 +1,323 @@
+{
+  "marketId": "gop-primary-2028",
+  "marketName": "Who will win the 2028 Republican presidential nomination?",
+  "series": [
+    {
+      "timestamp": "2026-01-19T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.46258932421366844,
+        "Marco Rubio": 0.19935486817358108,
+        "Ron DeSantis": 0.12184643283000214,
+        "Brian Kemp": 0.04782841754771588,
+        "Donald Trump": 0.07799199387768285
+      }
+    },
+    {
+      "timestamp": "2026-01-20T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5100593591654791,
+        "Marco Rubio": 0.18723208018206097,
+        "Ron DeSantis": 0.12262329819700689,
+        "Brian Kemp": 0.09707199583103648,
+        "Donald Trump": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-21T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5292322743663646,
+        "Marco Rubio": 0.1787265003006412,
+        "Ron DeSantis": 0.041456531121909085,
+        "Brian Kemp": 0.08935868129450408,
+        "Donald Trump": 0.02865128247664803
+      }
+    },
+    {
+      "timestamp": "2026-01-22T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.45945967757318645,
+        "Marco Rubio": 0.12187867603327543,
+        "Ron DeSantis": 0.056741426743252235,
+        "Brian Kemp": 0.034006636603647014,
+        "Donald Trump": 0
+      }
+    },
+    {
+      "timestamp": "2026-01-23T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5105544103787627,
+        "Marco Rubio": 0.16617270467362724,
+        "Ron DeSantis": 0.09662027605764441,
+        "Brian Kemp": 0.07704104584448733,
+        "Donald Trump": 0.01979594149446162
+      }
+    },
+    {
+      "timestamp": "2026-01-24T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.4714977824612493,
+        "Marco Rubio": 0.12196808449913736,
+        "Ron DeSantis": 0.10232683234942136,
+        "Brian Kemp": 0.055466574161424566,
+        "Donald Trump": 0.013098014521212512
+      }
+    },
+    {
+      "timestamp": "2026-01-25T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.4607259714514053,
+        "Marco Rubio": 0.12552104110408235,
+        "Ron DeSantis": 0.0879907480782263,
+        "Brian Kemp": 0.08325372108518739,
+        "Donald Trump": 0.04060934968414795
+      }
+    },
+    {
+      "timestamp": "2026-01-26T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.48949518718625473,
+        "Marco Rubio": 0.18152164899331444,
+        "Ron DeSantis": 0.07154391631028577,
+        "Brian Kemp": 0.08758177798230202,
+        "Donald Trump": 0.059057890961620785
+      }
+    },
+    {
+      "timestamp": "2026-01-27T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.48667961863745196,
+        "Marco Rubio": 0.16443279818842355,
+        "Ron DeSantis": 0.07710478952939853,
+        "Brian Kemp": 0.08044121640846326,
+        "Donald Trump": 0.057472831821246954
+      }
+    },
+    {
+      "timestamp": "2026-01-28T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5030540034882557,
+        "Marco Rubio": 0.16547467911122882,
+        "Ron DeSantis": 0.05901121882560727,
+        "Brian Kemp": 0.04027735575566683,
+        "Donald Trump": 0.05406275393862397
+      }
+    },
+    {
+      "timestamp": "2026-01-29T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5166273262953442,
+        "Marco Rubio": 0.14078011185479755,
+        "Ron DeSantis": 0.050703998194114294,
+        "Brian Kemp": 0.047859997006719945,
+        "Donald Trump": 0.021895091204514185
+      }
+    },
+    {
+      "timestamp": "2026-01-30T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5196536138998532,
+        "Marco Rubio": 0.15309428039956025,
+        "Ron DeSantis": 0.06729158583555364,
+        "Brian Kemp": 0.04191915627218055,
+        "Donald Trump": 0.0213325404845483
+      }
+    },
+    {
+      "timestamp": "2026-01-31T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.46930115198100186,
+        "Marco Rubio": 0.1879783861101668,
+        "Ron DeSantis": 0.10996235025530265,
+        "Brian Kemp": 0.05908829460792647,
+        "Donald Trump": 0.03572587637677761
+      }
+    },
+    {
+      "timestamp": "2026-02-01T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5175297167603669,
+        "Marco Rubio": 0.13828074070973032,
+        "Ron DeSantis": 0.0971889479670317,
+        "Brian Kemp": 0.036466596021364796,
+        "Donald Trump": 0.023515976038411792
+      }
+    },
+    {
+      "timestamp": "2026-02-02T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.49642191513213907,
+        "Marco Rubio": 0.15404864490599596,
+        "Ron DeSantis": 0.09464777777461712,
+        "Brian Kemp": 0.07588386756984163,
+        "Donald Trump": 0.045547324042002894
+      }
+    },
+    {
+      "timestamp": "2026-02-03T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.46672913927279275,
+        "Marco Rubio": 0.1485641088483741,
+        "Ron DeSantis": 0.06717390568894221,
+        "Brian Kemp": 0.0685981967514698,
+        "Donald Trump": 0.05156291576029304
+      }
+    },
+    {
+      "timestamp": "2026-02-04T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.504079204816541,
+        "Marco Rubio": 0.15230515968269737,
+        "Ron DeSantis": 0.0979078224161721,
+        "Brian Kemp": 0.038947265696638825,
+        "Donald Trump": 0.046540475741042545
+      }
+    },
+    {
+      "timestamp": "2026-02-05T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5100224598908426,
+        "Marco Rubio": 0.16974298039755484,
+        "Ron DeSantis": 0.08973777870535991,
+        "Brian Kemp": 0.049485247273024925,
+        "Donald Trump": 0.05854300382958609
+      }
+    },
+    {
+      "timestamp": "2026-02-06T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.48695976730355817,
+        "Marco Rubio": 0.14688291872018636,
+        "Ron DeSantis": 0.07038081174555058,
+        "Brian Kemp": 0.03168141075656897,
+        "Donald Trump": 0.022503668529323066
+      }
+    },
+    {
+      "timestamp": "2026-02-07T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.48062419436777587,
+        "Marco Rubio": 0.15582941781839663,
+        "Ron DeSantis": 0.064234223894758,
+        "Brian Kemp": 0.06394063523937545,
+        "Donald Trump": 0.04661980472522508
+      }
+    },
+    {
+      "timestamp": "2026-02-08T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5013444550624628,
+        "Marco Rubio": 0.1453371002781898,
+        "Ron DeSantis": 0.0830115020676773,
+        "Brian Kemp": 0.05335892441270963,
+        "Donald Trump": 0.023972756223261022
+      }
+    },
+    {
+      "timestamp": "2026-02-09T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.4868710636035148,
+        "Marco Rubio": 0.1736668047294117,
+        "Ron DeSantis": 0.08311821118859529,
+        "Brian Kemp": 0.035299629297240946,
+        "Donald Trump": 0.05291660116303266
+      }
+    },
+    {
+      "timestamp": "2026-02-10T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.5000633050523569,
+        "Marco Rubio": 0.14726664239393614,
+        "Ron DeSantis": 0.07308467180494917,
+        "Brian Kemp": 0.04812913683962604,
+        "Donald Trump": 0.03262096219694401
+      }
+    },
+    {
+      "timestamp": "2026-02-11T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.49211064785767233,
+        "Marco Rubio": 0.17079255994858636,
+        "Ron DeSantis": 0.08688665814022137,
+        "Brian Kemp": 0.04958648440418703,
+        "Donald Trump": 0.0409357947532792
+      }
+    },
+    {
+      "timestamp": "2026-02-12T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.4842833299178596,
+        "Marco Rubio": 0.1528092351498646,
+        "Ron DeSantis": 0.07299728679919444,
+        "Brian Kemp": 0.04486391123307356,
+        "Donald Trump": 0.04808330296919904
+      }
+    },
+    {
+      "timestamp": "2026-02-13T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.49547240386742175,
+        "Marco Rubio": 0.15470849656311728,
+        "Ron DeSantis": 0.08344454905614597,
+        "Brian Kemp": 0.051844400214160855,
+        "Donald Trump": 0.04675901931576484
+      }
+    },
+    {
+      "timestamp": "2026-02-14T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.49177200611370453,
+        "Marco Rubio": 0.16262675598097426,
+        "Ron DeSantis": 0.08084978660088564,
+        "Brian Kemp": 0.05025840227050297,
+        "Donald Trump": 0.0403347294702825
+      }
+    },
+    {
+      "timestamp": "2026-02-15T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.4945782363026358,
+        "Marco Rubio": 0.16380058595017677,
+        "Ron DeSantis": 0.08036793066689199,
+        "Brian Kemp": 0.049254704736146536,
+        "Donald Trump": 0.04254458086864813
+      }
+    },
+    {
+      "timestamp": "2026-02-16T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.4895780529641074,
+        "Marco Rubio": 0.16040371825735278,
+        "Ron DeSantis": 0.08311217077014836,
+        "Brian Kemp": 0.053106301275660114,
+        "Donald Trump": 0.03717733077507567
+      }
+    },
+    {
+      "timestamp": "2026-02-17T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.4895891295893878,
+        "Marco Rubio": 0.16093304304448253,
+        "Ron DeSantis": 0.07867538719998844,
+        "Brian Kemp": 0.050195721516533696,
+        "Donald Trump": 0.04132576483086471
+      }
+    },
+    {
+      "timestamp": "2026-02-18T06:03:43.801Z",
+      "values": {
+        "JD Vance": 0.49,
+        "Marco Rubio": 0.16,
+        "Ron DeSantis": 0.08,
+        "Brian Kemp": 0.05,
+        "Donald Trump": 0.04
+      }
+    }
+  ],
+  "contracts": [
+    "JD Vance",
+    "Marco Rubio",
+    "Ron DeSantis",
+    "Brian Kemp",
+    "Donald Trump"
+  ]
+}

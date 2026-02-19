@@ -1,0 +1,954 @@
+[
+  {
+    "id": "presidential-2028",
+    "slug": "presidential-2028",
+    "name": "Who will win the 2028 US Presidential Election?",
+    "description": "This market will resolve to the winner of the 2028 Presidential Election.",
+    "category": "presidential",
+    "status": "open",
+    "contracts": [
+      {
+        "id": "pres-vance",
+        "name": "JD Vance",
+        "shortName": "JD",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.245,
+            "noPrice": 0.755,
+            "yesBid": 0.2370656470621571,
+            "yesAsk": 0.2529343529378429,
+            "volume": 421949,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.2319091980408705,
+            "noPrice": 0.7675626290251198,
+            "yesBid": 0.22913129412431424,
+            "yesAsk": 0.2608687058756858,
+            "volume": 531886,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.2308133749402836,
+            "noPrice": 0.7428788083580774,
+            "yesBid": 0.2370656470621571,
+            "yesAsk": 0.2529343529378429,
+            "volume": 4286345,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.26358100280088925,
+            "noPrice": 0.7314618641116644,
+            "yesBid": 0.22119694118647137,
+            "yesAsk": 0.2688030588135286,
+            "volume": 150922,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.245,
+        "priceChange": -0.01,
+        "totalVolume": 5391102
+      },
+      {
+        "id": "pres-newsom",
+        "name": "Gavin Newsom",
+        "shortName": "Gavin",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.18,
+            "noPrice": 0.8200000000000001,
+            "yesBid": 0.16577356263616366,
+            "yesAsk": 0.19422643736383632,
+            "volume": 266290,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.19647973261714885,
+            "noPrice": 0.8221984483642512,
+            "yesBid": 0.15154712527232733,
+            "yesAsk": 0.20845287472767265,
+            "volume": 839389,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.18313704511311857,
+            "noPrice": 0.824417625485666,
+            "yesBid": 0.16577356263616366,
+            "yesAsk": 0.19422643736383632,
+            "volume": 2925436,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.17165945321227027,
+            "noPrice": 0.8422238531492979,
+            "yesBid": 0.137320687908491,
+            "yesAsk": 0.22267931209150899,
+            "volume": 193636,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.18,
+        "priceChange": 0.02,
+        "totalVolume": 4224751
+      },
+      {
+        "id": "pres-rubio",
+        "name": "Marco Rubio",
+        "shortName": "Marco",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.08,
+            "noPrice": 0.92,
+            "yesBid": 0.07452266346195896,
+            "yesAsk": 0.08547733653804104,
+            "volume": 251916,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.07005682548544405,
+            "noPrice": 0.9205898697111791,
+            "yesBid": 0.06904532692391792,
+            "yesAsk": 0.09095467307608208,
+            "volume": 1529920,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.06648384730694323,
+            "noPrice": 0.9133028137330118,
+            "yesBid": 0.07452266346195896,
+            "yesAsk": 0.08547733653804104,
+            "volume": 4211886,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.09762161173562264,
+            "noPrice": 0.9039449661311751,
+            "yesBid": 0.06356799038587688,
+            "yesAsk": 0.09643200961412313,
+            "volume": 125441,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.08,
+        "priceChange": 0.005,
+        "totalVolume": 6119163
+      },
+      {
+        "id": "pres-aoc",
+        "name": "Alexandria Ocasio-Cortez",
+        "shortName": "Alexandria",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.06,
+            "noPrice": 0.94,
+            "yesBid": 0.048523655067053445,
+            "yesAsk": 0.07147634493294655,
+            "volume": 153665,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.07018635902392845,
+            "noPrice": 0.9578628588921897,
+            "yesBid": 0.03704731013410689,
+            "yesAsk": 0.0829526898658931,
+            "volume": 231262,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.045681760656065246,
+            "noPrice": 0.9492886359203423,
+            "yesBid": 0.048523655067053445,
+            "yesAsk": 0.07147634493294655,
+            "volume": 1437257,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.07214136261056445,
+            "noPrice": 0.9169874251441714,
+            "yesBid": 0.02557096520116034,
+            "yesAsk": 0.09442903479883966,
+            "volume": 95565,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.06,
+        "priceChange": 0.01,
+        "totalVolume": 1917749
+      },
+      {
+        "id": "pres-desantis",
+        "name": "Ron DeSantis",
+        "shortName": "Ron",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.05,
+            "noPrice": 0.95,
+            "yesBid": 0.03750322919456217,
+            "yesAsk": 0.062496770805437835,
+            "volume": 51256,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.04923942931809954,
+            "noPrice": 0.9697564817584131,
+            "yesBid": 0.02500645838912434,
+            "yesAsk": 0.07499354161087567,
+            "volume": 1657784,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.04007929538005706,
+            "noPrice": 0.9422954290702882,
+            "yesBid": 0.03750322919456217,
+            "yesAsk": 0.062496770805437835,
+            "volume": 3773378,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.07081722348698878,
+            "noPrice": 0.9409004873687454,
+            "yesBid": 0.012509687583686507,
+            "yesAsk": 0.0874903124163135,
+            "volume": 39627,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.05,
+        "priceChange": 0,
+        "totalVolume": 5522045
+      },
+      {
+        "id": "pres-shapiro",
+        "name": "Josh Shapiro",
+        "shortName": "Josh",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.05,
+            "noPrice": 0.95,
+            "yesBid": 0.04219583535240324,
+            "yesAsk": 0.057804164647596766,
+            "volume": 50447,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.06364111693099389,
+            "noPrice": 0.9411770847625943,
+            "yesBid": 0.034391670704806476,
+            "yesAsk": 0.06560832929519353,
+            "volume": 577707,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.03996420270378284,
+            "noPrice": 0.9508654042348361,
+            "yesBid": 0.04219583535240324,
+            "yesAsk": 0.057804164647596766,
+            "volume": 3705695,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.027005826471731678,
+            "noPrice": 0.9353752828082982,
+            "yesBid": 0.02658750605720972,
+            "yesAsk": 0.07341249394279029,
+            "volume": 203040,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.05,
+        "priceChange": 0.01,
+        "totalVolume": 4536889
+      }
+    ],
+    "totalVolume": 248220477,
+    "endDate": "2028-11-05",
+    "lastUpdated": "2026-02-18T06:03:43.799Z"
+  },
+  {
+    "id": "gop-primary-2028",
+    "slug": "gop-primary-2028",
+    "name": "Who will win the 2028 Republican presidential nomination?",
+    "description": "This market will resolve to the candidate who wins the Republican nomination.",
+    "category": "primary-gop",
+    "status": "open",
+    "contracts": [
+      {
+        "id": "gop-vance",
+        "name": "JD Vance",
+        "shortName": "JD",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.49,
+            "noPrice": 0.51,
+            "yesBid": 0.4812827563112965,
+            "yesAsk": 0.49871724368870346,
+            "volume": 365640,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.4754669850377519,
+            "noPrice": 0.49254112040898007,
+            "yesBid": 0.472565512622593,
+            "yesAsk": 0.5074344873774069,
+            "volume": 995362,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.4965593069820261,
+            "noPrice": 0.5141322877369355,
+            "yesBid": 0.4812827563112965,
+            "yesAsk": 0.49871724368870346,
+            "volume": 843501,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.47409477108454073,
+            "noPrice": 0.4935676972953595,
+            "yesBid": 0.46384826893388953,
+            "yesAsk": 0.5161517310661105,
+            "volume": 172108,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.49,
+        "priceChange": 0.02,
+        "totalVolume": 2376611
+      },
+      {
+        "id": "gop-rubio",
+        "name": "Marco Rubio",
+        "shortName": "Marco",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.16,
+            "noPrice": 0.84,
+            "yesBid": 0.1506607169458578,
+            "yesAsk": 0.1693392830541422,
+            "volume": 506396,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.1504411543239026,
+            "noPrice": 0.8342592093392242,
+            "yesBid": 0.14132143389171564,
+            "yesAsk": 0.17867856610828436,
+            "volume": 1877018,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.17013094509578713,
+            "noPrice": 0.8543904369295144,
+            "yesBid": 0.1506607169458578,
+            "yesAsk": 0.1693392830541422,
+            "volume": 3894798,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.14344065853933166,
+            "noPrice": 0.8576160059133494,
+            "yesBid": 0.13198215083757345,
+            "yesAsk": 0.18801784916242656,
+            "volume": 113100,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.16,
+        "priceChange": -0.01,
+        "totalVolume": 6391312
+      },
+      {
+        "id": "gop-desantis",
+        "name": "Ron DeSantis",
+        "shortName": "Ron",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.08,
+            "noPrice": 0.92,
+            "yesBid": 0.06729772879226306,
+            "yesAsk": 0.09270227120773694,
+            "volume": 353071,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.0898413461631269,
+            "noPrice": 0.9247024475742591,
+            "yesBid": 0.054595457584526115,
+            "yesAsk": 0.1054045424154739,
+            "volume": 1709123,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.07569192158768476,
+            "noPrice": 0.9152954331189851,
+            "yesBid": 0.06729772879226306,
+            "yesAsk": 0.09270227120773694,
+            "volume": 1116901,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.10103063082591304,
+            "noPrice": 0.9206646064895889,
+            "yesBid": 0.04189318637678917,
+            "yesAsk": 0.11810681362321084,
+            "volume": 97357,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.08,
+        "priceChange": 0.01,
+        "totalVolume": 3276452
+      },
+      {
+        "id": "gop-kemp",
+        "name": "Brian Kemp",
+        "shortName": "Brian",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.05,
+            "noPrice": 0.95,
+            "yesBid": 0.039361308202785474,
+            "yesAsk": 0.06063869179721453,
+            "volume": 524510,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.06648902198626655,
+            "noPrice": 0.9617988005459702,
+            "yesBid": 0.028722616405570944,
+            "yesAsk": 0.07127738359442906,
+            "volume": 635186,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.05475712601651893,
+            "noPrice": 0.9447885492390576,
+            "yesBid": 0.039361308202785474,
+            "yesAsk": 0.06063869179721453,
+            "volume": 5355825,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.04503692505970396,
+            "noPrice": 0.9369398035845263,
+            "yesBid": 0.018083924608356415,
+            "yesAsk": 0.08191607539164358,
+            "volume": 95507,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.05,
+        "priceChange": 0.005,
+        "totalVolume": 6611028
+      },
+      {
+        "id": "gop-trump",
+        "name": "Donald Trump",
+        "shortName": "Donald",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.04,
+            "noPrice": 0.96,
+            "yesBid": 0.0266933685771923,
+            "yesAsk": 0.0533066314228077,
+            "volume": 468708,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.04453849136461379,
+            "noPrice": 0.9618227040908323,
+            "yesBid": 0.013386737154384598,
+            "yesAsk": 0.0666132628456154,
+            "volume": 1469852,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.05409066726332265,
+            "noPrice": 0.9637077204620431,
+            "yesBid": 0.0266933685771923,
+            "yesAsk": 0.0533066314228077,
+            "volume": 2356834,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.017489943521707327,
+            "noPrice": 0.9429922406764832,
+            "yesBid": 0.00008010573157690021,
+            "yesAsk": 0.07991989426842311,
+            "volume": 83828,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.04,
+        "priceChange": -0.02,
+        "totalVolume": 4379222
+      },
+      {
+        "id": "gop-cruz",
+        "name": "Ted Cruz",
+        "shortName": "Ted",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.03,
+            "noPrice": 0.97,
+            "yesBid": 0.01605879255776454,
+            "yesAsk": 0.04394120744223545,
+            "volume": 51290,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.03749273918048149,
+            "noPrice": 0.9658338870488955,
+            "yesBid": 0.0021175851155290845,
+            "yesAsk": 0.05788241488447091,
+            "volume": 553265,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.03562136671504607,
+            "noPrice": 0.9734118450928618,
+            "yesBid": 0.01605879255776454,
+            "yesAsk": 0.04394120744223545,
+            "volume": 744226,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.04407891899490539,
+            "noPrice": 0.9578496076562858,
+            "yesBid": -0.011823622326706376,
+            "yesAsk": 0.07182362232670637,
+            "volume": 112181,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.03,
+        "priceChange": 0,
+        "totalVolume": 1460962
+      },
+      {
+        "id": "gop-haley",
+        "name": "Nikki Haley",
+        "shortName": "Nikki",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.03,
+            "noPrice": 0.97,
+            "yesBid": 0.015102309279054094,
+            "yesAsk": 0.044897690720945904,
+            "volume": 312535,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.02304796771229846,
+            "noPrice": 0.9561614367834621,
+            "yesBid": 0.0002046185581081883,
+            "yesAsk": 0.05979538144189181,
+            "volume": 223154,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.017169942043331866,
+            "noPrice": 0.9632781172714793,
+            "yesBid": 0.015102309279054094,
+            "yesAsk": 0.044897690720945904,
+            "volume": 5088709,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.05317272808957732,
+            "noPrice": 0.9855855526123163,
+            "yesBid": -0.014693072162837717,
+            "yesAsk": 0.07469307216283771,
+            "volume": 100738,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.03,
+        "priceChange": -0.01,
+        "totalVolume": 5725136
+      },
+      {
+        "id": "gop-youngkin",
+        "name": "Glenn Youngkin",
+        "shortName": "Glenn",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.02,
+            "noPrice": 0.98,
+            "yesBid": 0.014886136916527475,
+            "yesAsk": 0.025113863083472528,
+            "volume": 497291,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.018195712931541052,
+            "noPrice": 0.970014514055147,
+            "yesBid": 0.00977227383305495,
+            "yesAsk": 0.03022772616694505,
+            "volume": 1801563,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.01912841482090628,
+            "noPrice": 0.9890017632056617,
+            "yesBid": 0.014886136916527475,
+            "yesAsk": 0.025113863083472528,
+            "volume": 2585922,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": -0.0016189307935291115,
+            "noPrice": 0.9615619430064415,
+            "yesBid": 0.004658410749582424,
+            "yesAsk": 0.035341589250417575,
+            "volume": 91689,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.02,
+        "priceChange": 0.005,
+        "totalVolume": 4976465
+      }
+    ],
+    "totalVolume": 12500000,
+    "endDate": "2028-08-01",
+    "lastUpdated": "2026-02-18T06:03:43.799Z"
+  },
+  {
+    "id": "house-2026",
+    "slug": "house-2026",
+    "name": "Which party will control the House after the 2026 midterms?",
+    "description": "This market resolves based on which party holds the majority after the 2026 elections.",
+    "category": "house",
+    "status": "open",
+    "contracts": [
+      {
+        "id": "house-dem",
+        "name": "Democratic Party",
+        "shortName": "Democratic",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.58,
+            "noPrice": 0.42000000000000004,
+            "yesBid": 0.5652256339452464,
+            "yesAsk": 0.5947743660547535,
+            "volume": 529981,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.5863409216595487,
+            "noPrice": 0.41079552695647326,
+            "yesBid": 0.5504512678904928,
+            "yesAsk": 0.6095487321095071,
+            "volume": 1125189,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.5689605072527517,
+            "noPrice": 0.42130784212414535,
+            "yesBid": 0.5652256339452464,
+            "yesAsk": 0.5947743660547535,
+            "volume": 2315718,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.5694350491879206,
+            "noPrice": 0.4324669591614325,
+            "yesBid": 0.5356769018357392,
+            "yesAsk": 0.6243230981642607,
+            "volume": 96906,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.58,
+        "priceChange": 0.02,
+        "totalVolume": 4067794
+      },
+      {
+        "id": "house-gop",
+        "name": "Republican Party",
+        "shortName": "Republican",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.42,
+            "noPrice": 0.5800000000000001,
+            "yesBid": 0.4122803671167349,
+            "yesAsk": 0.4277196328832651,
+            "volume": 73924,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.40477532072338046,
+            "noPrice": 0.5792058725721193,
+            "yesBid": 0.4045607342334698,
+            "yesAsk": 0.4354392657665302,
+            "volume": 1395931,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.41997848286029343,
+            "noPrice": 0.5737571819947962,
+            "yesBid": 0.4122803671167349,
+            "yesAsk": 0.4277196328832651,
+            "volume": 4168273,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.41834670110409067,
+            "noPrice": 0.5996493873549602,
+            "yesBid": 0.3968411013502046,
+            "yesAsk": 0.44315889864979535,
+            "volume": 34567,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.42,
+        "priceChange": -0.02,
+        "totalVolume": 5672695
+      }
+    ],
+    "totalVolume": 5200000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:03:43.799Z"
+  },
+  {
+    "id": "senate-2026",
+    "slug": "senate-2026",
+    "name": "Which party will control the Senate after the 2026 midterms?",
+    "description": "This market resolves based on which party holds the majority after the 2026 elections.",
+    "category": "senate",
+    "status": "open",
+    "contracts": [
+      {
+        "id": "senate-gop",
+        "name": "Republican Party",
+        "shortName": "Republican",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.64,
+            "noPrice": 0.36,
+            "yesBid": 0.6333724341646769,
+            "yesAsk": 0.6466275658353231,
+            "volume": 214200,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.6253729218217368,
+            "noPrice": 0.3561077979468818,
+            "yesBid": 0.6267448683293538,
+            "yesAsk": 0.6532551316706462,
+            "volume": 179988,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.6312550174777016,
+            "noPrice": 0.3732065742453844,
+            "yesBid": 0.6333724341646769,
+            "yesAsk": 0.6466275658353231,
+            "volume": 827972,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.6481134540506783,
+            "noPrice": 0.38066809126581114,
+            "yesBid": 0.6201173024940307,
+            "yesAsk": 0.6598826975059693,
+            "volume": 76396,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.64,
+        "priceChange": 0.01,
+        "totalVolume": 1298556
+      },
+      {
+        "id": "senate-dem",
+        "name": "Democratic Party",
+        "shortName": "Democratic",
+        "prices": [
+          {
+            "source": "PredictIt",
+            "region": "US",
+            "yesPrice": 0.36,
+            "noPrice": 0.64,
+            "yesBid": 0.35175111404629433,
+            "yesAsk": 0.36824888595370564,
+            "volume": 461606,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Kalshi",
+            "region": "US",
+            "yesPrice": 0.3626496556657785,
+            "noPrice": 0.6433494131107526,
+            "yesBid": 0.3435022280925887,
+            "yesAsk": 0.3764977719074113,
+            "volume": 1847774,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Polymarket",
+            "region": "International",
+            "yesPrice": 0.3605788965035487,
+            "noPrice": 0.6303905873194328,
+            "yesBid": 0.35175111404629433,
+            "yesAsk": 0.36824888595370564,
+            "volume": 3428914,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          },
+          {
+            "source": "Smarkets",
+            "region": "UK",
+            "yesPrice": 0.37766571173276586,
+            "noPrice": 0.6216902901459058,
+            "yesBid": 0.335253342138883,
+            "yesAsk": 0.38474665786111695,
+            "volume": 82191,
+            "lastUpdated": "2026-02-18T06:03:43.799Z"
+          }
+        ],
+        "aggregatedPrice": 0.36,
+        "priceChange": -0.01,
+        "totalVolume": 5820485
+      }
+    ],
+    "totalVolume": 3800000,
+    "endDate": "2026-11-03",
+    "lastUpdated": "2026-02-18T06:03:43.799Z"
+  }
+]

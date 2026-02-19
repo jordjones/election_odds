@@ -1,0 +1,64 @@
+# Current State Design Audit
+
+**Date:** 2026-02-19
+
+## Overview
+
+ElectionOdds is a Next.js 16 prediction market aggregator pulling data from PredictIt, Kalshi, Polymarket, and Smarkets. The current production design uses a minimal, functional layout with standard component patterns.
+
+## Visual Identity
+
+| Aspect | Current State | Assessment |
+|--------|--------------|------------|
+| Color palette | Zinc-based neutral dark theme | Functional but undifferentiated |
+| Typography | Geist Sans/Mono (Vercel default) | Clean but generic |
+| Spacing | Standard Tailwind scale | Consistent |
+| Icons | Lucide React | Good, comprehensive |
+| Charts | Recharts line/area | Functional but plain |
+
+## Layout Patterns
+
+- **Navigation:** Standard header with nav links + mobile hamburger
+- **Data tables:** Basic HTML tables with alternating backgrounds
+- **Cards:** Simple bordered containers with padding
+- **Charts:** Full-width Recharts with basic tooltips
+- **Responsive:** Standard Tailwind breakpoints (md, lg)
+
+## Strengths
+
+1. **Data-first approach** — prices, changes, and volumes are immediately visible
+2. **Multi-source transparency** — shows per-source prices (PredictIt, Kalshi, etc.)
+3. **Consistent number formatting** — formatPercent() used throughout, 0-1 decimal standard
+4. **Fast load times** — static generation where possible, minimal client JS
+5. **Comprehensive coverage** — presidential, primaries, house, senate, governors, maps
+
+## Weaknesses
+
+1. **Low visual differentiation** — looks like a generic dashboard template
+2. **No emotional hook** — no narrative, no urgency indicators, no social proof
+3. **Weak information hierarchy** — all data presented at equal weight
+4. **No progressive disclosure** — all complexity shown at once
+5. **Mobile experience** — functional but not optimized for thumb-zone interactions
+6. **No brand personality** — could be any data aggregator
+
+## Key Metrics (Production)
+
+- Pages: 15+ routes
+- Components: ~30 shared components
+- Data sources: 4 active (PredictIt, Kalshi, Polymarket, Smarkets)
+- Markets tracked: 718
+- Update frequency: Every 5 minutes via GitHub Actions
+
+## User Personas
+
+| Persona | Current Support | Gap |
+|---------|----------------|-----|
+| Political junkie | Good — lots of data | Lacks narrative/context |
+| Journalist | Moderate — data available | No editorial framing |
+| Sports bettor | Weak — unfamiliar layout | No matchup/comparison format |
+| Data analyst | Moderate — charts exist | No statistical depth |
+| Casual voter | Weak — too dense | No simplified entry point |
+
+## Recommendations
+
+The current design serves data-literate users well but fails to create distinct appeal for specific audiences. The 5 overhaul concepts each target a different persona with a purpose-built information architecture.
